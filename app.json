@@ -23,7 +23,10 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-image",
+      "expo-splash-screen",
+      "expo-asset"
     ],
     "scheme": "rnfinal",
     "experiments": {
