@@ -2,7 +2,8 @@
 
 Ứng dụng React Native dựng trên **Expo SDK 58 + Expo Router**, UI bằng **Tamagui v3** với cú pháp
 Tailwind (`@tamagui/tailwind`). Home và Product Listing được dựng theo prototype E-Commercial
-Market Place; các tab Search, Favorites, Inbox, Account hiện giữ màn hình placeholder.
+Market Place. Dự án có thêm chi tiết sản phẩm, Reviews, Size guide, Checkout, Payment và Feedback;
+các tab Search, Favorites, Inbox, Account hiện giữ màn hình placeholder.
 
 ## Home và Product Listing
 
@@ -36,38 +37,67 @@ src/
 ├── app/                      # CHỈ chứa route (Expo Router) — mỗi file là 1 màn hình
 │   ├── _layout.tsx           # Root: providers + Stack
 │   ├── +not-found.tsx        # 404
-│   └── (tabs)/               # Nhóm route có bottom tab
-│       ├── _layout.tsx       # Dựng menu tab từ navigation/tabs.ts
-│       ├── index.tsx         # → features/home
-│       ├── search.tsx        # → features/search
-│       ├── favorites.tsx     # → features/favorites
-│       ├── inbox.tsx         # → features/inbox
-│       ├── account.tsx       # → features/account
-│       └── product-listing.tsx # → features/products (không thêm nút tab)
+│   ├── (tabs)/               # Nhóm route có bottom tab
+│   │   ├── _layout.tsx       # Dựng menu tab từ navigation/tabs.ts
+│   │   ├── index.tsx         # → features/home
+│   │   ├── search | favorites | inbox | account.tsx
+│   │   └── product-listing.tsx # → features/products (không thêm nút tab)
+│   ├── product/[id]/
+│   │   ├── index.tsx         # → features/product  (Headphone / T-Shirt)
+│   │   ├── reviews.tsx       # → features/product  (Reviews: lọc theo số sao)
+│   │   └── size-guide.tsx    # → features/product  (Size guide: bảng size cm/inch)
+│   ├── checkout/
+│   │   ├── index.tsx         # → features/cart      (Checkout)
+│   │   ├── payment.tsx       # → features/checkout  (Payment)
+│   │   └── success.tsx       # → features/checkout  (Order placed)
+│   └── feedback.tsx          # → features/feedback  (bottom sheet, transparentModal)
 ├── features/                 # Code theo tính năng (feature-first)
+│   ├── home/                 # Trang chủ: danh mục, ưu đãi, sản phẩm đề xuất
+│   ├── products/             # Danh sách Electronics và lưới Fresh Fruits
+│   ├── product/              # Trang chi tiết: 2 layout chọn theo dữ liệu (có/không biến thể)
+│   ├── cart/                 # Giỏ hàng (zustand store), voucher, tính tiền computeTotals()
+│   ├── checkout/             # Phương thức thanh toán, đặt hàng (orderStore), màn thành công
+│   ├── feedback/             # Mood, chủ đề, upload ảnh (expo-image-picker), chấm sao
 │   └── <feature>/
 │       ├── screens/          # Màn hình của tính năng
-│       ├── components/       # Component chỉ dùng trong tính năng (tạo khi cần)
-│       ├── hooks/            # vd. inbox/hooks/useUnreadCount.ts → badge tab Inbox
-│       ├── api/              # Gọi API của tính năng (tạo khi cần)
+│       ├── components/       # Component chỉ dùng trong tính năng
+│       ├── hooks/ store/     # State & logic
+│       ├── api/ data/        # Truy cập dữ liệu; data/*.mock.ts là dữ liệu giả lập
+│       ├── types.ts
 │       └── index.ts          # Public API — bên ngoài chỉ import từ đây
 ├── components/
-│   ├── ui/                   # Component dùng chung: Screen, PlaceholderScreen
+│   ├── marketplace/          # Header, tìm kiếm, bộ lọc và thẻ UI của Home/Listing
+│   ├── ui/                   # Dùng chung: Screen, AppHeader, Button, StarRating, QuantityStepper,
+│   │                         # SectionHeader, Divider, ClampedText, PlaceholderScreen, Chip
 │   └── navigation/           # TabBarIcon
 ├── navigation/tabs.ts        # Cấu hình menu: thêm/bớt/sắp xếp tab tại đây
 ├── providers/AppProviders.tsx# Tamagui, SafeArea, theme React Navigation
 ├── theme/
-│   ├── tamagui.config.ts     # Config Tamagui (v6 Tailwind scale) + màu primary, nền trắng
+│   ├── tamagui.config.ts     # Config Tamagui: bảng màu design (appColors), font Inter/Epilogue
+│   ├── fonts.ts              # File font + map weight → file (native)
+│   ├── useAppFonts(.web).ts  # Nạp font: expo-font (native) / @font-face (web)
 │   ├── animations.ts         # Driver animation cho web (CSS)
 │   └── animations.native.ts  # Driver animation cho iOS/Android
 ├── hooks/                    # Hook dùng chung
-└── lib/                      # Tiện ích, API client, helpers
+└── lib/
+    ├── cn.ts                 # cn(): ghép className có điều kiện (clsx)
+    └── format.ts             # formatPrice, maskCardNumber
 ```
+
+Luồng Home: chọn Electronics / Fresh Fruits để mở Product Listing.
+Để thử các màn chi tiết, mở `/product/headphone-pro` hoặc `/product/hoodie-shirt`, sau đó
+Buy Now / Add to cart → Checkout → Payment → Pay now → Order placed → chạm sao → Feedback.
+Reviews và Size guide mở từ trang chi tiết tương ứng. Mã voucher thử: `SALE10`.
 
 Quy ước:
 
 - File trong `src/app/` mỏng, chỉ re-export màn hình từ `features/` — logic không nằm trong route.
 - Feature không import chéo vào bên trong feature khác; dùng `features/<tên>/index.ts`.
+- Cỡ chữ ghi tuyệt đối theo design (`text-[14px] leading-[22px]`) vì thang `text-sm/base…` của Tamagui
+  khác nhau giữa web và native. Tiêu đề thêm `font-heading` (Epilogue).
+- Class có điều kiện viết bằng `cn('base', active && 'bg-primary', className)`, không ghép template string.
+  Không cần `tailwind-merge`: @tamagui/tailwind tự cho class đứng sau thắng khi xung đột.
+- Cần cắt dòng thì dùng `ClampedText` — `Text` của Tailwind bỏ qua `numberOfLines` trên web.
 - Import tuyệt đối qua alias `@/` (→ `src/`).
 
 ## Viết style với Tamagui Tailwind
