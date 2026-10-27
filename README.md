@@ -21,37 +21,58 @@ src/
 ├── app/                      # CHỈ chứa route (Expo Router) — mỗi file là 1 màn hình
 │   ├── _layout.tsx           # Root: providers + Stack
 │   ├── +not-found.tsx        # 404
-│   └── (tabs)/               # Nhóm route có bottom tab
-│       ├── _layout.tsx       # Dựng menu tab từ navigation/tabs.ts
-│       ├── index.tsx         # → features/home
-│       ├── search.tsx        # → features/search
-│       ├── favorites.tsx     # → features/favorites
-│       ├── inbox.tsx         # → features/inbox
-│       └── account.tsx       # → features/account
+│   ├── (tabs)/               # Nhóm route có bottom tab
+│   │   ├── _layout.tsx       # Dựng menu tab từ navigation/tabs.ts
+│   │   ├── index.tsx         # → features/home
+│   │   └── search | favorites | inbox | account.tsx
+│   ├── product/[id].tsx      # → features/product  (Headphone / T-Shirt)
+│   ├── checkout/
+│   │   ├── index.tsx         # → features/cart      (Checkout)
+│   │   ├── payment.tsx       # → features/checkout  (Payment)
+│   │   └── success.tsx       # → features/checkout  (Order placed)
+│   └── feedback.tsx          # → features/feedback  (bottom sheet, transparentModal)
 ├── features/                 # Code theo tính năng (feature-first)
+│   ├── product/              # Trang chi tiết: 2 layout chọn theo dữ liệu (có/không biến thể)
+│   ├── cart/                 # Giỏ hàng (zustand store), voucher, tính tiền computeTotals()
+│   ├── checkout/             # Phương thức thanh toán, đặt hàng (orderStore), màn thành công
+│   ├── feedback/             # Mood, chủ đề, upload ảnh (expo-image-picker), chấm sao
 │   └── <feature>/
 │       ├── screens/          # Màn hình của tính năng
-│       ├── components/       # Component chỉ dùng trong tính năng (tạo khi cần)
-│       ├── hooks/            # vd. inbox/hooks/useUnreadCount.ts → badge tab Inbox
-│       ├── api/              # Gọi API của tính năng (tạo khi cần)
+│       ├── components/       # Component chỉ dùng trong tính năng
+│       ├── hooks/ store/     # State & logic
+│       ├── api/ data/        # Truy cập dữ liệu; data/*.mock.ts là dữ liệu giả lập
+│       ├── types.ts
 │       └── index.ts          # Public API — bên ngoài chỉ import từ đây
 ├── components/
-│   ├── ui/                   # Component dùng chung: Screen, PlaceholderScreen
+│   ├── ui/                   # Dùng chung: Screen, AppHeader, Button, StarRating, QuantityStepper,
+│   │                         # SectionHeader, Divider, ClampedText, PlaceholderScreen
 │   └── navigation/           # TabBarIcon
 ├── navigation/tabs.ts        # Cấu hình menu: thêm/bớt/sắp xếp tab tại đây
 ├── providers/AppProviders.tsx# Tamagui, SafeArea, theme React Navigation
 ├── theme/
-│   ├── tamagui.config.ts     # Config Tamagui (v6 Tailwind scale) + màu primary, nền trắng
+│   ├── tamagui.config.ts     # Config Tamagui: bảng màu design (appColors), font Inter/Epilogue
+│   ├── fonts.ts              # File font + map weight → file (native)
+│   ├── useAppFonts(.web).ts  # Nạp font: expo-font (native) / @font-face (web)
 │   ├── animations.ts         # Driver animation cho web (CSS)
 │   └── animations.native.ts  # Driver animation cho iOS/Android
 ├── hooks/                    # Hook dùng chung
-└── lib/                      # Tiện ích, API client, helpers
+└── lib/
+    ├── cn.ts                 # cn(): ghép className có điều kiện (clsx)
+    └── format.ts             # formatPrice, maskCardNumber
 ```
+
+Luồng demo: Home → Headphone / T-Shirt → Buy Now / Add to cart → Checkout → Payment → Pay now →
+Order placed → chạm sao → Feedback. Mã voucher thử: `SALE10`.
 
 Quy ước:
 
 - File trong `src/app/` mỏng, chỉ re-export màn hình từ `features/` — logic không nằm trong route.
 - Feature không import chéo vào bên trong feature khác; dùng `features/<tên>/index.ts`.
+- Cỡ chữ ghi tuyệt đối theo design (`text-[14px] leading-[22px]`) vì thang `text-sm/base…` của Tamagui
+  khác nhau giữa web và native. Tiêu đề thêm `font-heading` (Epilogue).
+- Class có điều kiện viết bằng `cn('base', active && 'bg-primary', className)`, không ghép template string.
+  Không cần `tailwind-merge`: @tamagui/tailwind tự cho class đứng sau thắng khi xung đột.
+- Cần cắt dòng thì dùng `ClampedText` — `Text` của Tailwind bỏ qua `numberOfLines` trên web.
 - Import tuyệt đối qua alias `@/` (→ `src/`).
 
 ## Viết style với Tamagui Tailwind

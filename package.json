@@ -3,14 +3,21 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@expo-google-fonts/epilogue": "^0.4.2",
+    "@expo-google-fonts/inter": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
     "@tamagui/config": "^3.1.6",
     "@tamagui/tailwind": "^3.1.6",
+    "clsx": "^2.1.1",
     "expo": "~58.0.19",
+    "expo-asset": "~58.0.18",
     "expo-constants": "~58.0.13",
     "expo-font": "~58.0.10",
+    "expo-image": "~58.0.17",
+    "expo-image-picker": "~58.0.10",
     "expo-linking": "~58.0.14",
     "expo-router": "~58.0.26",
+    "expo-splash-screen": "~58.0.11",
     "expo-status-bar": "~58.0.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -18,7 +25,8 @@
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
     "react-native-web": "^0.21.4",
-    "tamagui": "^3.1.6"
+    "tamagui": "^3.1.6",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

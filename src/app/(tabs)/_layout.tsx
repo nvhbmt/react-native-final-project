@@ -5,7 +5,7 @@ import { useTheme } from 'tamagui'
 import { TabBarIcon } from '@/components/navigation/TabBarIcon'
 import { useUnreadCount } from '@/features/inbox/hooks/useUnreadCount'
 import { TABS } from '@/navigation/tabs'
-import { appColors } from '@/theme/tamagui.config'
+import { appColors, bodyFont } from '@/theme/tamagui.config'
 
 const TAB_BAR_HEIGHT = 64
 
@@ -28,7 +28,8 @@ export default function TabsLayout() {
           backgroundColor: theme.background.val,
           borderTopColor: theme['border-color'].val,
         },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 12, ...bodyFont('500') },
+        tabBarItemStyle: { paddingHorizontal: 0 },
       }}
     >
       {TABS.map((tab) => (
