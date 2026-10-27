@@ -104,10 +104,10 @@ export function StandardProductDetail({ product }: { product: Product }) {
       <Divider />
 
       <View className="gap-4 px-6 pt-6 pb-6">
-        <SectionHeader title="Reviews" onSeeAll={() => {}} />
+        <SectionHeader title="Reviews" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
         <RatingSummary rating={product.rating} reviewCount={product.reviewCount} breakdown={product.ratingBreakdown} />
         <View className="gap-5 pt-2">
-          {product.reviews.map((r) => (
+          {product.reviews.slice(0, 2).map((r) => (
             <ReviewItem key={r.id} review={r} />
           ))}
         </View>
@@ -122,6 +122,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
           </View>
           <ScrollView
             horizontal
+            style={{ flexGrow: 0, flexShrink: 0 }}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: PADDING, gap: 14 }}
           >

@@ -9,9 +9,17 @@ export type ProductReview = {
   avatar: string
   content: string
   createdAt: string
+  /** 1–5 sao */
+  rating: number
 }
 
 export type ProductColor = { id: string; name: string; hex: string }
+
+/** Bảng size: số đo theo cm cho từng size, mỗi cột là một số đo (Ngực, Eo...). */
+export type SizeChart = {
+  columns: { key: string; label: string }[]
+  rows: { size: string; cm: Record<string, number> }[]
+}
 
 export type Product = {
   id: string
@@ -33,6 +41,7 @@ export type Product = {
     colors: ProductColor[]
     sizes: string[]
   }
+  sizeChart?: SizeChart
   promoLabel?: string
   relatedIds?: string[]
 }

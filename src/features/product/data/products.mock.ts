@@ -1,4 +1,4 @@
-import type { Product } from '../types'
+import type { Product, ProductReview, SizeChart } from '../types'
 
 // Dữ liệu giả lập — thay bằng API thật trong `api/productApi.ts`.
 const unsplash = (id: string, w = 800) =>
@@ -9,22 +9,33 @@ const avatar = (n: number) => `https://i.pravatar.cc/120?img=${n}`
 const LOREM_DESC =
   'Quis occaecat magna elit magna do nisi ipsum amet excepteur tempor nisi exercitation qui irure laboris. Laboris ad sint dolore fugiat ullamco aliqua nisi cupidatat consectetur.'
 
-const commonReviews = [
-  {
-    id: 'r1',
-    author: 'Jevon Raynor',
-    avatar: avatar(32),
-    content: 'Deserunt minim incididunt cillum',
-    createdAt: 'A day ago',
-  },
-  {
-    id: 'r2',
-    author: 'Jason D.',
-    avatar: avatar(12),
-    content: 'Magna pariatur sit et ullamco paria',
-    createdAt: '3 days ago',
-  },
+// Hai review đầu khớp design trang chi tiết; phần còn lại cho trang "Reviews".
+const commonReviews: ProductReview[] = [
+  { id: 'r1', author: 'Jevon Raynor', avatar: avatar(32), rating: 5, content: 'Deserunt minim incididunt cillum', createdAt: 'A day ago' },
+  { id: 'r2', author: 'Jason D.', avatar: avatar(12), rating: 4, content: 'Magna pariatur sit et ullamco paria', createdAt: '3 days ago' },
+  { id: 'r3', author: 'Mia Tran', avatar: avatar(45), rating: 5, content: 'Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.', createdAt: '5 days ago' },
+  { id: 'r4', author: 'Oliver K.', avatar: avatar(53), rating: 4, content: 'Excepteur sint occaecat cupidatat non proident.', createdAt: '1 week ago' },
+  { id: 'r5', author: 'Hannah Lee', avatar: avatar(44), rating: 3, content: 'Sunt in culpa qui officia deserunt mollit anim id est laborum.', createdAt: '1 week ago' },
+  { id: 'r6', author: 'Lucas P.', avatar: avatar(60), rating: 5, content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.', createdAt: '2 weeks ago' },
+  { id: 'r7', author: 'Sofia M.', avatar: avatar(25), rating: 2, content: 'Nostrud exercitation ullamco laboris nisi ut aliquip.', createdAt: '3 weeks ago' },
+  { id: 'r8', author: 'Ethan W.', avatar: avatar(68), rating: 1, content: 'Voluptate velit esse cillum dolore eu fugiat nulla pariatur.', createdAt: '1 month ago' },
 ]
+
+// Bảng size áo (cm). Trang Size guide tự đổi sang inch.
+const TOP_SIZE_CHART: SizeChart = {
+  columns: [
+    { key: 'chest', label: 'Chest' },
+    { key: 'waist', label: 'Waist' },
+    { key: 'length', label: 'Length' },
+  ],
+  rows: [
+    { size: 'XS', cm: { chest: 84, waist: 70, length: 64 } },
+    { size: 'S', cm: { chest: 90, waist: 76, length: 66 } },
+    { size: 'M', cm: { chest: 96, waist: 82, length: 68 } },
+    { size: 'L', cm: { chest: 102, waist: 88, length: 70 } },
+    { size: 'XL', cm: { chest: 108, waist: 94, length: 72 } },
+  ],
+}
 
 export const PRODUCTS: Product[] = [
   {
@@ -148,5 +159,6 @@ export const PRODUCTS: Product[] = [
       ],
       sizes: ['XS', 'S', 'M', 'L', 'XL'],
     },
+    sizeChart: TOP_SIZE_CHART,
   },
 ]

@@ -25,7 +25,10 @@ src/
 │   │   ├── _layout.tsx       # Dựng menu tab từ navigation/tabs.ts
 │   │   ├── index.tsx         # → features/home
 │   │   └── search | favorites | inbox | account.tsx
-│   ├── product/[id].tsx      # → features/product  (Headphone / T-Shirt)
+│   ├── product/[id]/
+│   │   ├── index.tsx         # → features/product  (Headphone / T-Shirt)
+│   │   ├── reviews.tsx       # → features/product  (Reviews: lọc theo số sao)
+│   │   └── size-guide.tsx    # → features/product  (Size guide: bảng size cm/inch)
 │   ├── checkout/
 │   │   ├── index.tsx         # → features/cart      (Checkout)
 │   │   ├── payment.tsx       # → features/checkout  (Payment)
@@ -45,7 +48,7 @@ src/
 │       └── index.ts          # Public API — bên ngoài chỉ import từ đây
 ├── components/
 │   ├── ui/                   # Dùng chung: Screen, AppHeader, Button, StarRating, QuantityStepper,
-│   │                         # SectionHeader, Divider, ClampedText, PlaceholderScreen
+│   │                         # SectionHeader, Divider, ClampedText, PlaceholderScreen, Chip
 │   └── navigation/           # TabBarIcon
 ├── navigation/tabs.ts        # Cấu hình menu: thêm/bớt/sắp xếp tab tại đây
 ├── providers/AppProviders.tsx# Tamagui, SafeArea, theme React Navigation

@@ -118,9 +118,12 @@ export function VariantProductDetail({ product }: { product: Product & Required<
 
       <View className="pt-6">
         <Divider />
-        <LinkRow title="Size guide" />
+        <LinkRow
+          title="Size guide"
+          onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
+        />
         <Divider />
-        <LinkRow title={`Reviews (${product.reviewCount})`} />
+        <LinkRow title={`Reviews (${product.reviewCount})`} onPress={() => router.push(`/product/${product.id}/reviews`)} />
       </View>
     </Screen>
   )

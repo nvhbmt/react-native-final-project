@@ -1,12 +1,11 @@
-import { Redirect, useLocalSearchParams } from 'expo-router'
+import { Redirect } from 'expo-router'
 
-import { productApi } from '../api/productApi'
 import { StandardProductDetail } from '../components/StandardProductDetail'
 import { VariantProductDetail } from '../components/VariantProductDetail'
+import { useRouteProduct } from '../hooks/useRouteProduct'
 
 export function ProductDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
-  const product = productApi.getById(id)
+  const product = useRouteProduct()
 
   if (!product) return <Redirect href="/" />
 

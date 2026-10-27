@@ -23,7 +23,9 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="product/[id]" />
+        <Stack.Screen name="product/[id]/index" />
+        <Stack.Screen name="product/[id]/reviews" />
+        <Stack.Screen name="product/[id]/size-guide" />
         <Stack.Screen name="checkout/index" />
         <Stack.Screen name="checkout/payment" />
         <Stack.Screen name="checkout/success" />
