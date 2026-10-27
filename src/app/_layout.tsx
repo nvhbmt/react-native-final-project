@@ -6,7 +6,7 @@ import { AppProviders } from '@/providers/AppProviders'
 export default function RootLayout() {
   return (
     <AppProviders>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" options={{ headerShown: true, title: 'Không tìm thấy' }} />
