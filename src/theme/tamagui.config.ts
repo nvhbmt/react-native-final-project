@@ -5,7 +5,7 @@ import { animations } from './animations'
 
 // Màu dùng chung, gọi qua token: `bg-primary`, `text-primary`, `text-muted`, `bg-badge`.
 export const appColors = {
-  primary: '#00bed1',
+  primary: '#00bdd6',
   muted: '#6a6d75',
   badge: '#e7000b',
 } as const
@@ -17,6 +17,11 @@ const baseConfig = createV6Config({
 
 export const config = createTamagui({
   ...baseConfig,
+  fonts: {
+    ...baseConfig.fonts,
+    marketplaceBody: { ...baseConfig.fonts.body, family: 'MarketplaceInter' },
+    marketplaceHeading: { ...baseConfig.fonts.heading, family: 'MarketplaceManrope' },
+  },
   themes: {
     ...baseConfig.themes,
     // Theme light mặc định có nền #faf9fb; app dùng nền trắng tinh.
