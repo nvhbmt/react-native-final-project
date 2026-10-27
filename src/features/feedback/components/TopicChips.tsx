@@ -1,8 +1,6 @@
-import { Ionicons } from '@expo/vector-icons'
-import { Text, View } from '@tamagui/tailwind'
+import { View } from '@tamagui/tailwind'
 
-import { cn } from '@/lib/cn'
-import { appColors } from '@/theme/tamagui.config'
+import { Chip } from '@/components/ui/Chip'
 
 import type { FeedbackTopic } from '../types'
 
@@ -22,20 +20,13 @@ export function TopicChips({ value, onChange }: Props) {
       {FEEDBACK_TOPICS.map((topic) => {
         const selected = value.includes(topic)
         return (
-          <View
+          <Chip
             key={topic}
+            label={topic}
+            selected={selected}
+            icon={selected ? 'checkmark' : 'add'}
             onPress={() => toggle(topic)}
-            role="checkbox"
-            aria-checked={selected}
-            className={cn('h-[36px] flex-row items-center gap-1.5 rounded-full px-3 active:opacity-70', selected ? 'bg-primary-50' : 'bg-neutral-200')}
-          >
-            <Text className={cn('text-[14px] leading-[22px]', selected ? 'text-primary' : 'text-neutral-700')}>{topic}</Text>
-            <Ionicons
-              name={selected ? 'checkmark' : 'add'}
-              size={18}
-              color={selected ? appColors.primary : appColors['neutral-700']}
-            />
-          </View>
+          />
         )
       })}
     </View>
