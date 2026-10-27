@@ -1,8 +1,23 @@
 # react-native-final-project
 
 Ứng dụng React Native dựng trên **Expo SDK 58 + Expo Router**, UI bằng **Tamagui v3** với cú pháp
-Tailwind (`@tamagui/tailwind`). Có sẵn menu 5 tab (Home, Search, Favorites, Inbox, Account) và các
-màn hình placeholder.
+Tailwind (`@tamagui/tailwind`). Home và Product Listing được dựng theo prototype E-Commercial
+Market Place; các tab Search, Favorites, Inbox, Account hiện giữ màn hình placeholder.
+
+## Home và Product Listing
+
+- Home: danh mục cuộn ngang, banner Shoes, hai ưu đãi và sản phẩm đề xuất.
+- Chọn **Electronics** để mở danh sách; chọn **Fresh Fruits** để mở lưới hai cột.
+- Listing hỗ trợ tìm kiếm, chọn danh mục con, sắp xếp, lọc giá/đánh giá, xem thêm và thêm vào giỏ.
+- Giỏ hàng xem được từ icon trên header; dữ liệu mẫu và giỏ hiện lưu trong bộ nhớ, chưa nối backend.
+- Route `/product-listing?category=electronics` và `/product-listing?category=fruits`
+  dùng chung thanh tab, với Home được đánh dấu đang chọn.
+- `src/features/products/` chứa dữ liệu, kiểu dữ liệu, xử lý lọc và màn listing;
+  `src/features/home/components/` chứa các phần của Home;
+  `src/components/marketplace/` chứa UI dùng chung; `src/providers/CartProvider.tsx` quản lý giỏ.
+- Ảnh trong `assets/marketplace/` được trích từ ảnh prototype gốc. Font Inter/Manrope
+  nằm trong `assets/fonts/`, kèm giấy phép OFL, được nạp cục bộ qua `expo-font`.
+- Các màn dùng safe area và thanh trạng thái thật của thiết bị, không vẽ lại giờ/pin của ảnh mẫu.
 
 ## Chạy dự án
 
@@ -27,7 +42,8 @@ src/
 │       ├── search.tsx        # → features/search
 │       ├── favorites.tsx     # → features/favorites
 │       ├── inbox.tsx         # → features/inbox
-│       └── account.tsx       # → features/account
+│       ├── account.tsx       # → features/account
+│       └── product-listing.tsx # → features/products (không thêm nút tab)
 ├── features/                 # Code theo tính năng (feature-first)
 │   └── <feature>/
 │       ├── screens/          # Màn hình của tính năng
@@ -67,7 +83,7 @@ import { Text, View } from '@tamagui/tailwind'
 - Class được phân giải thành token/theme của Tamagui (không cần build CSS), chạy được cả native lẫn web.
 - Theme key: `background`, `color`, `color-1`…`color-11`, `border-color`… → `bg-background`,
   `text-color-11`, `border-border-color`. App cố định theme light, nền trắng `#ffffff`.
-- Màu app: `primary` (`#00bed1`), `muted` (xám icon), `badge` — khai báo trong `theme/tamagui.config.ts`
+- Màu app: `primary` (`#00bdd6`), `muted` (xám icon), `badge` — khai báo trong `theme/tamagui.config.ts`
   → `bg-primary`, `text-primary`, `text-muted`.
 - Component dựng sẵn của `tamagui` (Button, Input, Sheet…) vẫn dùng được; chúng nhận props kiểu
   Tamagui (`p="4"`, `bg="background"` — **không có `$`** ở v3).
