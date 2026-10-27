@@ -1,3 +1,4 @@
+export { ProductListingScreen } from './screens/ProductListingScreen'
 export { allProducts, categories, recommendedProducts } from './data/catalog'
 export { filterProducts } from './lib/filterProducts'
 export { emptyFilters } from './types'
