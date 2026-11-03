@@ -3,21 +3,46 @@
 Ứng dụng React Native dựng trên **Expo SDK 58 + Expo Router**, UI bằng **Tamagui v3** với cú pháp
 Tailwind (`@tamagui/tailwind`). Home và Product Listing được dựng theo prototype E-Commercial
 Market Place. Dự án có thêm chi tiết sản phẩm, Reviews, Size guide, Checkout, Payment và Feedback;
-các tab Search, Favorites, Inbox, Account hiện giữ màn hình placeholder.
+tab Search dùng chung màn danh sách; Favorites, Inbox, Account hiện giữ màn hình placeholder.
 
-## Home và Product Listing
+## Home, Product Listing và Filter
 
 - Home: danh mục cuộn ngang, banner Shoes, hai ưu đãi và sản phẩm đề xuất.
 - Chọn **Electronics** để mở danh sách; chọn **Fresh Fruits** để mở lưới hai cột.
 - Listing hỗ trợ tìm kiếm, chọn danh mục con, sắp xếp, lọc giá/đánh giá, xem thêm và thêm vào giỏ.
-- Giỏ hàng xem được từ icon trên header; dữ liệu mẫu và giỏ hiện lưu trong bộ nhớ, chưa nối backend.
+- Icon lọc trên Home và Listing mở `/filters`: Shipping options, Price range hai đầu kéo,
+  Average review và bốn ô Others (Free Return, Buyer Protection, Best Deal, Ship to store).
+  Từng mục có thể thu gọn. Nút X trở về màn trước, giữ các lựa chọn dùng chung trong phiên.
+  Lần đầu mở Filter hiển thị lựa chọn của prototype: $10–$1000, 4 sao và Free Return.
+  Chỉ mở rồi đóng Filter không áp dụng các lựa chọn mẫu. Khi người dùng chỉnh,
+  các lựa chọn mới được áp dụng ngay và giữ khi quay lại.
+- Chọn lại số sao đang chọn để bỏ điều kiện đánh giá; bỏ chọn các checkbox/ô Others và
+  xoá hai ô giá để trở lại danh sách đầy đủ. Không thêm nút Reset/Apply ngoài thiết kế gốc.
+- Các lựa chọn giao hàng và quyền lợi hiện dựa trên chính sách shop giả lập tại
+  `src/features/products/data/shoppingPolicies.ts`; nhiều cách giao hàng dùng điều kiện OR,
+  nhiều quyền lợi dùng điều kiện AND.
+- Chạm ảnh/tên sản phẩm để mở chi tiết đúng ID, giá và hình ảnh. Nút cộng thêm vào giỏ;
+  sản phẩm có biến thể mở màn chọn màu/size trước khi thêm.
+- Icon giỏ trên mọi header mở chung màn Checkout. Giỏ bắt đầu rỗng; thêm từ Listing hoặc
+  chi tiết đều dùng cùng Zustand store, hỗ trợ đổi số lượng, xoá dòng và voucher `SALE10`.
+- Home → danh mục/tìm kiếm → chi tiết → Checkout → Payment → Success → Feedback → Home.
+  Headphone có trong Electronics khi chọn See all; Hoodie shirt có trong Fashion.
+- Size guide và Reviews mở từ chi tiết. Submit ở Feedback lưu góp ý theo sản phẩm/đơn hàng;
+  đánh giá sản phẩm vừa gửi xuất hiện ở Reviews khi quay lại.
+- Thanh toán dùng phương thức giả lập, chốt bản sao sản phẩm/tổng tiền rồi xoá giỏ và voucher.
+  Success và Feedback giữ thông tin đơn đã mua. Dữ liệu giỏ, đơn và góp ý lưu trong bộ nhớ,
+  mất khi tải lại ứng dụng; chưa nối backend hoặc cổng thanh toán thật.
 - Route `/product-listing?category=electronics` và `/product-listing?category=fruits`
   dùng chung thanh tab, với Home được đánh dấu đang chọn.
 - `src/features/products/` chứa dữ liệu, kiểu dữ liệu, xử lý lọc và màn listing;
   `src/features/home/components/` chứa các phần của Home;
-  `src/components/marketplace/` chứa UI dùng chung; `src/providers/CartProvider.tsx` quản lý giỏ.
-- Ảnh trong `assets/marketplace/` được trích từ ảnh prototype gốc. Font Inter/Manrope
-  nằm trong `assets/fonts/`, kèm giấy phép OFL, được nạp cục bộ qua `expo-font`.
+  `src/components/marketplace/` chứa UI dùng chung; `src/features/cart/store/cartStore.ts` quản lý giỏ.
+- Ảnh trong `assets/marketplace/` được trích từ ảnh prototype gốc. Nội dung dùng Inter,
+  tiêu đề dùng Epilogue với các weight tĩnh đã khai báo trong `src/theme/fonts.ts`.
+  Native nạp qua `expo-font`; web chờ font sẵn sàng trước khi hiển thị.
+- Các nút, danh mục, lựa chọn lọc và chấm chuyển banner hỗ trợ bàn phím trên web.
+  Khoảng giá nhận dấu chấm/phẩy thập phân, tự sắp lại hai đầu khi nhập ngược,
+  giữ giới hạn trống là không giới hạn. Mỗi đầu kéo đọc giá trị tiền qua accessibility label.
 - Các màn dùng safe area và thanh trạng thái thật của thiết bị, không vẽ lại giờ/pin của ảnh mẫu.
 
 ## Chạy dự án
@@ -28,6 +53,7 @@ npm start            # Expo dev server — quét QR bằng Expo Go hoặc nhấn
 npm run web          # chạy trên trình duyệt
 npm run typecheck    # tsc --noEmit
 npm run lint         # expo lint
+npm test             # 16 kiểm thử giỏ hàng, đơn, góp ý và lọc sản phẩm (Node 22.13+)
 ```
 
 ## Cấu trúc thư mục
@@ -37,6 +63,7 @@ src/
 ├── app/                      # CHỈ chứa route (Expo Router) — mỗi file là 1 màn hình
 │   ├── _layout.tsx           # Root: providers + Stack
 │   ├── +not-found.tsx        # 404
+│   ├── filters.tsx           # → features/filters (không có bottom tab)
 │   ├── (tabs)/               # Nhóm route có bottom tab
 │   │   ├── _layout.tsx       # Dựng menu tab từ navigation/tabs.ts
 │   │   ├── index.tsx         # → features/home
@@ -54,6 +81,7 @@ src/
 ├── features/                 # Code theo tính năng (feature-first)
 │   ├── home/                 # Trang chủ: danh mục, ưu đãi, sản phẩm đề xuất
 │   ├── products/             # Danh sách Electronics và lưới Fresh Fruits
+│   ├── filters/              # Filter: screen, section/slider components và Zustand store
 │   ├── product/              # Trang chi tiết: 2 layout chọn theo dữ liệu (có/không biến thể)
 │   ├── cart/                 # Giỏ hàng (zustand store), voucher, tính tiền computeTotals()
 │   ├── checkout/             # Phương thức thanh toán, đặt hàng (orderStore), màn thành công
@@ -84,15 +112,18 @@ src/
     └── format.ts             # formatPrice, maskCardNumber
 ```
 
-Luồng Home: chọn Electronics / Fresh Fruits để mở Product Listing.
-Để thử các màn chi tiết, mở `/product/headphone-pro` hoặc `/product/hoodie-shirt`, sau đó
-Buy Now / Add to cart → Checkout → Payment → Pay now → Order placed → chạm sao → Feedback.
-Reviews và Size guide mở từ trang chi tiết tương ứng. Mã voucher thử: `SALE10`.
+Luồng thử: Home → Electronics → See all → Headphone → Buy Now → Checkout → Next →
+Payment → Pay now → Order placed → chạm sao → Feedback → Submit → Back to Home.
+Luồng biến thể: Home → Fashion → Hoodie shirt → chọn màu/size/số lượng → Size guide →
+quay lại → Add to cart → Checkout. Reviews → Write a review → Submit cập nhật đánh giá
+ngay trong phiên hiện tại. Có thể tìm Headphone/Hoodie shirt từ ô tìm kiếm hoặc tab Search.
 
 Quy ước:
 
 - File trong `src/app/` mỏng, chỉ re-export màn hình từ `features/` — logic không nằm trong route.
 - Feature không import chéo vào bên trong feature khác; dùng `features/<tên>/index.ts`.
+- `features/products/catalog.ts` là public entry chỉ chứa dữ liệu/kiểu cho trang chi tiết,
+  giúp đọc danh mục mà không nạp ngược UI của màn listing.
 - Cỡ chữ ghi tuyệt đối theo design (`text-[14px] leading-[22px]`) vì thang `text-sm/base…` của Tamagui
   khác nhau giữa web và native. Tiêu đề thêm `font-heading` (Epilogue).
 - Class có điều kiện viết bằng `cn('base', active && 'bg-primary', className)`, không ghép template string.
