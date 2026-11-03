@@ -5,8 +5,6 @@ import { TamaguiProvider } from 'tamagui'
 
 import { appColors, config } from '@/theme/tamagui.config'
 
-import { CartProvider } from './CartProvider'
-
 // Đồng bộ màu header/nền của React Navigation với theme Tamagui.
 const navTheme = {
   ...DefaultTheme,
@@ -20,7 +18,7 @@ export function AppProviders({ children }: PropsWithChildren) {
     <SafeAreaProvider>
       <TamaguiProvider config={config} defaultTheme="light">
         <ThemeProvider value={navTheme}>
-          <CartProvider>{children}</CartProvider>
+          {children}
         </ThemeProvider>
       </TamaguiProvider>
     </SafeAreaProvider>

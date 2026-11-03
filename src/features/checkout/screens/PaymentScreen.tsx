@@ -1,6 +1,6 @@
 import { Text, View } from '@tamagui/tailwind'
-import { router } from 'expo-router'
-import { useState } from 'react'
+import { Redirect, router } from 'expo-router'
+import { useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { AppHeader } from '@/components/ui/AppHeader'
@@ -16,16 +16,21 @@ import { useOrderStore } from '../store/orderStore'
 export function PaymentScreen() {
   const cartTotals = useCartTotals()
   const clearCart = useCartStore((s) => s.clear)
+  const items = useCartStore((s) => s.items)
   const placeOrder = useOrderStore((s) => s.placeOrder)
   const [selectedId, setSelectedId] = useState(PAYMENT_METHODS[0].id)
   // Sau khi trả tiền, giỏ bị xoá nhưng màn này vẫn hiện trong lúc chuyển màn → giữ số đã thanh toán.
   const [paidTotals, setPaidTotals] = useState<CartTotals | null>(null)
   const totals = paidTotals ?? cartTotals
+  const submitting = useRef(false)
+
+  if (items.length === 0 && !paidTotals) return <Redirect href="/checkout" />
 
   const payNow = () => {
     const method = PAYMENT_METHODS.find((m) => m.id === selectedId)
-    if (!method || paidTotals) return
-    placeOrder(cartTotals, method)
+    if (!method || submitting.current || cartTotals.total <= 0) return
+    submitting.current = true
+    placeOrder(items, cartTotals, method)
     setPaidTotals(cartTotals)
     clearCart()
     // Đóng cả luồng checkout (product → checkout → payment) rồi mới mở Success, để Success nằm ngay
@@ -47,7 +52,7 @@ export function PaymentScreen() {
         ))}
       </View>
 
-      <Button title="Pay now" leftIcon="card-outline" className="mt-5" onPress={payNow} disabled={totals.total <= 0} />
+      <Button title="Pay now" leftIcon="card-outline" className="mt-5" onPress={payNow} disabled={!!paidTotals || totals.total <= 0} />
       <Button
         title="Add new card"
         variant="text"

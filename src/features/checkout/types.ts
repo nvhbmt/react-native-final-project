@@ -1,4 +1,4 @@
-import type { CartTotals } from '@/features/cart'
+import type { CartItem, CartTotals } from '@/features/cart'
 
 export type PaymentBrand = 'visa' | 'mastercard' | 'paypal'
 
@@ -14,4 +14,5 @@ export type Order = CartTotals & {
   paymentMethod: PaymentMethod
   status: 'success'
   createdAt: number
+  items: CartItem[]
 }

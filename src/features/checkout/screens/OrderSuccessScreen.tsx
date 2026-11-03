@@ -51,7 +51,8 @@ export function OrderSuccessScreen() {
           className="gap-1"
           onChange={(value) => {
             setRating(value)
-            router.push({ pathname: '/feedback', params: { rating: String(value) } })
+            const productIds = [...new Set(order.items.map((item) => item.productId))]
+            router.push({ pathname: '/feedback', params: { rating: String(value), orderId: order.id, ...(productIds.length === 1 ? { productId: productIds[0] } : {}) } })
           }}
         />
       </View>

@@ -23,21 +23,12 @@ type CartState = {
 const itemKey = (i: Pick<CartItem, 'productId' | 'options'>) =>
   [i.productId, i.options?.color, i.options?.size].filter(Boolean).join(':')
 
-const img = (id: string) => `https://images.unsplash.com/photo-${id}?w=300&q=75&auto=format&fit=crop`
-
-// Giỏ hàng mẫu khớp màn Checkout trong design.
-const SEED_ITEMS: CartItem[] = [
-  { productId: 'headphone-classic', name: 'Headphone', subtitle: 'Consequat ex eu', image: img('1583394838336-acd977736f90'), price: 500, quantity: 1 },
-  { productId: 'headphone-gold', name: 'Headphone', subtitle: 'Consequat ex eu', image: img('1505740420928-5e560c06d30e'), price: 300, quantity: 1 },
-  { productId: 'smartphone-x', name: 'Smartphone', subtitle: 'Consequat ex eu', image: img('1511707171634-5f897ff02aa9'), price: 1000, quantity: 1 },
-  { productId: 'smartphone-mini', name: 'Smartphone', subtitle: 'Consequat ex eu', image: img('1592899677977-9c10ca588bbd'), price: 1000, quantity: 1 },
-].map((i) => ({ ...i, key: itemKey(i) }))
-
-export const useCartStore = create<CartState>((set, get) => ({
-  items: SEED_ITEMS,
+export const useCartStore = create<CartState>((set) => ({
+  items: [],
   voucher: null,
 
   addItem: ({ quantity = 1, ...input }) => {
+    if (!Number.isInteger(quantity) || quantity <= 0) return
     const key = itemKey(input)
     set((s) => {
       const existing = s.items.find((i) => i.key === key)
@@ -48,10 +39,12 @@ export const useCartStore = create<CartState>((set, get) => ({
     })
   },
 
-  setQuantity: (key, quantity) =>
+  setQuantity: (key, quantity) => {
+    if (!Number.isInteger(quantity)) return
     set((s) => ({
       items: quantity <= 0 ? s.items.filter((i) => i.key !== key) : s.items.map((i) => (i.key === key ? { ...i, quantity } : i)),
-    })),
+    }))
+  },
 
   removeItem: (key) => set((s) => ({ items: s.items.filter((i) => i.key !== key) })),
 
@@ -68,10 +61,10 @@ export const useCartStore = create<CartState>((set, get) => ({
 
 /** Tính tiền từ state — tách hàm thuần để dễ test và tái dùng ở màn Payment/Success. */
 export function computeTotals(items: CartItem[], voucherRate = 0): CartTotals {
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const subtotal = Math.round(items.reduce((sum, i) => sum + i.price * i.quantity, 0) * 100) / 100
   const discount = Math.round(subtotal * voucherRate * 100) / 100
-  const taxable = subtotal - discount
+  const taxable = Math.round((subtotal - discount) * 100) / 100
   const tax = Math.round(taxable * TAX_RATE * 100) / 100
   const fees = 0
-  return { subtotal, discount, tax, fees, total: taxable + tax + fees }
+  return { subtotal, discount, tax, fees, total: Math.round((taxable + tax + fees) * 100) / 100 }
 }
