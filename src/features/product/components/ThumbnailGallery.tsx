@@ -3,8 +3,10 @@ import { Image } from 'expo-image'
 
 import { cn } from '@/lib/cn'
 
+import type { Product } from '../types'
+
 type Props = {
-  images: string[]
+  images: Product['images']
   selected: number
   onSelect: (index: number) => void
   width: number
@@ -19,22 +21,22 @@ export function ThumbnailGallery({ images, selected, onSelect, width }: Props) {
   return (
     <View className="gap-2">
       <Image
-        source={{ uri: images[selected] }}
+        source={images[selected]}
         style={{ width, height: Math.round(width * 0.59), borderRadius: 6 }}
         contentFit="cover"
         transition={200}
       />
       <View className="flex-row" style={{ gap: GAP }}>
-        {images.map((uri, i) => (
+        {images.map((source, i) => (
           <View
-            key={uri}
+            key={i}
             onPress={() => onSelect(i)}
             role="button"
             aria-label={`Ảnh ${i + 1}`}
             aria-selected={i === selected}
             className={cn('overflow-hidden rounded-[4px] border-2', i === selected ? 'border-primary' : 'border-transparent')}
           >
-            <Image source={{ uri }} style={{ width: thumbSize - 4, height: thumbSize - 4 }} contentFit="cover" />
+            <Image source={source} style={{ width: thumbSize - 4, height: thumbSize - 4 }} contentFit="cover" />
           </View>
         ))}
       </View>

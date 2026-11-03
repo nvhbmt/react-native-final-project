@@ -25,7 +25,7 @@ export function ProductCard({ product, width = 130 }: Props) {
       style={{ width }}
     >
       <Image
-        source={{ uri: product.images[0] }}
+        source={product.images[0]}
         style={{ width: width - 20, height: width * 0.65, borderRadius: 4 }}
         contentFit="cover"
       />

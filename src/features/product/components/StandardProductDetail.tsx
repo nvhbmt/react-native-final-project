@@ -70,7 +70,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
       }
     >
       <View className="gap-4 px-6 pt-1 pb-6">
-        <ImageCarousel images={product.images} width={contentWidth} height={Math.round(contentWidth * 0.545)} />
+        <ImageCarousel images={product.images} width={contentWidth} height={Math.round(contentWidth * 0.545)} contentFit={product.imageFit} />
         <View className="flex-row items-center justify-between">
           <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">
             {formatPrice(product.price)}
@@ -118,7 +118,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
       {related.length ? (
         <View className="gap-4 pt-6 pb-4">
           <View className="px-6">
-            <SectionHeader title="Relevant products" onSeeAll={() => {}} />
+            <SectionHeader title="Relevant products" onSeeAll={() => router.push({ pathname: '/product-listing', params: { relatedTo: product.id } })} />
           </View>
           <ScrollView
             horizontal

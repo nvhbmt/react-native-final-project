@@ -11,8 +11,8 @@ export function ProductDetailScreen() {
 
   // Sản phẩm có biến thể (màu/size) dùng layout chọn biến thể, còn lại dùng layout chuẩn.
   return product.variants ? (
-    <VariantProductDetail product={{ ...product, variants: product.variants }} />
+    <VariantProductDetail key={product.id} product={{ ...product, variants: product.variants }} />
   ) : (
-    <StandardProductDetail product={product} />
+    <StandardProductDetail key={product.id} product={product} />
   )
 }

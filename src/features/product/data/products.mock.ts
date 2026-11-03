@@ -1,9 +1,6 @@
 import type { Product, ProductReview, SizeChart } from '../types'
 
 // Dữ liệu giả lập — thay bằng API thật trong `api/productApi.ts`.
-const unsplash = (id: string, w = 800) =>
-  `https://images.unsplash.com/photo-${id}?w=${w}&q=75&auto=format&fit=crop`
-
 const avatar = (n: number) => `https://i.pravatar.cc/120?img=${n}`
 
 const LOREM_DESC =
@@ -46,10 +43,10 @@ export const PRODUCTS: Product[] = [
     description: LOREM_DESC,
     price: 59,
     images: [
-      unsplash('1618366712010-f4ae9c647dcb'),
-      unsplash('1546435770-a3e426bf472b'),
-      unsplash('1583394838336-acd977736f90'),
-      unsplash('1572536147248-ac59a8abfa4b'),
+      require('../../../../assets/marketplace/headphone-hero.png'),
+      require('../../../../assets/marketplace/headphone-classic.png'),
+      require('../../../../assets/marketplace/headphone-gold.png'),
+      require('../../../../assets/marketplace/headphone-silver.png'),
     ],
     rating: 4.5,
     reviewCount: 99,
@@ -70,7 +67,7 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Consequat ex eu',
     description: LOREM_DESC,
     price: 500,
-    images: [unsplash('1583394838336-acd977736f90')],
+    images: [require('../../../../assets/marketplace/headphone-classic.png')],
     rating: 4.5,
     reviewCount: 99,
     ratingBreakdown: [70, 48, 20, 10, 3],
@@ -84,7 +81,7 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Consequat ex eu',
     description: LOREM_DESC,
     price: 300,
-    images: [unsplash('1505740420928-5e560c06d30e')],
+    images: [require('../../../../assets/marketplace/headphone-gold.png')],
     rating: 4.5,
     reviewCount: 99,
     ratingBreakdown: [70, 48, 20, 10, 3],
@@ -98,7 +95,7 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Consequat ex eu',
     description: LOREM_DESC,
     price: 99,
-    images: [unsplash('1487215078519-e21cc028cb29')],
+    images: [require('../../../../assets/marketplace/headphone-silver.png')],
     rating: 4.5,
     reviewCount: 99,
     ratingBreakdown: [70, 48, 20, 10, 3],
@@ -112,7 +109,7 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Consequat ex eu',
     description: LOREM_DESC,
     price: 1000,
-    images: [unsplash('1511707171634-5f897ff02aa9')],
+    images: [require('../../../../assets/marketplace/phone-white.png')],
     rating: 4.5,
     reviewCount: 99,
     ratingBreakdown: [70, 48, 20, 10, 3],
@@ -126,7 +123,7 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Consequat ex eu',
     description: LOREM_DESC,
     price: 1000,
-    images: [unsplash('1592899677977-9c10ca588bbd')],
+    images: [require('../../../../assets/marketplace/phone-blue.png')],
     rating: 4.5,
     reviewCount: 99,
     ratingBreakdown: [70, 48, 20, 10, 3],
@@ -142,10 +139,10 @@ export const PRODUCTS: Product[] = [
     price: 2.99,
     promoLabel: 'Buy 1 get 1',
     images: [
-      unsplash('1529139574466-a303027c1d8b'),
-      unsplash('1524504388940-b1c1722653e1'),
-      unsplash('1515886657613-9f3515b0c78f'),
-      unsplash('1509631179647-0177331693ae'),
+      require('../../../../assets/marketplace/hoodie-green.png'),
+      require('../../../../assets/marketplace/hoodie-black.png'),
+      require('../../../../assets/marketplace/hoodie-hero.png'),
+      require('../../../../assets/marketplace/hoodie-red.png'),
     ],
     rating: 4.5,
     reviewCount: 99,

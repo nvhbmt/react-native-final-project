@@ -6,7 +6,7 @@ export type ProductFeature = {
 export type ProductReview = {
   id: string
   author: string
-  avatar: string
+  avatar: string | number
   content: string
   createdAt: string
   /** 1–5 sao */
@@ -29,7 +29,8 @@ export type Product = {
   subtitle: string
   description: string
   price: number
-  images: string[]
+  images: (string | number)[]
+  imageFit?: 'contain' | 'cover'
   rating: number
   reviewCount: number
   /** Số lượt đánh giá theo từng mức sao, index 0 → 5 sao ... index 4 → 1 sao. */

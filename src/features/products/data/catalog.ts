@@ -21,6 +21,10 @@ export const electronics: Product[] = [
   { id: 'phone-apps', name: 'Smartphone', category: 'electronics', subcategory: 'phone', image: require('../../../../assets/marketplace/phone-apps.png'), price: 999, rating: 4, sales: 100, keywords: 'apps phone' },
   { id: 'tablet', name: 'Tablet', category: 'electronics', subcategory: 'tablet', image: require('../../../../assets/marketplace/tablet.png'), price: 499, rating: 4.5, sales: 90 },
   { id: 'laptop', name: 'Laptop', category: 'electronics', subcategory: 'laptop', image: require('../../../../assets/marketplace/subcategory-laptop.png'), price: 999, rating: 4.5, sales: 80 },
+  { id: 'headphone-pro', name: 'Headphone', category: 'electronics', subcategory: 'headphone', image: require('../../../../assets/marketplace/headphone-hero.png'), price: 59, rating: 4.5, sales: 70 },
+  { id: 'headphone-classic', name: 'Headphone', category: 'electronics', subcategory: 'headphone', image: require('../../../../assets/marketplace/headphone-classic.png'), price: 500, rating: 4.5, sales: 60 },
+  { id: 'headphone-gold', name: 'Headphone', category: 'electronics', subcategory: 'headphone', image: require('../../../../assets/marketplace/headphone-gold.png'), price: 300, rating: 4.5, sales: 50 },
+  { id: 'headphone-silver', name: 'Headphone', category: 'electronics', subcategory: 'headphone', image: require('../../../../assets/marketplace/headphone-silver.png'), price: 99, rating: 4.5, sales: 40 },
 ]
 
 export const fruits: Product[] = [
@@ -36,9 +40,14 @@ export const relevantFruits: Product[] = [
 ]
 
 const shoes: Product = { id: 'boots', name: 'Shoes', category: 'fashion', image: require('../../../../assets/marketplace/boots.png'), price: 299, rating: 4.5, sales: 300 }
+const hoodie: Product = { id: 'hoodie-shirt', name: 'Hoodie shirt', category: 'fashion', image: require('../../../../assets/marketplace/hoodie-hero.png'), price: 2.99, rating: 4.5, sales: 200, keywords: 't-shirt clothing' }
+const legacyPhones: Product[] = [
+  { id: 'smartphone-x', name: 'Smartphone', category: 'electronics', image: require('../../../../assets/marketplace/phone-white.png'), price: 1000, rating: 4.5, sales: 30 },
+  { id: 'smartphone-mini', name: 'Smartphone', category: 'electronics', image: require('../../../../assets/marketplace/phone-blue.png'), price: 1000, rating: 4.5, sales: 20 },
+]
 
 export const recommendedProducts: Product[] = [shoes, electronics[4], fruits[0]]
-export const allProducts: Product[] = [...electronics, ...fruits, ...relevantFruits, shoes]
+export const allProducts: Product[] = [...electronics, ...fruits, ...relevantFruits, shoes, hoodie, ...legacyPhones]
 
 export const electronicCategories = [
   { id: 'phone', name: 'Smartphones', image: require('../../../../assets/marketplace/subcategory-phone.png') },

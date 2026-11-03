@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Text, View } from '@tamagui/tailwind'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useWindowDimensions } from 'react-native'
 
@@ -39,10 +39,11 @@ export function VariantProductDetail({ product }: { product: Product & Required<
   const { width } = useWindowDimensions()
   const contentWidth = Math.min(width, 520) - PADDING * 2
   const { colors, sizes } = product.variants
+  const params = useLocalSearchParams<{ color?: string; size?: string }>()
   const [imageIndex, setImageIndex] = useState(Math.min(2, product.images.length - 1))
   const [selection, setSelection] = useState<ProductSelection>({
-    colorId: colors[colors.length - 1]?.id,
-    size: sizes[Math.floor(sizes.length / 2)],
+    colorId: colors.find((color) => color.id === params.color)?.id ?? colors[colors.length - 1]?.id,
+    size: sizes.includes(params.size ?? '') ? params.size : sizes[Math.floor(sizes.length / 2)],
     quantity: 1,
   })
   const addItem = useCartStore((s) => s.addItem)
