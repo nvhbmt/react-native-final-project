@@ -23,6 +23,7 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="filters" options={{ presentation: 'modal' }} />
         <Stack.Screen name="product/[id]/index" />
         <Stack.Screen name="product/[id]/reviews" />
         <Stack.Screen name="product/[id]/size-guide" />

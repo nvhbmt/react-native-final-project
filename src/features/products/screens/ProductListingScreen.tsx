@@ -5,17 +5,19 @@ import { FlatList, Image, StyleSheet } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 
 import { BannerCarousel } from '@/components/marketplace/BannerCarousel'
-import { FilterModal } from '@/components/marketplace/FilterModal'
 import { MarketHeading, MarketText } from '@/components/marketplace/MarketText'
 import { MarketplaceFrame } from '@/components/marketplace/MarketplaceFrame'
 import { SearchField } from '@/components/marketplace/SearchField'
+import { productApi } from '@/features/product'
+import { hasActiveFilters, useProductFilters } from '@/features/filters'
+import { keyboardAction } from '@/components/marketplace/keyboardAction'
 import { marketplace as m } from '@/theme/marketplace'
 
 import { EmptyProducts, ProductGridCard, ProductRow } from '../components/ProductCard'
 import { SeeAllButton } from '../components/SeeAllButton'
 import { allProducts, categoryNames, electronicCategories, electronics, fruits, relevantFruits } from '../data/catalog'
 import { filterProducts } from '../lib/filterProducts'
-import type { CategoryId, ProductFilters, SortOrder } from '../types'
+import type { CategoryId, SortOrder } from '../types'
 
 const electronicsBanners = [
   { image: require('../../../../assets/marketplace/banner-electronics.png'), label: 'Discover the latest electronics' },
@@ -33,7 +35,7 @@ const sortOptions: { value: SortOrder; label: string }[] = [
   { value: 'sales', label: 'Best Sales' }, { value: 'matched', label: 'Best Matched' }, { value: 'popular', label: 'Popular' },
 ]
 
-type ListingParams = { category?: string; query?: string; minimumPrice?: string; maximumPrice?: string; minimumRating?: string }
+type ListingParams = { category?: string; query?: string; relatedTo?: string }
 
 export function ProductListingScreen() {
   const params = useLocalSearchParams<ListingParams>()
@@ -45,8 +47,7 @@ function ProductListingContent({ params }: { params: ListingParams }) {
   const isFruit = category === 'fruits'
   const isElectronics = category === 'electronics'
   const [query, setQuery] = useState(params.query ?? '')
-  const [filters, setFilters] = useState<ProductFilters>({ minimumPrice: params.minimumPrice ?? '', maximumPrice: params.maximumPrice ?? '', minimumRating: Number(params.minimumRating) || 0 })
-  const [filterVisible, setFilterVisible] = useState(false)
+  const filters = useProductFilters()
   const [subcategory, setSubcategory] = useState('phone')
   const [sort, setSort] = useState<SortOrder>('sales')
   const [expanded, setExpanded] = useState(false)
@@ -55,16 +56,21 @@ function ProductListingContent({ params }: { params: ListingParams }) {
     let source = category === 'all' ? allProducts : allProducts.filter((item) => item.category === category)
     if (isFruit) source = expanded ? [...fruits, ...relevantFruits] : fruits
     if (isElectronics) source = expanded ? electronics : electronics.filter((item) => item.subcategory === subcategory)
+    if (params.relatedTo) {
+      const detail = productApi.getById(params.relatedTo)
+      const related = detail ? new Set(productApi.getRelated(detail).map((item) => item.id)) : new Set<string>()
+      source = allProducts.filter((item) => related.has(item.id))
+    }
     return filterProducts(source, query, filters, sort)
-  }, [category, expanded, filters, isElectronics, isFruit, query, sort, subcategory])
+  }, [category, expanded, filters, isElectronics, isFruit, query, sort, subcategory, params.relatedTo])
   const rows = useMemo(() => isFruit
     ? Array.from({ length: Math.ceil(products.length / 2) }, (_, index) => products.slice(index * 2, index * 2 + 2))
     : products.map((product) => [product]), [isFruit, products])
   const relevant = filterProducts(relevantFruits, query, filters)
-  const filtered = Boolean(filters.minimumPrice || filters.maximumPrice || filters.minimumRating)
+  const filtered = hasActiveFilters(filters)
 
   return (
-    <MarketplaceFrame title={category === 'all' ? 'All Deals' : categoryNames[category]} onBack={() => router.canGoBack() ? router.back() : router.replace('/')}>
+    <MarketplaceFrame title={params.relatedTo ? 'Relevant products' : category === 'all' ? 'All Deals' : categoryNames[category]} onBack={() => router.canGoBack() ? router.back() : router.replace('/')}>
       <FlatList
         data={rows}
         keyExtractor={(row) => row.map((product) => product.id).join('-')}
@@ -74,25 +80,25 @@ function ProductListingContent({ params }: { params: ListingParams }) {
         ItemSeparatorComponent={() => <YStack h={isFruit ? 24 : 14} />}
         ListHeaderComponent={(
           <YStack>
-            <SearchField value={query} onChangeText={setQuery} onFilter={() => setFilterVisible(true)} filtered={filtered} />
+            <SearchField value={query} onChangeText={setQuery} onFilter={() => router.push('/filters')} filtered={filtered} />
             {isFruit && <YStack mt={24} mb={22}><BannerCarousel slides={fruitBanners} /></YStack>}
             {isElectronics && <>
               <XStack items="center" justify="space-between" mt={24} mb={12}>
                 <MarketHeading>Categories</MarketHeading>
-                <XStack role="button" aria-label="See all electronics categories" onPress={() => { setExpanded(true); setSubcategory('all') }} items="center" hitSlop={8}>
+                <XStack {...keyboardAction} role="button" aria-label="See all electronics categories" onPress={() => { setExpanded(true); setSubcategory('all') }} items="center" hitSlop={8}>
                   <MarketText fontSize={11} color={m.muted}>See all</MarketText><Ionicons name="caret-forward" size={11} color={m.muted} />
                 </XStack>
               </XStack>
               <XStack gap={14}>
                 {electronicCategories.map((item) => (
-                  <YStack key={item.id} flex={1} h={92} overflow="hidden" rounded={6} borderWidth={1} borderColor={subcategory === item.id ? m.purple : 'transparent'} role="button" aria-label={item.name} aria-selected={subcategory === item.id} onPress={() => { setSubcategory(item.id); setExpanded(false) }}>
+                  <YStack {...keyboardAction} key={item.id} flex={1} h={92} overflow="hidden" rounded={6} borderWidth={1} borderColor={subcategory === item.id ? m.purple : 'transparent'} role="button" aria-label={item.name} aria-selected={subcategory === item.id} onPress={() => { setSubcategory(item.id); setExpanded(false) }}>
                     <Image source={item.image} style={styles.categoryImage} resizeMode="cover" />
                   </YStack>
                 ))}
               </XStack>
               <XStack gap={8} mt={38} mb={14}>
                 {sortOptions.map((option) => (
-                  <YStack key={option.value} flex={1} h={24} rounded={14} justify="center" items="center" bg={sort === option.value ? '#eafbfd' : 'transparent'} role="button" aria-label={option.label} aria-selected={sort === option.value} onPress={() => setSort(option.value)} hitSlop={6}>
+                  <YStack {...keyboardAction} key={option.value} flex={1} h={24} rounded={14} justify="center" items="center" bg={sort === option.value ? '#eafbfd' : 'transparent'} role="button" aria-label={option.label} aria-selected={sort === option.value} onPress={() => setSort(option.value)} hitSlop={6}>
                     <MarketText fontSize={11} lineHeight="18px" fontWeight={sort === option.value ? '600' : '400'} color={sort === option.value ? m.primary : m.secondary}>{option.label}</MarketText>
                   </YStack>
                 ))}
@@ -107,19 +113,21 @@ function ProductListingContent({ params }: { params: ListingParams }) {
         ListEmptyComponent={<EmptyProducts />}
         ListFooterComponent={(
           <YStack>
-            {(isFruit || isElectronics) && <YStack mt={isFruit ? 24 : 14}><SeeAllButton expanded={expanded} onPress={() => setExpanded(!expanded)} /></YStack>}
+            {(isFruit || isElectronics) && <YStack mt={isFruit ? 24 : 14}><SeeAllButton expanded={expanded} onPress={() => {
+              setExpanded(!expanded)
+              if (expanded && subcategory === 'all') setSubcategory('phone')
+            }} /></YStack>}
             {isElectronics && <YStack mt={24}><BannerCarousel slides={electronicsBanners} /></YStack>}
             {isFruit && <YStack mt={48}>
               <XStack items="center" justify="space-between" mb={18}>
                 <MarketHeading>Relevant products</MarketHeading>
-                <XStack role="button" aria-label="See all relevant products" onPress={() => setExpanded(true)} items="center" hitSlop={8} gap={3}><MarketText fontSize={12} color={m.muted}>See all</MarketText><Ionicons name="chevron-forward" size={14} color={m.muted} /></XStack>
+                <XStack {...keyboardAction} role="button" aria-label="See all relevant products" onPress={() => setExpanded(true)} items="center" hitSlop={8} gap={3}><MarketText fontSize={12} color={m.muted}>See all</MarketText><Ionicons name="chevron-forward" size={14} color={m.muted} /></XStack>
               </XStack>
               <YStack gap={14}>{relevant.map((product) => <ProductRow key={product.id} product={product} accent={m.muted} />)}</YStack>
             </YStack>}
           </YStack>
         )}
       />
-      <FilterModal visible={filterVisible} value={filters} onChange={setFilters} onClose={() => setFilterVisible(false)} />
     </MarketplaceFrame>
   )
 }
