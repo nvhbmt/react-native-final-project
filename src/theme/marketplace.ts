@@ -1,3 +1,5 @@
+import { bodyFontFamily } from './tamagui.config'
+
 // Measurements follow the 375px-wide prototype; content grows with the device width.
 export const marketplace = {
   ink: '#171a1f',
@@ -11,6 +13,5 @@ export const marketplace = {
   border: '#f0f1f3',
   star: '#ffc329',
   starEmpty: '#dee1e6',
-  bodyFont: 'MarketplaceInter',
-  headingFont: 'MarketplaceManrope',
+  bodyFont: bodyFontFamily,
 } as const

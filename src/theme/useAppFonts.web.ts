@@ -1,4 +1,5 @@
 import { Asset } from 'expo-asset'
+import { useEffect, useState } from 'react'
 
 import { fontAssets, webFontFaces } from './fonts'
 
@@ -19,8 +20,16 @@ function injectFontFaces() {
   document.head.appendChild(style)
 }
 
-/** Web: khai báo @font-face theo weight (font-display: swap nên không cần chờ). */
+/** Wait for the same static faces used on native before revealing the UI. */
 export function useAppFonts(): boolean {
-  injectFontFaces()
-  return true
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    injectFontFaces()
+    let mounted = true
+    Promise.all(webFontFaces.map(({ family, weight }) => document.fonts.load(`${weight} 16px "${family}"`)))
+      .catch(() => undefined)
+      .finally(() => { if (mounted) setReady(true) })
+    return () => { mounted = false }
+  }, [])
+  return ready
 }

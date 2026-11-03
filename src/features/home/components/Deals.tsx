@@ -10,7 +10,7 @@ export function Deals() {
     <YStack px={24} gap={8}>
       <XStack position="relative" h={176} bg="#f5f1fe" borderTopLeftRadius={6} borderTopRightRadius={6} items="center" px={24} overflow="hidden">
         <YStack z={1} gap={2}>
-          <MarketHeading fontSize={26} lineHeight="36px" color={m.primary}>Shoes</MarketHeading>
+          <MarketHeading fontSize={24} lineHeight="36px" color={m.primary}>Shoes</MarketHeading>
           <MarketText fontSize={18} lineHeight="28px" color="#565656">50% off</MarketText>
           <YStack w={96} h={36} mt={12} bg={m.ink} rounded={3} items="center" justify="center" role="button" aria-label="Buy shoes now" onPress={() => router.push({ pathname: '/product-listing', params: { category: 'fashion' } })} opacity="1 press:0.8" style={styles.shadow}>
             <MarketText fontWeight="600" color="white">Buy now</MarketText>
