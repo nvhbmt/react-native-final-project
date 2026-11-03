@@ -40,7 +40,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "node --experimental-strip-types --test tests/cart-checkout.test.cjs tests/product-filters.test.cjs"
   },
   "private": true,
   "overrides": {
