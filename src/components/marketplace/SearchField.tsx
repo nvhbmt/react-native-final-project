@@ -4,6 +4,8 @@ import { XStack, YStack } from 'tamagui'
 
 import { marketplace as m } from '@/theme/marketplace'
 
+import { keyboardAction } from './keyboardAction'
+
 type Props = {
   value: string
   onChangeText: (text: string) => void
@@ -33,6 +35,7 @@ export function SearchField({ value, onChangeText, onFilter, onSubmit, placehold
         />
       </XStack>
       <YStack
+        {...keyboardAction}
         role="button" aria-label="Filter products" onPress={onFilter}
         w={36} h={36} items="center" justify="center"
         rounded={4} bg={filtered ? '#e6fbfe' : m.input}

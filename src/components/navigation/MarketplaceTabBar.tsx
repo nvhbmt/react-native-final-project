@@ -6,6 +6,7 @@ import { XStack, YStack } from 'tamagui'
 import { MarketText } from '@/components/marketplace/MarketText'
 import { useUnreadCount } from '@/features/inbox'
 import { TABS } from '@/navigation/tabs'
+import { keyboardAction } from '@/components/marketplace/keyboardAction'
 import { marketplace as m } from '@/theme/marketplace'
 
 import { TabBarIcon } from './TabBarIcon'
@@ -28,13 +29,13 @@ export function MarketplaceTabBar({ state, emitter, navigateToTab }: Props) {
         const focused = active === tab.name
         const color = focused ? m.primary : m.secondary
         return (
-          <YStack key={tab.name} flex={1} minH={44} items="center" justify="center" gap={2} role="tab" aria-label={tab.title} aria-selected={focused} onPress={() => {
+          <YStack {...keyboardAction} key={tab.name} flex={1} minH={44} items="center" justify="center" gap={2} role="tab" aria-label={tab.title} aria-selected={focused} onPress={() => {
             if (!route) return
             const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true })
             if (!event.defaultPrevented) navigateToTab(route.key)
           }}>
-            <YStack position="relative">
-              <TabBarIcon name={tab.icon} color={color} size={26} />
+            <YStack position="relative" w={28} h={26} items="center" justify="center">
+              <TabBarIcon name={tab.icon} color={color} size={28} />
               {((tab.name === 'favorites' && !isFruit) || (tab.name === 'inbox' && isFruit && unread > 0)) && <YStack position="absolute" t={-3} l={15} bg="#f04452" rounded={8} px={3} borderWidth={1} borderColor="white"><MarketText fontSize={9} lineHeight="13px" color="white" fontWeight="700">{tab.name === 'favorites' ? '99+' : unread}</MarketText></YStack>}
             </YStack>
             <MarketText fontSize={10} lineHeight="16px" color={color} fontWeight={focused ? '600' : '400'}>{tab.title}</MarketText>

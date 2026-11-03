@@ -4,13 +4,14 @@ import { YStack } from 'tamagui'
 
 import { MarketText } from '@/components/marketplace/MarketText'
 import { categories } from '@/features/products'
+import { keyboardAction } from '@/components/marketplace/keyboardAction'
 import { marketplace as m } from '@/theme/marketplace'
 
 export function CategoryStrip() {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
       {categories.map((category) => (
-        <YStack key={category.id} w={84} gap={8} items="center" role="button" aria-label={`Browse ${category.name}`} onPress={() => router.push({ pathname: '/product-listing', params: { category: category.id } })} opacity="1 press:0.8">
+        <YStack {...keyboardAction} key={category.id} w={84} gap={8} items="center" role="button" aria-label={`Browse ${category.name}`} onPress={() => router.push({ pathname: '/product-listing', params: { category: category.id } })} opacity="1 press:0.8">
           <YStack w={84} h={84} rounded={42} bg={category.id === 'fruits' ? '#e85660' : 'transparent'} overflow="hidden">
             <Image source={category.image} style={category.id === 'fruits' ? styles.fruit : styles.image} resizeMode="contain" />
           </YStack>
