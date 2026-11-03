@@ -12,6 +12,7 @@ import { appColors, bodyFontFamily } from '@/theme/tamagui.config'
 import { ImageUploader } from '../components/ImageUploader'
 import { MoodPicker } from '../components/MoodPicker'
 import { TopicChips } from '../components/TopicChips'
+import { useFeedbackStore } from '../store/feedbackStore'
 import type { FeedbackInput } from '../types'
 
 const SHEET_TOP = 89
@@ -22,7 +23,7 @@ function Label({ children }: { children: string }) {
 
 /** Bottom sheet góp ý, mở dạng modal trong suốt phủ lên màn trước. */
 export function FeedbackScreen() {
-  const params = useLocalSearchParams<{ rating?: string }>()
+  const params = useLocalSearchParams<{ rating?: string; productId?: string; orderId?: string }>()
   const { height } = useWindowDimensions()
   const insets = useSafeAreaInsets()
   const [translateY] = useState(() => new Animated.Value(height))
@@ -31,9 +32,10 @@ export function FeedbackScreen() {
     topics: [],
     comment: '',
     images: [],
-    rating: Number(params.rating) || 0,
+    rating: Math.max(0, Math.min(5, Math.round(Number(params.rating) || 0))),
   })
   const update = (patch: Partial<FeedbackInput>) => setForm((f) => ({ ...f, ...patch }))
+  const submitFeedback = useFeedbackStore((state) => state.submitFeedback)
 
   useEffect(() => {
     Animated.spring(translateY, { toValue: 0, useNativeDriver: true, bounciness: 0, speed: 14 }).start()
@@ -48,7 +50,8 @@ export function FeedbackScreen() {
   }
 
   const submit = () => {
-    // TODO: gửi `form` lên API góp ý.
+    if (closingRef.current || !form.rating) return
+    submitFeedback({ ...form, productId: params.productId, orderId: params.orderId })
     close()
   }
 

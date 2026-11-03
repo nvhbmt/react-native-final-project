@@ -9,3 +9,10 @@ export type FeedbackInput = {
   images: string[]
   rating: number
 }
+
+export type SubmittedFeedback = FeedbackInput & {
+  id: string
+  createdAt: number
+  productId?: string
+  orderId?: string
+}
