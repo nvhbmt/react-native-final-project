@@ -1,5 +1,5 @@
-import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen'
+import { ProductListingScreen } from '@/features/products'
 
 export function SearchScreen() {
-  return <PlaceholderScreen title="Search" icon="search-outline" description="Tìm kiếm: ô tìm kiếm, bộ lọc, kết quả." />
+  return <ProductListingScreen />
 }

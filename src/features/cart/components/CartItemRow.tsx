@@ -16,12 +16,15 @@ export function CartItemRow({ item }: { item: CartItem }) {
   const [editing, setEditing] = useState(false)
   const setQuantity = useCartStore((s) => s.setQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
-  const openProduct = () => router.push(`/product/${item.productId}`)
+  const openProduct = () => router.push({
+    pathname: '/product/[id]',
+    params: { id: item.productId, color: item.options?.color ?? '', size: item.options?.size ?? '' },
+  })
 
   return (
     <View className="h-[99px] flex-row items-center gap-4">
       <View onPress={openProduct} role="link" aria-label={item.name} className="active:opacity-80">
-        <Image source={{ uri: item.image }} style={{ width: 80, height: 80, borderRadius: 4 }} contentFit="cover" />
+        <Image source={item.image} style={{ width: 80, height: 80, borderRadius: 4 }} contentFit="contain" />
       </View>
       <View className="flex-1 gap-1 pl-1.5">
         <ClampedText lines={1} className="font-heading text-[14px] leading-[22px] font-bold text-neutral-700">

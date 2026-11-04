@@ -14,7 +14,7 @@ type Props = {
 export function ReviewItem({ review, showRating = false }: Props) {
   return (
     <View className="flex-row gap-4">
-      <Image source={{ uri: review.avatar }} style={{ width: 36, height: 36, borderRadius: 18 }} />
+      <Image source={review.avatar} style={{ width: 36, height: 36, borderRadius: 18 }} />
       <View className="flex-1 gap-1">
         <View className="flex-row items-center justify-between">
           <Text className="text-[14px] leading-[22px] text-neutral-700">{review.author}</Text>

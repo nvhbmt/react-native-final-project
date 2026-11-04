@@ -58,6 +58,7 @@ export function bodyFont(weight: keyof typeof interFace) {
 export const config = createTamagui({
   ...baseConfig,
   fonts: {
+    ...baseConfig.fonts,
     body: createFont({
       ...baseConfig.fonts.body,
       family: fontFamily('Inter', 'Inter_400Regular'),

@@ -32,7 +32,7 @@ export function ReviewsScreen() {
       contentClassName="pt-2 pb-6"
       footer={
         <View className="border-t border-neutral-200 px-6 pt-3 pb-3">
-          <Button title="Write a review" leftIcon="create-outline" onPress={() => router.push('/feedback')} />
+          <Button title="Write a review" leftIcon="create-outline" onPress={() => router.push({ pathname: '/feedback', params: { productId: product.id } })} />
         </View>
       }
     >

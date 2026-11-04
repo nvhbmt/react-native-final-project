@@ -22,7 +22,7 @@ export function AppHeader({
   title,
   align = 'center',
   right,
-  onBack = () => router.back(),
+  onBack = () => router.canGoBack() ? router.back() : router.replace('/'),
   showBack = true,
 }: Props) {
   const back = showBack ? (

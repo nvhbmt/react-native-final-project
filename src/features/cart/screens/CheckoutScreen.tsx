@@ -20,6 +20,12 @@ export function CheckoutScreen() {
   return (
     <Screen header={<AppHeader title="Checkout" />} contentClassName="px-5 pt-4 pb-6" safeBottom>
       <View className="px-1">
+        {items.length === 0 && (
+          <View className="gap-5 py-10">
+            <Text className="text-center text-[14px] leading-[22px] text-neutral-500">Your cart is empty.</Text>
+            <Button title="Continue shopping" variant="outline" onPress={() => router.dismissTo('/')} />
+          </View>
+        )}
         {items.map((item, i) => (
           <Fragment key={item.key}>
             {i > 0 ? <Divider className="bg-neutral-200" /> : null}

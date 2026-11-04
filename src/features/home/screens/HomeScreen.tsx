@@ -1,28 +1,39 @@
 import { router } from 'expo-router'
+import { useState } from 'react'
+import { ScrollView, StyleSheet } from 'react-native'
+import { YStack } from 'tamagui'
 
-import { AppHeader } from '@/components/ui/AppHeader'
-import { Button } from '@/components/ui/Button'
-import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen'
-import { HeaderActions } from '@/navigation/HeaderActions'
+import { MarketplaceFrame } from '@/components/marketplace/MarketplaceFrame'
+import { SearchField } from '@/components/marketplace/SearchField'
+import { hasActiveFilters, useProductFilters } from '@/features/filters'
 
-// Lối vào tạm để demo các màn đã làm — thay bằng trang chủ thật sau.
-const DEMO_LINKS = [
-  { title: 'Headphone', href: '/product/headphone-pro' },
-  { title: 'T-Shirt', href: '/product/hoodie-shirt' },
-  { title: 'Checkout', href: '/checkout' },
-] as const
+import { CategoryStrip } from '../components/CategoryStrip'
+import { Deals } from '../components/Deals'
+import { RecommendedProducts } from '../components/RecommendedProducts'
 
 export function HomeScreen() {
+  const [query, setQuery] = useState('')
+  const filters = useProductFilters()
+
   return (
-    <PlaceholderScreen
-      title="Home"
-      icon="home-outline"
-      description="Trang chủ: banner, danh mục, gợi ý nổi bật."
-      header={<AppHeader title="Home" align="left" showBack={false} right={<HeaderActions />} />}
-    >
-      {DEMO_LINKS.map((l) => (
-        <Button key={l.href} title={l.title} variant="outline" className="self-stretch" onPress={() => router.push(l.href)} />
-      ))}
-    </PlaceholderScreen>
+    <MarketplaceFrame title="All Deals" onBack={() => { if (router.canGoBack()) router.back() }}>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
+        <YStack px={24} mb={24}>
+          <SearchField
+            value={query} onChangeText={setQuery} placeholder="Search for product"
+            onFilter={() => router.push('/filters')}
+            filtered={hasActiveFilters(filters)}
+            onSubmit={() => router.push({ pathname: '/product-listing', params: { query } })}
+          />
+        </YStack>
+        <CategoryStrip />
+        <YStack h={24} />
+        <Deals />
+        <YStack h={32} />
+        <RecommendedProducts />
+      </ScrollView>
+    </MarketplaceFrame>
   )
 }
+
+const styles = StyleSheet.create({ content: { paddingTop: 28, paddingBottom: 22 } })
