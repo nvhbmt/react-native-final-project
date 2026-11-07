@@ -32,6 +32,34 @@ npm run db:generate           # sửa src/db/schema.ts → sinh SQL vào drizzle
 
 Integration test **xoá sạch bảng**, nên tên DB bắt buộc chứa `test`.
 
+## Database (Docker)
+
+Chỉ Postgres chạy trong Docker (`docker-compose.yml`), API chạy trực tiếp bằng Node để hot reload.
+Cần Docker Desktop hoặc OrbStack.
+
+| | Giá trị |
+|---|---|
+| Image | `postgres:17-alpine` |
+| Cổng máy | `5435` (tránh 5433/5434 của các project khác trong workspace) |
+| User / mật khẩu | `market` / `market` |
+| Database | `market` (dev), `market_test` (integration test) |
+| Dữ liệu | volume `server_market-pg`, còn nguyên khi tắt/bật lại container |
+
+```bash
+npm run db:up        # bật Postgres, chờ tới khi healthcheck OK
+npm run db:down      # tắt container, GIỮ dữ liệu
+npm run db:reset     # XOÁ volume, tạo DB mới rồi chạy migration
+npm run db:psql      # mở psql vào DB market (\dt để xem bảng)
+npm run db:logs      # xem log Postgres
+```
+
+- `scripts/init-test-db.sql` tạo `market_test`, nhưng **chỉ chạy lần đầu volume được tạo**. Nếu volume có
+  từ trước khi thêm script này, chạy `npm run db:reset` (mất dữ liệu dev) hoặc tạo tay:
+  `docker compose exec db createdb -U market market_test`.
+- Đổi schema: sửa `src/db/schema.ts` → `npm run db:generate` → xem lại SQL trong `drizzle/` → `npm run migrate`.
+  Commit cả thư mục `drizzle/` (kể cả `meta/`).
+- Mật khẩu `market/market` chỉ dùng cho dev. Production dùng Postgres riêng và đặt `DATABASE_URL` trong env.
+
 ## Cấu trúc
 
 ```

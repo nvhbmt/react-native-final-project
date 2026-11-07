@@ -56,6 +56,20 @@ npm run lint         # expo lint
 npm test             # 23 kiểm thử giỏ hàng, đơn, góp ý, lọc sản phẩm và API client (Node 22.13+)
 ```
 
+Đăng nhập/đăng ký cần backend chạy song song (cần Docker cho Postgres). Mở terminal thứ hai:
+
+```bash
+cd server
+npm install
+cp .env.example .env   # thay JWT_ACCESS_SECRET bằng chuỗi ngẫu nhiên ≥ 32 ký tự
+npm run db:up          # Postgres 17 trong Docker, cổng 5435
+npm run migrate
+npm run dev            # API tại http://localhost:4000/api/v1
+```
+
+Không bật backend thì app vẫn duyệt sản phẩm được; màn đăng nhập sẽ báo không kết nối được máy chủ.
+Chi tiết database (tắt, reset, psql) xem `server/README.md`.
+
 ## Backend và đăng nhập
 
 API nằm trong `server/` (Hono + Drizzle + Postgres), là một cây npm riêng, không nằm trong bundle
