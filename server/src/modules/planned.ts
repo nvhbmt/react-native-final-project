@@ -1,0 +1,112 @@
+import { Hono } from 'hono'
+
+import { AppError } from '@/lib/http.ts'
+import { requireAuth } from '@/middleware/auth.ts'
+
+/**
+ * Các endpoint đã chốt hợp đồng (method + path) nhưng chưa triển khai.
+ * Mỗi endpoint trả 501 NOT_IMPLEMENTED; endpoint cần đăng nhập vẫn kiểm tra access token trước,
+ * để app có thể nối luồng 401 → refresh → thử lại ngay từ bây giờ.
+ *
+ * Khi triển khai một module: tạo `modules/<module>/routes.ts`, mount trong `app.ts`
+ * TRƯỚC router này, rồi xoá các dòng tương ứng ở đây.
+ */
+export type PlannedEndpoint = {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
+  module: string
+  auth: boolean
+  summary: string
+}
+
+const e = (method: PlannedEndpoint['method'], path: string, module: string, auth: boolean, summary: string): PlannedEndpoint => ({
+  method,
+  path,
+  module,
+  auth,
+  summary,
+})
+
+export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
+  // Auth — phần còn lại cần dịch vụ gửi email
+  e('POST', '/auth/forgot-password', 'auth', false, 'Gửi mã/đường dẫn đặt lại mật khẩu qua email'),
+  e('POST', '/auth/reset-password', 'auth', false, 'Đặt lại mật khẩu bằng mã đã gửi'),
+
+  // Tài khoản
+  e('PATCH', '/users/me', 'users', true, 'Cập nhật họ tên, số điện thoại, địa chỉ'),
+  e('PUT', '/users/me/avatar', 'users', true, 'Đổi ảnh đại diện (nhận uploadId)'),
+  e('DELETE', '/users/me', 'users', true, 'Xoá tài khoản'),
+  e('GET', '/users/me/addresses', 'users', true, 'Danh sách địa chỉ giao hàng'),
+  e('POST', '/users/me/addresses', 'users', true, 'Thêm địa chỉ giao hàng'),
+
+  // Danh mục & sản phẩm (public)
+  e('GET', '/home', 'catalog', false, 'Dữ liệu trang chủ: danh mục, banner, ưu đãi, sản phẩm đề xuất'),
+  e('GET', '/categories', 'catalog', false, 'Danh sách danh mục và danh mục con'),
+  e('GET', '/products', 'catalog', false, 'Tìm/lọc sản phẩm: q, category, subcategory, sort, minPrice, maxPrice, minRating, shipping[], benefits[], cursor'),
+  e('GET', '/products/:id', 'catalog', false, 'Chi tiết sản phẩm kèm biến thể màu/size'),
+  e('GET', '/products/:id/related', 'catalog', false, 'Sản phẩm liên quan'),
+  e('GET', '/products/:id/size-guide', 'catalog', false, 'Bảng size'),
+
+  // Đánh giá
+  e('GET', '/products/:id/reviews', 'reviews', false, 'Danh sách đánh giá, lọc theo số sao, phân trang'),
+  e('POST', '/products/:id/reviews', 'reviews', true, 'Viết đánh giá (chỉ khi đã mua)'),
+
+  // Giỏ hàng — đồng bộ với cartStore phía app
+  e('GET', '/cart', 'cart', true, 'Lấy giỏ hàng và tổng tiền'),
+  e('POST', '/cart/items', 'cart', true, 'Thêm sản phẩm (productId, colorId?, size?, quantity)'),
+  e('PATCH', '/cart/items/:key', 'cart', true, 'Đổi số lượng một dòng'),
+  e('DELETE', '/cart/items/:key', 'cart', true, 'Xoá một dòng'),
+  e('DELETE', '/cart', 'cart', true, 'Xoá toàn bộ giỏ'),
+  e('POST', '/cart/voucher', 'cart', true, 'Áp mã giảm giá'),
+  e('DELETE', '/cart/voucher', 'cart', true, 'Bỏ mã giảm giá'),
+
+  // Thanh toán & đơn hàng
+  e('GET', '/payment-methods', 'payments', true, 'Phương thức thanh toán đã lưu'),
+  e('POST', '/payment-methods', 'payments', true, 'Lưu phương thức thanh toán (token từ cổng thanh toán)'),
+  e('DELETE', '/payment-methods/:id', 'payments', true, 'Xoá phương thức thanh toán'),
+  e('POST', '/orders', 'orders', true, 'Đặt hàng từ giỏ hiện tại, chốt giá và tổng tiền'),
+  e('GET', '/orders', 'orders', true, 'Lịch sử đơn hàng'),
+  e('GET', '/orders/:id', 'orders', true, 'Chi tiết đơn hàng'),
+  e('POST', '/orders/:id/cancel', 'orders', true, 'Huỷ đơn khi chưa giao'),
+  e('POST', '/orders/:id/pay', 'payments', true, 'Tạo giao dịch thanh toán cho đơn'),
+  e('POST', '/payments/webhook', 'payments', false, 'Webhook từ cổng thanh toán (xác thực bằng chữ ký)'),
+
+  // Góp ý, yêu thích, hộp thư, upload
+  e('POST', '/feedback', 'feedback', true, 'Gửi góp ý: mood, topics, comment, images, rating, productId?, orderId?'),
+  e('GET', '/feedback', 'feedback', true, 'Góp ý đã gửi'),
+  e('GET', '/favorites', 'favorites', true, 'Sản phẩm yêu thích'),
+  e('PUT', '/favorites/:productId', 'favorites', true, 'Thêm vào yêu thích (idempotent)'),
+  e('DELETE', '/favorites/:productId', 'favorites', true, 'Bỏ yêu thích'),
+  e('GET', '/inbox', 'inbox', true, 'Thông báo/tin nhắn, phân trang'),
+  e('GET', '/inbox/unread-count', 'inbox', true, 'Số tin chưa đọc (badge tab Inbox)'),
+  e('POST', '/inbox/:id/read', 'inbox', true, 'Đánh dấu đã đọc'),
+  e('POST', '/inbox/read-all', 'inbox', true, 'Đánh dấu tất cả đã đọc'),
+  e('POST', '/uploads', 'uploads', true, 'Upload ảnh (multipart) cho avatar/feedback/review, trả uploadId + url'),
+
+  // Chat AI — trợ lý mua sắm
+  e('GET', '/ai/conversations', 'ai-chat', true, 'Danh sách cuộc hội thoại với trợ lý AI'),
+  e('POST', '/ai/conversations', 'ai-chat', true, 'Tạo hội thoại mới (có thể gắn productId/orderId làm ngữ cảnh)'),
+  e('GET', '/ai/conversations/:id', 'ai-chat', true, 'Chi tiết hội thoại'),
+  e('DELETE', '/ai/conversations/:id', 'ai-chat', true, 'Xoá hội thoại'),
+  e('GET', '/ai/conversations/:id/messages', 'ai-chat', true, 'Lịch sử tin nhắn, phân trang ngược'),
+  e('POST', '/ai/conversations/:id/messages', 'ai-chat', true, 'Gửi tin nhắn; trả lời stream qua SSE (text/event-stream)'),
+  e('POST', '/ai/conversations/:id/messages/:messageId/stop', 'ai-chat', true, 'Dừng câu trả lời đang stream'),
+  e('POST', '/ai/messages/:messageId/rating', 'ai-chat', true, 'Đánh giá câu trả lời (hữu ích / không hữu ích)'),
+]
+
+export function plannedRoutes(accessSecret: string) {
+  const app = new Hono()
+  const auth = requireAuth(accessSecret)
+
+  for (const endpoint of PLANNED_ENDPOINTS) {
+    const notImplemented = () => {
+      throw new AppError(501, 'NOT_IMPLEMENTED', `${endpoint.method} ${endpoint.path} chưa được triển khai`, {
+        module: endpoint.module,
+        summary: endpoint.summary,
+      })
+    }
+    if (endpoint.auth) app.on(endpoint.method, endpoint.path, auth, notImplemented)
+    else app.on(endpoint.method, endpoint.path, notImplemented)
+  }
+  return app
+}

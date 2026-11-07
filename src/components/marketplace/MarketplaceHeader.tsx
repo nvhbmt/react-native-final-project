@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import { Image, StyleSheet } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 
+import { ProfileAvatar } from '@/features/account'
+import { useCurrentUser } from '@/features/auth'
 import { useCartStore } from '@/features/cart'
 import { keyboardAction } from '@/components/marketplace/keyboardAction'
 import { marketplace as m } from '@/theme/marketplace'
@@ -10,6 +11,7 @@ import { marketplace as m } from '@/theme/marketplace'
 import { MarketHeading, MarketText } from './MarketText'
 
 export function MarketplaceHeader({ title, onBack }: { title: string; onBack: () => void }) {
+  const user = useCurrentUser()
   const count = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
 
   return (
@@ -27,10 +29,8 @@ export function MarketplaceHeader({ title, onBack }: { title: string; onBack: ()
         )}
       </YStack>
       <YStack {...keyboardAction} ml={4} role="button" aria-label="Open account" onPress={() => router.navigate('/account')} hitSlop={4}>
-        <Image source={require('../../../assets/marketplace/avatar.png')} style={styles.avatar} />
+        <ProfileAvatar user={user} size={36} />
       </YStack>
     </XStack>
   )
 }
-
-const styles = StyleSheet.create({ avatar: { width: 36, height: 36, borderRadius: 18 } })

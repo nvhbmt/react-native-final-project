@@ -1,0 +1,75 @@
+import { Text, View } from '@tamagui/tailwind'
+import { router } from 'expo-router'
+import { useState } from 'react'
+import { Alert, Platform } from 'react-native'
+
+import { Divider } from '@/components/ui/Divider'
+import { useAuthStore, type User } from '@/features/auth'
+
+import { AccountMenuRow } from './AccountMenuRow'
+import { ProfileAvatar } from './ProfileAvatar'
+
+/** Hỏi xác nhận: Alert trên native, window.confirm trên web (Alert nhiều nút không chạy trên web). */
+function confirm(title: string, message: string, action: string, onConfirm: () => void) {
+  if (Platform.OS === 'web') {
+    if (globalThis.confirm?.(`${title}\n\n${message}`)) onConfirm()
+    return
+  }
+  Alert.alert(title, message, [
+    { text: 'Huỷ', style: 'cancel' },
+    { text: action, style: 'destructive', onPress: onConfirm },
+  ])
+}
+
+export function SignedInAccount({ user }: { user: User }) {
+  const logout = useAuthStore((s) => s.logout)
+  const logoutAll = useAuthStore((s) => s.logoutAll)
+  const [busy, setBusy] = useState<'logout' | 'logout-all' | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const run = (kind: 'logout' | 'logout-all', action: () => Promise<void>) => async () => {
+    setBusy(kind)
+    setError(null)
+    try {
+      await action()
+    } catch (e) {
+      setError((e as Error).message || 'Không thực hiện được, vui lòng thử lại')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <View className="gap-6">
+      <View className="flex-row items-center gap-4">
+        <ProfileAvatar user={user} size={64} />
+        <View className="flex-1 gap-[2px]">
+          <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">{user.fullName}</Text>
+          <Text className="text-[14px] leading-[22px] text-neutral-600">{user.email}</Text>
+        </View>
+      </View>
+
+      <View className="overflow-hidden rounded-[8px] border border-neutral-300">
+        <AccountMenuRow icon="key-outline" label="Đổi mật khẩu" onPress={() => router.push('/change-password')} />
+        <Divider />
+        <AccountMenuRow
+          icon="phone-portrait-outline"
+          label="Đăng xuất khỏi mọi thiết bị"
+          loading={busy === 'logout-all'}
+          onPress={() =>
+            confirm('Đăng xuất mọi thiết bị?', 'Tất cả thiết bị đang đăng nhập tài khoản này sẽ phải đăng nhập lại.', 'Đăng xuất', run('logout-all', logoutAll))
+          }
+        />
+        <Divider />
+        <AccountMenuRow
+          icon="log-out-outline"
+          label="Đăng xuất"
+          danger
+          loading={busy === 'logout'}
+          onPress={() => confirm('Đăng xuất?', 'Bạn có chắc muốn đăng xuất khỏi thiết bị này?', 'Đăng xuất', run('logout', logout))}
+        />
+      </View>
+      {error ? <Text className="text-[12px] leading-[20px] text-danger">{error}</Text> : null}
+    </View>
+  )
+}
