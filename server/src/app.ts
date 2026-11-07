@@ -18,6 +18,8 @@ export type AppDeps = {
   accessTtlSeconds: number
   refreshTtlSeconds: number
   corsOrigins: string[]
+  /** Dev: chấp nhận mọi `http://localhost:<cổng>` (Expo web có thể chạy ở cổng khác 8081). */
+  allowLocalhostOrigins?: boolean
   /** Kiểm tra kết nối DB cho /healthz; bỏ trống trong unit test. */
   checkDatabase?: () => Promise<void>
   logRequests?: boolean
@@ -38,7 +40,10 @@ export function buildApp(deps: AppDeps) {
   if (deps.logRequests) app.use('*', logger())
   app.use('*', secureHeaders())
   // App native không gửi Origin nên không bị CORS chặn; danh sách này chỉ dành cho Expo web.
-  app.use('*', cors({ origin: deps.corsOrigins, allowHeaders: ['Content-Type', 'Authorization'], maxAge: 600 }))
+  const localhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/
+  const allowOrigin = (origin: string) =>
+    deps.corsOrigins.includes(origin) || (deps.allowLocalhostOrigins && localhost.test(origin)) ? origin : null
+  app.use('*', cors({ origin: allowOrigin, allowHeaders: ['Content-Type', 'Authorization'], maxAge: 600 }))
   app.use('/api/*', bodyLimit({ maxSize: 1024 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Dữ liệu gửi lên quá lớn') } }))
 
   app.get('/healthz', async (c) => {

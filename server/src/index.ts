@@ -15,6 +15,7 @@ const app = buildApp({
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,
   refreshTtlSeconds: env.REFRESH_TOKEN_TTL,
   corsOrigins: env.CORS_ORIGINS,
+  allowLocalhostOrigins: env.NODE_ENV === 'development',
   checkDatabase: async () => {
     await db.execute(sql`select 1`)
   },

@@ -20,7 +20,8 @@ npm run dev                   # http://localhost:4000/api/v1
 ```
 
 Điện thoại thật không gọi được `localhost` — dùng IP LAN của máy dev (`http://192.168.x.x:4000`).
-Server lắng nghe trên `0.0.0.0`. Expo web (`:8081`) phải có trong `CORS_ORIGINS`.
+Server lắng nghe trên `0.0.0.0`. Khi `NODE_ENV=development`, mọi origin `http://localhost:<cổng>` đều được
+CORS cho phép; môi trường khác chỉ cho các origin trong `CORS_ORIGINS`. App native không bị CORS chặn.
 
 ```bash
 npm run typecheck
