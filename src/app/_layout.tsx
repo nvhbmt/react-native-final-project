@@ -30,6 +30,9 @@ export default function RootLayout() {
         <Stack.Screen name="checkout/index" />
         <Stack.Screen name="checkout/payment" />
         <Stack.Screen name="checkout/success" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
+        <Stack.Screen name="change-password" />
         <Stack.Screen
           name="feedback"
           options={{ presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }}

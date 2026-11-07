@@ -17,6 +17,7 @@
     "expo-image-picker": "~58.0.10",
     "expo-linking": "~58.0.14",
     "expo-router": "~58.0.26",
+    "expo-secure-store": "~58.0.2",
     "expo-splash-screen": "~58.0.11",
     "expo-status-bar": "~58.0.4",
     "react": "19.3.0",
@@ -41,7 +42,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
-    "test": "node --experimental-strip-types --test tests/cart-checkout.test.cjs tests/product-filters.test.cjs"
+    "test": "node --experimental-strip-types --test tests/cart-checkout.test.cjs tests/product-filters.test.cjs tests/api-client.test.cjs"
   },
   "private": true,
   "overrides": {

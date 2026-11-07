@@ -53,14 +53,25 @@ npm start            # Expo dev server — quét QR bằng Expo Go hoặc nhấn
 npm run web          # chạy trên trình duyệt
 npm run typecheck    # tsc --noEmit
 npm run lint         # expo lint
-npm test             # 16 kiểm thử giỏ hàng, đơn, góp ý và lọc sản phẩm (Node 22.13+)
+npm test             # 23 kiểm thử giỏ hàng, đơn, góp ý, lọc sản phẩm và API client (Node 22.13+)
 ```
 
-## Backend
+## Backend và đăng nhập
 
 API nằm trong `server/` (Hono + Drizzle + Postgres), là một cây npm riêng, không nằm trong bundle
 của app. Hiện có luồng xác thực; các API còn lại và chat AI đang là placeholder.
 Cách chạy và hợp đồng API xem `server/README.md`.
+
+- Khách vẫn duyệt sản phẩm, giỏ hàng như cũ. Tab **Account** hiện Log in / Create account khi chưa
+  đăng nhập; đã đăng nhập thì hiện hồ sơ, Đổi mật khẩu, Đăng xuất, Đăng xuất mọi thiết bị.
+  Avatar trên header hiện chữ cái đầu của tên người dùng.
+- Route: `/login`, `/register`, `/change-password` → `features/auth`.
+- `src/lib/api/` là HTTP client dùng chung: bóc `{ success, data }`, ném `ApiError` có `code`,
+  tự gắn access token và tự refresh một lần khi gặp `401 TOKEN_EXPIRED`.
+- `features/auth/store/authStore.ts` (Zustand): access token chỉ giữ trong bộ nhớ; refresh token lưu bằng
+  `expo-secure-store` (web: `localStorage`). Mở app sẽ tự khôi phục phiên; các lần refresh đồng thời được gộp làm một.
+- Địa chỉ API: `EXPO_PUBLIC_API_URL` nếu có; khi dev trên điện thoại tự lấy IP máy chạy Metro, cổng 4000;
+  web dùng `http://localhost:4000`.
 
 ## Cấu trúc thư mục
 
@@ -92,6 +103,8 @@ src/
 │   ├── cart/                 # Giỏ hàng (zustand store), voucher, tính tiền computeTotals()
 │   ├── checkout/             # Phương thức thanh toán, đặt hàng (orderStore), màn thành công
 │   ├── feedback/             # Mood, chủ đề, upload ảnh (expo-image-picker), chấm sao
+│   ├── auth/                 # Login/Register/Đổi mật khẩu, authStore, lưu token
+│   ├── account/              # Tab Account: guest / hồ sơ; ProfileAvatar dùng chung
 │   └── <feature>/
 │       ├── screens/          # Màn hình của tính năng
 │       ├── components/       # Component chỉ dùng trong tính năng
@@ -114,6 +127,7 @@ src/
 │   └── animations.native.ts  # Driver animation cho iOS/Android
 ├── hooks/                    # Hook dùng chung
 └── lib/
+    ├── api/                  # HTTP client gọi server/ (ApiError, tự refresh token)
     ├── cn.ts                 # cn(): ghép className có điều kiện (clsx)
     └── format.ts             # formatPrice, maskCardNumber
 ```
