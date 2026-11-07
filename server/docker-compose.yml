@@ -1,0 +1,22 @@
+# Postgres cho môi trường dev. Cổng 5435 để không đụng các project khác trong workspace (5433/5434).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: market
+      POSTGRES_PASSWORD: market
+      POSTGRES_DB: market
+    ports:
+      - '5435:5432'
+    volumes:
+      - market-pg:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U market -d market']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  market-pg:

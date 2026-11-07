@@ -56,6 +56,12 @@ npm run lint         # expo lint
 npm test             # 16 kiểm thử giỏ hàng, đơn, góp ý và lọc sản phẩm (Node 22.13+)
 ```
 
+## Backend
+
+API nằm trong `server/` (Hono + Drizzle + Postgres), là một cây npm riêng, không nằm trong bundle
+của app. Hiện có luồng xác thực; các API còn lại và chat AI đang là placeholder.
+Cách chạy và hợp đồng API xem `server/README.md`.
+
 ## Cấu trúc thư mục
 
 ```
