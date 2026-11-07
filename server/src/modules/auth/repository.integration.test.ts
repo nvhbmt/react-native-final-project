@@ -4,9 +4,9 @@ import { sql } from 'drizzle-orm'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { buildApp } from '../../app.ts'
-import { createDb } from '../../db/client.ts'
-import { TEST_SECRET } from '../../test/helpers.ts'
+import { buildApp } from '@/app.ts'
+import { createDb } from '@/db/client.ts'
+import { TEST_SECRET } from '@/test/helpers.ts'
 import { createDrizzleAuthRepository } from './repository.ts'
 
 // Chạy với Postgres thật: INTEGRATION=1 DATABASE_URL=postgres://market:market@localhost:5435/market_test

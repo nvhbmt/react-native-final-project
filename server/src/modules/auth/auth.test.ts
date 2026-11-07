@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createTestApp } from '../../test/helpers.ts'
+import { createTestApp } from '@/test/helpers.ts'
 
 const alice = { email: 'Alice@Example.com', password: 'correct horse', fullName: 'Alice Nguyễn' }
 

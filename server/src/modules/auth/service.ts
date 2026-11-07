@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
 
-import type { UserRow } from '../../db/schema.ts'
-import { AppError } from '../../lib/http.ts'
-import { getDummyHash, hashPassword, verifyPassword } from '../../lib/password.ts'
-import { createRefreshToken, hashRefreshToken, signAccessToken } from '../../lib/tokens.ts'
+import type { UserRow } from '@/db/schema.ts'
+import { AppError } from '@/lib/http.ts'
+import { getDummyHash, hashPassword, verifyPassword } from '@/lib/password.ts'
+import { createRefreshToken, hashRefreshToken, signAccessToken } from '@/lib/tokens.ts'
 import type { AuthRepository } from './repository.ts'
 import type { ChangePasswordInput, LoginInput, RegisterInput } from './schemas.ts'
 import { toPublicUser, type PublicUser } from './serialize.ts'

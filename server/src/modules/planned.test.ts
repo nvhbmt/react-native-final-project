@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createTestApp } from '../test/helpers.ts'
+import { createTestApp } from '@/test/helpers.ts'
 import { PLANNED_ENDPOINTS } from './planned.ts'
 
 describe('endpoint placeholder', () => {

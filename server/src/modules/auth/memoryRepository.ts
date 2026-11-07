@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import type { RefreshTokenRow, UserRow } from '../../db/schema.ts'
+import type { RefreshTokenRow, UserRow } from '@/db/schema.ts'
 import type { AuthRepository } from './repository.ts'
 
 /** Bản in-memory của AuthRepository — dùng cho unit test, không dùng ở production. */

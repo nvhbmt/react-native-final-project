@@ -6,11 +6,11 @@ import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 import { bodyLimit } from 'hono/body-limit'
 
-import { AppError, fail, ok } from './lib/http.ts'
-import { authRoutes } from './modules/auth/routes.ts'
-import type { AuthRepository } from './modules/auth/repository.ts'
-import { createAuthService } from './modules/auth/service.ts'
-import { PLANNED_ENDPOINTS, plannedRoutes } from './modules/planned.ts'
+import { AppError, fail, ok } from '@/lib/http.ts'
+import { authRoutes } from '@/modules/auth/routes.ts'
+import type { AuthRepository } from '@/modules/auth/repository.ts'
+import { createAuthService } from '@/modules/auth/service.ts'
+import { PLANNED_ENDPOINTS, plannedRoutes } from '@/modules/planned.ts'
 
 export type AppDeps = {
   authRepository: AuthRepository

@@ -1,10 +1,10 @@
 import { Hono } from 'hono'
 import { getConnInfo } from '@hono/node-server/conninfo'
 
-import { ok } from '../../lib/http.ts'
-import { rateLimit } from '../../lib/rateLimit.ts'
-import { validate } from '../../lib/validate.ts'
-import { requireAuth, type AuthVariables } from '../../middleware/auth.ts'
+import { ok } from '@/lib/http.ts'
+import { rateLimit } from '@/lib/rateLimit.ts'
+import { validate } from '@/lib/validate.ts'
+import { requireAuth, type AuthVariables } from '@/middleware/auth.ts'
 import { changePasswordSchema, loginSchema, refreshSchema, registerSchema } from './schemas.ts'
 import type { AuthService } from './service.ts'
 

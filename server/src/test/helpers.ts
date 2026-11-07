@@ -1,5 +1,5 @@
-import { buildApp, type AppDeps } from '../app.ts'
-import { createMemoryAuthRepository } from '../modules/auth/memoryRepository.ts'
+import { buildApp, type AppDeps } from '@/app.ts'
+import { createMemoryAuthRepository } from '@/modules/auth/memoryRepository.ts'
 
 export const TEST_SECRET = 'test-secret-that-is-at-least-32-characters-long'
 

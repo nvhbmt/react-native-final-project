@@ -2,9 +2,9 @@ import { serve } from '@hono/node-server'
 import { sql } from 'drizzle-orm'
 
 import { buildApp } from './app.ts'
-import { createDb } from './db/client.ts'
+import { createDb } from '@/db/client.ts'
 import { loadEnv } from './env.ts'
-import { createDrizzleAuthRepository } from './modules/auth/repository.ts'
+import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
 
 const env = loadEnv()
 const { db, close } = createDb(env.DATABASE_URL)

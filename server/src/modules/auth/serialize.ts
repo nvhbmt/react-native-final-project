@@ -1,4 +1,4 @@
-import type { UserRow } from '../../db/schema.ts'
+import type { UserRow } from '@/db/schema.ts'
 
 /**
  * Cổng duy nhất để dữ liệu user rời server. Liệt kê tường minh từng field

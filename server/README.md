@@ -49,6 +49,10 @@ src/
 
 Quy ước:
 
+- Import tuyệt đối qua alias `@/` (→ `src/`), giữ đuôi `.ts`: `import { AppError } from '@/lib/http.ts'`.
+  File cùng thư mục vẫn import `./`. Alias khai ở **hai** nơi phải sửa cùng nhau: `tsconfig.json`
+  (`paths` — tsc và tsx đọc) và `vitest.config.ts` (`resolve.alias` — Vite không đọc `paths`).
+
 - Mọi phản hồi: `{ success: true, data }` hoặc `{ success: false, error: { code, message, details? } }`.
   App nên rẽ nhánh theo `error.code`, không theo `message`.
 - Dữ liệu user chỉ rời server qua `modules/auth/serialize.ts` (liệt kê tường minh, không lộ `passwordHash`).

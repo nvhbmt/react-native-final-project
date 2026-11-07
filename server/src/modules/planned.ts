@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 
-import { AppError } from '../lib/http.ts'
-import { requireAuth } from '../middleware/auth.ts'
+import { AppError } from '@/lib/http.ts'
+import { requireAuth } from '@/middleware/auth.ts'
 
 /**
  * Các endpoint đã chốt hợp đồng (method + path) nhưng chưa triển khai.

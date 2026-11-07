@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 
-import { AppError } from '../lib/http.ts'
-import { verifyAccessToken, type AccessTokenClaims } from '../lib/tokens.ts'
+import { AppError } from '@/lib/http.ts'
+import { verifyAccessToken, type AccessTokenClaims } from '@/lib/tokens.ts'
 
 export type AuthVariables = { auth: AccessTokenClaims }
 

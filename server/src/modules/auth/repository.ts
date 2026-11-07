@@ -1,7 +1,7 @@
 import { and, eq, isNull } from 'drizzle-orm'
 
-import type { Db } from '../../db/client.ts'
-import { refreshTokens, users, type RefreshTokenRow, type UserRow } from '../../db/schema.ts'
+import type { Db } from '@/db/client.ts'
+import { refreshTokens, users, type RefreshTokenRow, type UserRow } from '@/db/schema.ts'
 
 export type NewRefreshToken = Pick<RefreshTokenRow, 'userId' | 'familyId' | 'tokenHash' | 'userAgent' | 'expiresAt'>
 
