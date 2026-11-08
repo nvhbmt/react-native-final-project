@@ -1,5 +1,7 @@
 import { sql } from 'drizzle-orm'
-import { index, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+import { boolean, check, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+
+import { benefits, categoryIds, shippingOptions, type ProductVariants, type RatingBreakdown, type SizeChart } from '@/modules/catalog/model.ts'
 
 export const userRole = pgEnum('user_role', ['customer', 'admin'])
 
@@ -47,3 +49,49 @@ export const refreshTokens = pgTable(
 
 export type UserRow = typeof users.$inferSelect
 export type RefreshTokenRow = typeof refreshTokens.$inferSelect
+
+export const catalogCategory = pgEnum('catalog_category', categoryIds)
+export const catalogShipping = pgEnum('catalog_shipping', shippingOptions)
+export const catalogBenefit = pgEnum('catalog_benefit', benefits)
+
+export const catalogProducts = pgTable(
+  'catalog_products',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    brand: text('brand').notNull(),
+    category: catalogCategory('category').notNull(),
+    subcategory: text('subcategory').notNull(),
+    subtitle: text('subtitle').notNull(),
+    description: text('description').notNull(),
+    keywords: text('keywords').notNull().default(''),
+    images: text('images').array().notNull(),
+    priceCents: integer('price_cents').notNull(),
+    compareAtPriceCents: integer('compare_at_price_cents'),
+    priceBasis: text('price_basis').$type<'listed' | 'from' | 'reference'>().notNull(),
+    priceUnit: text('price_unit').$type<'item' | 'lb'>().notNull(),
+    priceSourceUrl: text('price_source_url'),
+    ratingTenths: integer('rating_tenths'),
+    reviewCount: integer('review_count').notNull().default(0),
+    ratingBreakdown: jsonb('rating_breakdown').$type<RatingBreakdown>(),
+    sales: integer('sales'),
+    available: boolean('available'),
+    shippingOptions: catalogShipping('shipping_options').array().notNull(),
+    benefits: catalogBenefit('benefits').array().notNull(),
+    variants: jsonb('variants').$type<ProductVariants>(),
+    sizeChart: jsonb('size_chart').$type<SizeChart>(),
+    featured: boolean('featured').notNull().default(false),
+    sourceUrl: text('source_url').notNull(),
+    imageAttribution: text('image_attribution'),
+  },
+  (table) => [
+    index('catalog_products_category_subcategory_idx').on(table.category, table.subcategory),
+    index('catalog_products_price_idx').on(table.priceCents),
+    check('catalog_products_price_valid', sql`${table.priceCents} > 0 AND ${table.compareAtPriceCents} > ${table.priceCents}`),
+    check('catalog_products_rating_valid', sql`${table.ratingTenths} BETWEEN 0 AND 50`),
+    check('catalog_products_counts_valid', sql`${table.reviewCount} >= 0 AND (${table.sales} IS NULL OR ${table.sales} >= 0)`),
+    check('catalog_products_images_nonempty', sql`cardinality(${table.images}) > 0`),
+  ],
+)
+
+export type CatalogProductRow = typeof catalogProducts.$inferSelect

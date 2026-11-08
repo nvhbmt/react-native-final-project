@@ -3,8 +3,8 @@
 Backend cho app React Native: **Hono + Drizzle ORM + Postgres 17**, chạy trên Node 22.
 Cây npm riêng, độc lập với app Expo ở thư mục gốc — chạy `npm install` bên trong `server/`.
 
-Hiện đã có: **xác thực** (đăng ký, đăng nhập, refresh token xoay vòng, đăng xuất, đổi mật khẩu).
-Các module còn lại (catalog, giỏ hàng, đơn hàng, thanh toán, góp ý, yêu thích, hộp thư, upload,
+Hiện đã có **xác thực** và **catalog sản phẩm**.
+Các chức năng còn lại (đánh giá sản phẩm, giỏ hàng, đơn hàng, thanh toán, góp ý, yêu thích, hộp thư, upload,
 **chat AI**) đã chốt đường dẫn và trả `501 NOT_IMPLEMENTED` — xem `src/modules/planned.ts`
 hoặc gọi `GET /api/v1`.
 
@@ -16,6 +16,7 @@ npm install
 cp .env.example .env          # rồi thay JWT_ACCESS_SECRET bằng chuỗi ngẫu nhiên
 npm run db:up                 # Postgres trên cổng 5435 (tạo sẵn cả DB market_test)
 npm run migrate
+npm run db:seed:catalog       # 80 sản phẩm mẫu. Chạy lại giữ nguyên các bản ghi đã có.
 npm run dev                   # http://localhost:4000/api/v1
 ```
 
@@ -30,7 +31,13 @@ INTEGRATION=1 DATABASE_URL=postgres://market:market@localhost:5435/market_test n
 npm run db:generate           # sửa src/db/schema.ts → sinh SQL vào drizzle/ (nhớ commit)
 ```
 
-Integration test **xoá sạch bảng**, nên tên DB bắt buộc chứa `test`.
+Integration test xác thực **xoá dữ liệu trong các bảng xác thực**, nên tên DB bắt buộc chứa `test`.
+Catalog có integration test riêng trên một database có hậu tố `_catalog_test`.
+
+```bash
+docker compose exec db createdb -U market market_catalog_test
+CATALOG_TEST_DATABASE_URL=postgres://market:market@localhost:5435/market_catalog_test npm test
+```
 
 ## Database (Docker)
 
@@ -72,6 +79,7 @@ src/
 ├── middleware/auth.ts       # requireAuth / requireRole
 └── modules/
     ├── auth/                # routes → service → repository (Drizzle | in-memory cho test), serialize
+    ├── catalog/             # routes → service → repository, dữ liệu seed trong data/
     └── planned.ts           # Danh sách endpoint dự kiến, trả 501
 ```
 
@@ -124,6 +132,37 @@ refresh thất bại → về màn đăng nhập.
 | `EMAIL_TAKEN` | 409 | Email đã đăng ký |
 | `RATE_LIMITED` | 429 | Có header `Retry-After` |
 | `NOT_IMPLEMENTED` | 501 | Endpoint placeholder |
+
+## Catalog sản phẩm
+
+Các route dưới `/api/v1` dùng phương thức GET và có thể gọi công khai.
+
+| Path | Dữ liệu trả về |
+|---|---|
+| `/home` | `categories`, `banners`, `deals`, `recommendedProducts` |
+| `/categories` | Danh mục, danh mục con và ảnh đại diện |
+| `/products` | `items` và `nextCursor` cho tìm kiếm, lọc và phân trang |
+| `/products/:id` | Thông tin thẻ sản phẩm, thư viện ảnh, mô tả, màu, kích cỡ, đánh giá tổng hợp và nguồn |
+| `/products/:id/related` | Sản phẩm cùng danh mục, ưu tiên cùng danh mục con. `limit` mặc định 6, tối đa 20. |
+| `/products/:id/size-guide` | Bảng kích cỡ từ nguồn hoặc `null` nếu chưa có bảng |
+
+`/products` nhận `q`, `category`, `subcategory`, `sort` (`sales`, `matched`, `popular`), `minPrice`,
+`maxPrice`, `minRating`, `shipping[]`, `benefits[]`, `relatedTo`, `limit` (mặc định 20, tối đa 50) và `cursor`.
+`relatedTo` giới hạn kết quả vào danh mục của sản phẩm tham chiếu và bỏ chính sản phẩm đó.
+Lặp tham số để chọn nhiều mục. Sản phẩm phải có ít nhất một cách giao đã chọn và đủ các quyền lợi đã chọn.
+Giữ nguyên bộ lọc khi gửi lại `nextCursor`. Giá nhận và trả theo USD.
+
+```text
+/api/v1/products?category=electronics&minPrice=100&minRating=4&shipping[]=express&shipping[]=standard&benefits[]=best-deal
+```
+
+Seed có 20 sản phẩm cho mỗi nhóm `electronics`, `fashion`, `beauty`, `fruits`. Mỗi bản ghi lưu trang nguồn.
+Ảnh do CDN của nguồn cung cấp. Ảnh trái cây có `imageAttribution` dẫn đến trang tệp Wikimedia Commons.
+`priceBasis` phân biệt giá niêm yết (`listed`), giá từ (`from`) và giá tham chiếu (`reference`).
+Giá trái cây dùng giá bán lẻ trung bình của USDA ERS năm 2023, theo USD/lb (`priceUnit: lb`).
+Các lựa chọn giao hàng và quyền lợi trong seed là cấu hình mẫu của marketplace để thử bộ lọc.
+Các giá trị chưa xác minh như số lượt bán, tồn kho và bảng kích cỡ có thể là `null`.
+Sắp xếp `sales` ưu tiên sản phẩm nổi bật khi chưa có số lượt bán.
 
 ## Chat AI (dự kiến)
 

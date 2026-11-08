@@ -10,10 +10,13 @@ import { AppError, fail, ok } from '@/lib/http.ts'
 import { authRoutes } from '@/modules/auth/routes.ts'
 import type { AuthRepository } from '@/modules/auth/repository.ts'
 import { createAuthService } from '@/modules/auth/service.ts'
+import { catalogRoutes } from '@/modules/catalog/routes.ts'
+import type { CatalogService } from '@/modules/catalog/service.ts'
 import { PLANNED_ENDPOINTS, plannedRoutes } from '@/modules/planned.ts'
 
 export type AppDeps = {
   authRepository: AuthRepository
+  catalog?: CatalogService
   accessSecret: string
   accessTtlSeconds: number
   refreshTtlSeconds: number
@@ -61,6 +64,7 @@ export function buildApp(deps: AppDeps) {
   api.get('/', (c) => ok(c, { name: 'market-api', version: 'v1', planned: PLANNED_ENDPOINTS }))
   // Thứ tự quan trọng: router đã triển khai mount trước router placeholder.
   api.route('/auth', authRoutes(authService, { accessSecret: deps.accessSecret, rateLimitMax: deps.authRateLimitMax }))
+  if (deps.catalog) api.route('/', catalogRoutes(deps.catalog))
   api.route('/', plannedRoutes(deps.accessSecret))
 
   app.route('/api/v1', api)

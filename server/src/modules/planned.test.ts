@@ -6,10 +6,10 @@ import { PLANNED_ENDPOINTS } from './planned.ts'
 describe('endpoint placeholder', () => {
   it('endpoint public trả 501 NOT_IMPLEMENTED', async () => {
     const { call } = createTestApp()
-    const res = await call('GET', '/products')
+    const res = await call('GET', '/products/example/reviews')
     expect(res.status).toBe(501)
     expect(res.body.error.code).toBe('NOT_IMPLEMENTED')
-    expect(res.body.error.details.module).toBe('catalog')
+    expect(res.body.error.details.module).toBe('reviews')
   })
 
   it('endpoint cần đăng nhập kiểm tra token trước khi trả 501', async () => {

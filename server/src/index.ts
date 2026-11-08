@@ -5,12 +5,15 @@ import { buildApp } from './app.ts'
 import { createDb } from '@/db/client.ts'
 import { loadEnv } from './env.ts'
 import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
+import { createCatalogRepository } from '@/modules/catalog/repository.ts'
+import { createCatalogService } from '@/modules/catalog/service.ts'
 
 const env = loadEnv()
 const { db, close } = createDb(env.DATABASE_URL)
 
 const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
+  catalog: createCatalogService(createCatalogRepository(db)),
   accessSecret: env.JWT_ACCESS_SECRET,
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,
   refreshTtlSeconds: env.REFRESH_TOKEN_TTL,
