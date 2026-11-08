@@ -14,6 +14,7 @@ const { db, close } = createDb(env.DATABASE_URL)
 const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
   catalog: createCatalogService(createCatalogRepository(db)),
+  commerce: { db, allowDemoCheckout: env.NODE_ENV !== 'production' },
   accessSecret: env.JWT_ACCESS_SECRET,
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,
   refreshTtlSeconds: env.REFRESH_TOKEN_TTL,

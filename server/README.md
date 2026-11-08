@@ -3,8 +3,8 @@
 Backend cho app React Native: **Hono + Drizzle ORM + Postgres 17**, chạy trên Node 22.
 Cây npm riêng, độc lập với app Expo ở thư mục gốc — chạy `npm install` bên trong `server/`.
 
-Hiện đã có **xác thực** và **catalog sản phẩm**.
-Các chức năng còn lại (đánh giá sản phẩm, giỏ hàng, đơn hàng, thanh toán, góp ý, yêu thích, hộp thư, upload,
+Hiện đã có **xác thực**, **catalog sản phẩm**, **đặt đơn demo** và **đánh giá sản phẩm**.
+Các chức năng còn lại (đồng bộ giỏ hàng, lịch sử và huỷ đơn, cổng thanh toán, góp ý, yêu thích, hộp thư, upload,
 **chat AI**) đã chốt đường dẫn và trả `501 NOT_IMPLEMENTED` — xem `src/modules/planned.ts`
 hoặc gọi `GET /api/v1`.
 
@@ -163,6 +163,27 @@ Giá trái cây dùng giá bán lẻ trung bình của USDA ERS năm 2023, theo 
 Các lựa chọn giao hàng và quyền lợi trong seed là cấu hình mẫu của marketplace để thử bộ lọc.
 Các giá trị chưa xác minh như số lượt bán, tồn kho và bảng kích cỡ có thể là `null`.
 Sắp xếp `sales` ưu tiên sản phẩm nổi bật khi chưa có số lượt bán.
+
+## Đơn demo và đánh giá sản phẩm
+
+Chạy `npm run migrate` để áp dụng `0002_orders_reviews.sql`. Các route sau dùng tiền tố `/api/v1`.
+
+| Method và path | Quyền truy cập | Hành vi |
+| --- | --- | --- |
+| `POST /orders` | Đăng nhập | Nhận `requestId`, `paymentMethod`, `items: [{ productId, quantity, options? }]` và `voucher?`. Server kiểm tra sản phẩm, biến thể, tính tổng từ catalog và lưu đơn demo. Gửi lại cùng `requestId` với cùng nội dung trả về đơn đã lưu. |
+| `GET /orders/:id` | Chủ đơn | Lấy sản phẩm và tổng tiền đã lưu của đơn. |
+| `GET /products/:id/reviews` | Công khai | Nhận `rating` (1–5), `limit` (mặc định 10, tối đa 30) và `cursor`. Trả `items`, `nextCursor` và `summary` của tất cả đánh giá trong app, kể cả khi lọc sao. |
+| `GET /products/:id/reviews/eligibility` | Đăng nhập | Kiểm tra điều kiện viết đánh giá, có thể giới hạn vào `orderId`. |
+| `POST /products/:id/reviews` | Người đã mua | Nhận `rating` (số nguyên 1–5), `content` (1–1000 ký tự) và `orderId?`. Chỉ nhận đánh giá cho sản phẩm thuộc đơn đã hoàn tất của chính tài khoản. Gửi trùng trả `409 REVIEW_EXISTS`. |
+
+Checkout demo không thu tiền và chỉ tạo đơn khi `NODE_ENV` là `development` hoặc `test`. Production cần dữ liệu đơn được xác thực từ cổng thanh toán. Đánh giá dựa trên đơn demo mang nhãn **Demo order**. Điểm đánh giá đã nhập từ các nguồn catalog vẫn được lưu riêng.
+
+Chạy test tích hợp review trên một database dành riêng cho test:
+
+```bash
+docker compose exec db createdb -U market market_reviews_test
+REVIEWS_TEST_DATABASE_URL=postgres://market:market@localhost:5435/market_reviews_test npm test
+```
 
 ## Chat AI (dự kiến)
 

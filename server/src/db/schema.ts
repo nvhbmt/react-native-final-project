@@ -95,3 +95,47 @@ export const catalogProducts = pgTable(
 )
 
 export type CatalogProductRow = typeof catalogProducts.$inferSelect
+
+export type CheckoutItem = {
+  key: string
+  productId: string
+  name: string
+  subtitle: string
+  image: string
+  priceCents: number
+  quantity: number
+  options?: { color?: string; size?: string }
+}
+
+export const orders = pgTable('orders', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  requestId: text('request_id').notNull(),
+  requestHash: text('request_hash').notNull(),
+  paymentMethod: text('payment_method').notNull(),
+  status: text('status').$type<'completed' | 'cancelled'>().notNull(),
+  paymentMode: text('payment_mode').$type<'demo' | 'verified'>().notNull(),
+  items: jsonb('items').$type<CheckoutItem[]>().notNull(),
+  subtotalCents: integer('subtotal_cents').notNull(),
+  discountCents: integer('discount_cents').notNull(),
+  taxCents: integer('tax_cents').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('orders_user_request_idx').on(table.userId, table.requestId),
+  index('orders_user_created_idx').on(table.userId, table.createdAt),
+])
+
+export const productReviews = pgTable('product_reviews', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  productId: text('product_id').notNull().references(() => catalogProducts.id, { onDelete: 'cascade' }),
+  rating: integer('rating').notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('product_reviews_user_product_idx').on(table.userId, table.productId),
+  index('product_reviews_product_created_idx').on(table.productId, table.createdAt, table.id),
+  check('product_reviews_rating_valid', sql`${table.rating} BETWEEN 1 AND 5`),
+  check('product_reviews_content_valid', sql`char_length(btrim(${table.content})) BETWEEN 1 AND 1000`),
+])
