@@ -1,19 +1,18 @@
 import { useLocalSearchParams } from 'expo-router'
 
 import { useFeedbackStore } from '@/features/feedback'
+import { useCatalogRequest } from '@/features/products/hooks/useCatalogRequest'
 
-import { productApi } from '../api/productApi'
-import type { ProductReview } from '../types'
+import { productPath } from '../api/productApi'
+import type { ProductDetail, ProductReview } from '../types'
 
-/** Sản phẩm theo param `[id]` của route hiện tại (undefined nếu không tồn tại). */
 export function useRouteProduct() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const entries = useFeedbackStore((state) => state.entries)
-  const product = productApi.getById(id)
-  if (!product) return undefined
+  const request = useCatalogRequest<ProductDetail>(id ? productPath(id) : undefined)
+  const product = request.data
+  if (!product) return { ...request, product: undefined }
   const feedback = entries.filter((entry) => entry.productId === id)
-  if (!feedback.length) return product
-
   const reviews: ProductReview[] = feedback.map((entry) => ({
     id: entry.id,
     author: 'You',
@@ -22,15 +21,5 @@ export function useRouteProduct() {
     rating: entry.rating,
     createdAt: 'Just now',
   }))
-  const reviewCount = product.reviewCount + feedback.length
-  const ratingBreakdown = [...product.ratingBreakdown] as typeof product.ratingBreakdown
-  feedback.forEach((entry) => { ratingBreakdown[5 - entry.rating] += 1 })
-
-  return {
-    ...product,
-    reviews: [...reviews, ...product.reviews],
-    reviewCount,
-    rating: Math.round((product.rating * product.reviewCount + feedback.reduce((sum, entry) => sum + entry.rating, 0)) / reviewCount * 10) / 10,
-    ratingBreakdown,
-  }
+  return { ...request, product: { ...product, reviews } }
 }

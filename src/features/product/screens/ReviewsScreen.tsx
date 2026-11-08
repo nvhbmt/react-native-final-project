@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Text, View } from '@tamagui/tailwind'
-import { Redirect, router } from 'expo-router'
+import { router } from 'expo-router'
 import { Fragment, useState } from 'react'
 import { ScrollView } from 'react-native'
 
@@ -12,6 +12,7 @@ import { Screen } from '@/components/ui/Screen'
 import { appColors } from '@/theme/tamagui.config'
 
 import { RatingSummary } from '../components/RatingSummary'
+import { ProductStatus } from '../components/ProductStatus'
 import { ReviewItem } from '../components/ReviewItem'
 import { useRouteProduct } from '../hooks/useRouteProduct'
 
@@ -19,10 +20,10 @@ const FILTERS = [null, 5, 4, 3, 2, 1] as const
 type Filter = (typeof FILTERS)[number]
 
 export function ReviewsScreen() {
-  const product = useRouteProduct()
+  const { product, ...request } = useRouteProduct()
   const [filter, setFilter] = useState<Filter>(null)
 
-  if (!product) return <Redirect href="/" />
+  if (!product) return <ProductStatus title="Reviews" {...request} />
 
   const reviews = filter ? product.reviews.filter((r) => r.rating === filter) : product.reviews
 
@@ -69,7 +70,7 @@ export function ReviewsScreen() {
           ))
         ) : (
           <Text className="py-10 text-center text-[14px] leading-[22px] text-neutral-500">
-            No {filter}-star reviews yet.
+            {filter ? `No ${filter}-star reviews to display.` : 'No written reviews to display.'}
           </Text>
         )}
       </View>

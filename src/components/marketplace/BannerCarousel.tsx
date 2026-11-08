@@ -6,7 +6,7 @@ import { marketplace as m } from '@/theme/marketplace'
 
 import { keyboardAction } from './keyboardAction'
 
-type Slide = { image: ImageSourcePropType; label: string }
+type Slide = { image: ImageSourcePropType; label: string; resizeMode?: 'contain' | 'cover' }
 
 export function BannerCarousel({ slides }: { slides: Slide[] }) {
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null)
@@ -28,7 +28,7 @@ export function BannerCarousel({ slides }: { slides: Slide[] }) {
         style={styles.carousel}
       >
         {width > 0 && slides.map((slide, index) => (
-          <Image key={index} source={slide.image} accessibilityLabel={slide.label} resizeMode="cover" style={{ width, height: 129 }} />
+          <Image key={index} source={slide.image} accessibilityLabel={slide.label} resizeMode={slide.resizeMode ?? 'cover'} style={{ width, height: 129, backgroundColor: m.surface }} />
         ))}
       </ScrollView>
       <XStack justify="center" gap={7} h={8} items="center" aria-label={`Banner ${active + 1} of ${slides.length}`}>

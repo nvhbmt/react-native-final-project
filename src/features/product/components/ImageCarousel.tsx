@@ -9,7 +9,7 @@ type Props = {
   images: Product['images']
   width: number
   height: number
-  contentFit?: Product['imageFit']
+  contentFit?: 'contain' | 'cover'
 }
 
 /** Ảnh trượt ngang có chấm phân trang (trang chi tiết dạng chuẩn). */

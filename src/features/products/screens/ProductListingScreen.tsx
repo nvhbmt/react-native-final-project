@@ -1,36 +1,28 @@
 import { Ionicons } from '@expo/vector-icons'
+import { Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useMemo, useState } from 'react'
-import { FlatList, Image, StyleSheet } from 'react-native'
+import { useEffect, useMemo, useState } from 'react'
+import { FlatList, StyleSheet } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 
 import { BannerCarousel } from '@/components/marketplace/BannerCarousel'
 import { MarketHeading, MarketText } from '@/components/marketplace/MarketText'
 import { MarketplaceFrame } from '@/components/marketplace/MarketplaceFrame'
 import { SearchField } from '@/components/marketplace/SearchField'
-import { productApi } from '@/features/product'
 import { hasActiveFilters, useProductFilters } from '@/features/filters'
 import { keyboardAction } from '@/components/marketplace/keyboardAction'
 import { marketplace as m } from '@/theme/marketplace'
 
+import { listingPath } from '../api/listingPath'
+import { CatalogStatus } from '../components/CatalogStatus'
 import { EmptyProducts, ProductGridCard, ProductRow } from '../components/ProductCard'
 import { SeeAllButton } from '../components/SeeAllButton'
-import { allProducts, categoryNames, electronicCategories, electronics, fruits, relevantFruits } from '../data/catalog'
-import { filterProducts } from '../lib/filterProducts'
-import type { CategoryId, SortOrder } from '../types'
+import { useCatalogRequest } from '../hooks/useCatalogRequest'
+import { useProductPages } from '../hooks/useProductPages'
+import type { CatalogCategory, CategoryId, SortOrder } from '../types'
 
-const electronicsBanners = [
-  { image: require('../../../../assets/marketplace/banner-electronics.png'), label: 'Discover the latest electronics' },
-  { image: require('../../../../assets/marketplace/deal-electronics.png'), label: 'Electronics deals' },
-  { image: require('../../../../assets/marketplace/subcategory-tablet.png'), label: 'Explore tablets' },
-  { image: require('../../../../assets/marketplace/subcategory-laptop.png'), label: 'Explore laptops' },
-]
-const fruitBanners = [
-  { image: require('../../../../assets/marketplace/banner-fruits.png'), label: 'Fresh melon selection' },
-  { image: require('../../../../assets/marketplace/avocado.png'), label: 'Fresh avocados' },
-  { image: require('../../../../assets/marketplace/cherry.png'), label: 'Seasonal cherries' },
-  { image: require('../../../../assets/marketplace/orange.png'), label: 'Fresh citrus fruits' },
-]
+const categoryIds = new Set<string>(['electronics', 'fashion', 'beauty', 'fruits'])
+const electronicsTabs = ['phone', 'tablet', 'laptop']
 const sortOptions: { value: SortOrder; label: string }[] = [
   { value: 'sales', label: 'Best Sales' }, { value: 'matched', label: 'Best Matched' }, { value: 'popular', label: 'Popular' },
 ]
@@ -43,34 +35,44 @@ export function ProductListingScreen() {
 }
 
 function ProductListingContent({ params }: { params: ListingParams }) {
-  const category: CategoryId | 'all' = params.category && Object.hasOwn(categoryNames, params.category) ? params.category as CategoryId : 'all'
+  const category = params.category && categoryIds.has(params.category) ? params.category as CategoryId : undefined
   const isFruit = category === 'fruits'
   const isElectronics = category === 'electronics'
   const [query, setQuery] = useState(params.query ?? '')
+  const [search, setSearch] = useState(query)
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(query), 250)
+    return () => clearTimeout(timer)
+  }, [query])
   const filters = useProductFilters()
-  const [subcategory, setSubcategory] = useState('phone')
+  const [subcategory, setSubcategory] = useState<string>()
   const [sort, setSort] = useState<SortOrder>('sales')
   const [expanded, setExpanded] = useState(false)
+  const activeSubcategory = expanded ? undefined : subcategory ?? (search.trim() ? undefined : 'phone')
 
-  const products = useMemo(() => {
-    let source = category === 'all' ? allProducts : allProducts.filter((item) => item.category === category)
-    if (isFruit) source = expanded ? [...fruits, ...relevantFruits] : fruits
-    if (isElectronics) source = expanded ? electronics : electronics.filter((item) => item.subcategory === subcategory)
-    if (params.relatedTo) {
-      const detail = productApi.getById(params.relatedTo)
-      const related = detail ? new Set(productApi.getRelated(detail).map((item) => item.id)) : new Set<string>()
-      source = allProducts.filter((item) => related.has(item.id))
-    }
-    return filterProducts(source, query, filters, sort)
-  }, [category, expanded, filters, isElectronics, isFruit, query, sort, subcategory, params.relatedTo])
-  const rows = useMemo(() => isFruit
-    ? Array.from({ length: Math.ceil(products.length / 2) }, (_, index) => products.slice(index * 2, index * 2 + 2))
-    : products.map((product) => [product]), [isFruit, products])
-  const relevant = filterProducts(relevantFruits, query, filters)
+  const categories = useCatalogRequest<CatalogCategory[]>(category ? '/categories' : undefined)
+  const selectedCategory = categories.data?.find((item) => item.id === category)
+  const subcategories = selectedCategory?.subcategories ?? []
+  const electronicCategories = electronicsTabs.flatMap((id) => subcategories.filter((item) => item.id === id))
+  const banners = subcategories.flatMap((item) => item.image ? [{ image: { uri: item.image }, label: item.name, resizeMode: 'contain' as const }] : []).slice(0, 4)
+  const products = useProductPages(listingPath({
+    category,
+    subcategory: isElectronics ? activeSubcategory : undefined,
+    query: search,
+    filters,
+    sort,
+    relatedTo: params.relatedTo,
+  }))
   const filtered = hasActiveFilters(filters)
+  const fruitPreview = isFruit && !expanded && !filtered && !search.trim()
+  const visible = useMemo(() => fruitPreview ? products.items.slice(0, 4) : products.items, [fruitPreview, products.items])
+  const rows = useMemo(() => isFruit
+    ? Array.from({ length: Math.ceil(visible.length / 2) }, (_, index) => visible.slice(index * 2, index * 2 + 2))
+    : visible.map((product) => [product]), [isFruit, visible])
+  const relevant = fruitPreview ? products.items.slice(4, 6) : []
 
   return (
-    <MarketplaceFrame title={params.relatedTo ? 'Relevant products' : category === 'all' ? 'All Deals' : categoryNames[category]} onBack={() => router.canGoBack() ? router.back() : router.replace('/')}>
+    <MarketplaceFrame title={params.relatedTo ? 'Relevant products' : selectedCategory?.name ?? 'All Deals'} onBack={() => router.canGoBack() ? router.back() : router.replace('/')}>
       <FlatList
         data={rows}
         keyExtractor={(row) => row.map((product) => product.id).join('-')}
@@ -80,19 +82,20 @@ function ProductListingContent({ params }: { params: ListingParams }) {
         ItemSeparatorComponent={() => <YStack h={isFruit ? 24 : 14} />}
         ListHeaderComponent={(
           <YStack>
-            <SearchField value={query} onChangeText={setQuery} onFilter={() => router.push('/filters')} filtered={filtered} />
-            {isFruit && <YStack mt={24} mb={22}><BannerCarousel slides={fruitBanners} /></YStack>}
+            <SearchField value={query} onChangeText={setQuery} onSubmit={() => setSearch(query)} onFilter={() => router.push('/filters')} filtered={filtered} />
+            {isFruit && banners.length > 0 && <YStack mt={24} mb={22}><BannerCarousel slides={banners} /></YStack>}
             {isElectronics && <>
               <XStack items="center" justify="space-between" mt={24} mb={12}>
                 <MarketHeading>Categories</MarketHeading>
-                <XStack {...keyboardAction} role="button" aria-label="See all electronics categories" onPress={() => { setExpanded(true); setSubcategory('all') }} items="center" hitSlop={8}>
+                <XStack {...keyboardAction} role="button" aria-label="See all electronics categories" onPress={() => setExpanded(true)} items="center" hitSlop={8}>
                   <MarketText fontSize={11} color={m.muted}>See all</MarketText><Ionicons name="caret-forward" size={11} color={m.muted} />
                 </XStack>
               </XStack>
               <XStack gap={14}>
                 {electronicCategories.map((item) => (
-                  <YStack {...keyboardAction} key={item.id} flex={1} h={92} overflow="hidden" rounded={6} borderWidth={1} borderColor={subcategory === item.id ? m.purple : 'transparent'} role="button" aria-label={item.name} aria-selected={subcategory === item.id} onPress={() => { setSubcategory(item.id); setExpanded(false) }}>
-                    <Image source={item.image} style={styles.categoryImage} resizeMode="cover" />
+                  <YStack {...keyboardAction} key={item.id} position="relative" flex={1} h={92} overflow="hidden" rounded={6} borderWidth={1} borderColor={activeSubcategory === item.id ? m.purple : 'transparent'} role="button" aria-label={item.name} aria-selected={activeSubcategory === item.id} onPress={() => { setSubcategory(item.id); setExpanded(false) }}>
+                    {item.image && <Image source={item.image} style={styles.categoryImage} contentFit="contain" />}
+                    <MarketText position="absolute" b={0} l={0} r={0} text="center" bg={m.surface} fontSize={10} numberOfLines={1}>{item.name}</MarketText>
                   </YStack>
                 ))}
               </XStack>
@@ -110,15 +113,18 @@ function ProductListingContent({ params }: { params: ListingParams }) {
         renderItem={({ item: row }) => isFruit
           ? <XStack gap={14}>{row.map((product) => <ProductGridCard key={product.id} product={product} />)}{row.length === 1 && <YStack flex={1} />}</XStack>
           : <ProductRow product={row[0]} />}
-        ListEmptyComponent={<EmptyProducts />}
+        ListEmptyComponent={products.loading || products.error
+          ? <CatalogStatus loading={products.loading} message={products.error ? 'Could not load products.' : undefined} onRetry={products.error ? products.retry : undefined} />
+          : <EmptyProducts />}
         ListFooterComponent={(
           <YStack>
-            {(isFruit || isElectronics) && <YStack mt={isFruit ? 24 : 14}><SeeAllButton expanded={expanded} onPress={() => {
+            {!products.loading && !products.error && (isElectronics || (isFruit && !filtered && !search.trim() && products.items.length > 4)) && <YStack mt={isFruit ? 24 : 14}><SeeAllButton expanded={expanded} onPress={() => {
               setExpanded(!expanded)
-              if (expanded && subcategory === 'all') setSubcategory('phone')
             }} /></YStack>}
-            {isElectronics && <YStack mt={24}><BannerCarousel slides={electronicsBanners} /></YStack>}
-            {isFruit && <YStack mt={48}>
+            {products.hasMore && !fruitPreview && <YStack mt={14}><SeeAllButton label="Load more" onPress={products.loadMore} /></YStack>}
+            {(products.loadingMore || products.moreError) && <CatalogStatus loading={products.loadingMore} message={products.moreError ? 'Could not load more products.' : undefined} onRetry={products.moreError ? products.retryMore : undefined} />}
+            {isElectronics && banners.length > 0 && <YStack mt={24}><BannerCarousel slides={banners} /></YStack>}
+            {relevant.length > 0 && <YStack mt={48}>
               <XStack items="center" justify="space-between" mb={18}>
                 <MarketHeading>Relevant products</MarketHeading>
                 <XStack {...keyboardAction} role="button" aria-label="See all relevant products" onPress={() => setExpanded(true)} items="center" hitSlop={8} gap={3}><MarketText fontSize={12} color={m.muted}>See all</MarketText><Ionicons name="chevron-forward" size={14} color={m.muted} /></XStack>

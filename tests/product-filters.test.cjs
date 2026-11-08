@@ -11,49 +11,29 @@ require.extensions['.ts'] = (module, filename) => {
   }).outputText
   module._compile(source, filename)
 }
-const { filterProducts } = require('../src/features/products/lib/filterProducts.ts')
+const { listingPath } = require('../src/features/products/api/listingPath.ts')
 const { emptyFilters } = require('../src/features/products/types.ts')
 const { cleanPrice, normalizePriceRange } = require('../src/features/filters/lib/priceRange.ts')
 require.extensions['.ts'] = previousLoader
 
-const items = [
-  { id: 'phone', name: 'Smartphone', keywords: 'white phone', category: 'electronics', price: 899, rating: 4, sales: 30, image: 1 },
-  { id: 'phone-purple', name: 'Smartphone', keywords: 'purple phone', category: 'electronics', price: 789, rating: 4.5, sales: 20, image: 1 },
-  { id: 'pear', name: 'Pear', category: 'fruits', price: 3, rating: 4, sales: 40, image: 1 },
-  { id: 'cherry', name: 'Cherry', category: 'fruits', price: 10, rating: 5, sales: 10, image: 1 },
-]
-const ids = (result) => result.map((item) => item.id)
-
-test('search normalizes case and whitespace, includes product keywords and preserves input order', () => {
-  assert.deepEqual(ids(filterProducts(items, ' PURPLE ', emptyFilters)), ['phone-purple'])
-  assert.deepEqual(ids(filterProducts(items, 'missing', emptyFilters)), [])
-  assert.deepEqual(ids(items), ['phone', 'phone-purple', 'pear', 'cherry'])
+test('listing sends catalog query fields and repeated policy parameters accepted by the API', () => {
+  const path = listingPath({
+    category: 'electronics', subcategory: 'phone', query: ' White & Blue ', sort: 'popular',
+    relatedTo: 'iphone-15', limit: 10,
+    filters: { minimumPrice: '0', maximumPrice: '899.99', minimumRating: 4.5, shippingOptions: ['instant', 'express'], others: ['free-return', 'best-deal'] },
+  })
+  const url = new URL(path, 'http://localhost')
+  assert.equal(url.pathname, '/products')
+  assert.deepEqual(Object.fromEntries([...url.searchParams].filter(([key]) => !key.endsWith('[]'))), {
+    q: 'White & Blue', category: 'electronics', subcategory: 'phone', sort: 'popular', relatedTo: 'iphone-15',
+    limit: '10', minPrice: '0', maxPrice: '899.99', minRating: '4.5',
+  })
+  assert.deepEqual(url.searchParams.getAll('shipping[]'), ['instant', 'express'])
+  assert.deepEqual(url.searchParams.getAll('benefits[]'), ['free-return', 'best-deal'])
 })
 
-test('price bounds and minimum review rating are inclusive', () => {
-  assert.deepEqual(ids(filterProducts(items, '', { ...emptyFilters, minimumPrice: '10', maximumPrice: '789', minimumRating: 4.5 })), ['phone-purple', 'cherry'])
-  assert.deepEqual(ids(filterProducts(items, '', { ...emptyFilters, minimumPrice: '900', maximumPrice: '700' })), [])
-})
-
-test('shipping options match any selected delivery method', () => {
-  assert.deepEqual(ids(filterProducts(items, '', { ...emptyFilters, shippingOptions: ['instant'] })), ['pear', 'cherry'])
-  assert.equal(filterProducts(items, '', { ...emptyFilters, shippingOptions: ['instant', 'express'] }).length, 4)
-})
-
-test('Others requires every selected shop benefit', () => {
-  assert.deepEqual(ids(filterProducts(items, '', { ...emptyFilters, others: ['free-return', 'best-deal'] })), ['phone-purple'])
-  assert.deepEqual(ids(filterProducts(items, '', { ...emptyFilters, others: ['ship-to-store'] })), ['phone', 'phone-purple'])
-})
-
-test('explicit product policies override the mock category defaults', () => {
-  const custom = [{ ...items[0], shippingOptions: ['standard'], benefits: [] }]
-  assert.equal(filterProducts(custom, '', { ...emptyFilters, shippingOptions: ['express'] }).length, 0)
-  assert.equal(filterProducts(custom, '', { ...emptyFilters, others: ['buyer-protection'] }).length, 0)
-})
-
-test('sort order respects popularity and sales without changing the catalog', () => {
-  assert.deepEqual(ids(filterProducts(items, '', emptyFilters, 'popular')), ['cherry', 'phone-purple', 'pear', 'phone'])
-  assert.deepEqual(ids(filterProducts(items, '', emptyFilters, 'sales')), ['pear', 'phone', 'phone-purple', 'cherry'])
+test('listing skips filters and subcategory when none are applicable', () => {
+  assert.equal(listingPath({ filters: emptyFilters, query: '   ', subcategory: 'phone' }), '/products')
 })
 
 test('price entry accepts decimal separators and strips pasted non-price characters', () => {
