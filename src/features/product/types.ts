@@ -8,11 +8,18 @@ export type ProductFeature = {
 export type ProductReview = {
   id: string
   author: string
-  avatar: string | number
+  avatar: string | null
   content: string
   createdAt: string
   /** 1–5 sao */
   rating: number
+  purchaseMode: 'demo' | 'verified'
+}
+
+export type ReviewSummary = {
+  rating: number | null
+  reviewCount: number
+  breakdown: [number, number, number, number, number]
 }
 
 export type ProductColor = { id: string; name: string; hex?: string; swatchImage?: string; image?: string }
@@ -42,7 +49,7 @@ export type ProductDetail = Pick<CatalogProduct, 'id' | 'name' | 'subtitle' | 'p
   benefits: CatalogProduct['benefits']
 }
 
-export type Product = ProductDetail & { reviews: ProductReview[] }
+export type Product = ProductDetail
 
 export type ProductSelection = {
   colorId?: string

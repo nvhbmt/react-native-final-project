@@ -15,6 +15,7 @@ import { formatPrice } from '@/lib/format'
 import { HeaderActions } from '@/navigation/HeaderActions'
 import { appColors } from '@/theme/tamagui.config'
 
+import { useReviewPreview } from '../api/reviews'
 import type { Product, ProductSelection } from '../types'
 import { ColorSwatches } from './ColorSwatches'
 import { SizeSelector } from './SizeSelector'
@@ -48,6 +49,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
     quantity: 1,
   })
   const addItem = useCartStore((s) => s.addItem)
+  const reviews = useReviewPreview(product.id, 1)
   const color = colors.find((item) => item.id === selection.colorId)
   const images = color?.image && !product.images.includes(color.image) ? [color.image, ...product.images] : product.images
   const unavailable = product.available === false
@@ -128,7 +130,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
           onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
         />
         <Divider /></>}
-        <LinkRow title={`Reviews (${product.reviewCount})`} onPress={() => router.push(`/product/${product.id}/reviews`)} />
+        <LinkRow title={reviews.data ? `Reviews (${reviews.data.summary.reviewCount})` : 'Reviews'} onPress={() => router.push(`/product/${product.id}/reviews`)} />
       </View>
     </Screen>
   )

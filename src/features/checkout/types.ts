@@ -12,7 +12,8 @@ export type PaymentMethod = {
 export type Order = CartTotals & {
   id: string
   paymentMethod: PaymentMethod
-  status: 'success'
+  status: 'completed' | 'cancelled'
+  paymentMode: 'demo' | 'verified'
   createdAt: number
   items: CartItem[]
 }

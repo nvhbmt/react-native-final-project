@@ -19,6 +19,7 @@ import { HeaderActions } from '@/navigation/HeaderActions'
 import { appColors } from '@/theme/tamagui.config'
 
 import { productPath } from '../api/productApi'
+import { useReviewPreview } from '../api/reviews'
 import type { Product, ProductFeature } from '../types'
 import { FeatureList } from './FeatureList'
 import { ImageCarousel } from './ImageCarousel'
@@ -37,6 +38,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
   const [notify, setNotify] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const related = useCatalogRequest<CatalogProduct[]>(productPath(product.id, '/related'))
+  const reviews = useReviewPreview(product.id, 2)
   const features: ProductFeature[] = []
   if (product.shippingOptions.includes('express')) features.push({ icon: 'express', label: 'Express' })
   if (product.benefits.includes('free-return')) features.push({ icon: 'return', label: '30-day free return' })
@@ -118,9 +120,10 @@ export function StandardProductDetail({ product }: { product: Product }) {
 
       <View className="gap-4 px-6 pt-6 pb-6">
         <SectionHeader title="Reviews" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
-        <RatingSummary rating={product.rating} reviewCount={product.reviewCount} breakdown={product.ratingBreakdown} />
+        {reviews.data && <RatingSummary {...reviews.data.summary} />}
+        {(reviews.loading || Boolean(reviews.error)) && <CatalogStatus loading={reviews.loading} message={reviews.error ? 'Could not load reviews.' : undefined} onRetry={reviews.error ? reviews.retry : undefined} />}
         <View className="gap-5 pt-2">
-          {product.reviews.slice(0, 2).map((r) => (
+          {reviews.data?.items.map((r) => (
             <ReviewItem key={r.id} review={r} />
           ))}
         </View>
