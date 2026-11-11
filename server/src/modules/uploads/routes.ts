@@ -50,20 +50,32 @@ export function uploadRoutes(db: Db, accessSecret: string, uploadDir: string) {
   return app
     .post(
       '/uploads',
-      bodyLimit({ maxSize: MAX_UPLOAD_BYTES + 64 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB') } }),
+      bodyLimit({ maxSize: Math.ceil(MAX_UPLOAD_BYTES * 4 / 3) + 64 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB') } }),
       requireAuth(accessSecret),
       perUser,
       async (c) => {
-        const form = await c.req.parseBody().catch(() => {
-          throw new AppError(400, 'BAD_REQUEST', 'Gửi ảnh dạng multipart/form-data, field "file"')
-        })
+        // Hai dạng: multipart (field `file`) hoặc JSON `{ purpose, data: <base64> }` — app mobile dùng base64
+        // từ image picker vì gửi file qua FormData không ổn định giữa các nền tảng.
+        const isJson = c.req.header('Content-Type')?.includes('application/json')
+        const form: Record<string, unknown> = isJson
+          ? await c.req.json().catch(() => ({}))
+          : await c.req.parseBody().catch(() => {
+              throw new AppError(400, 'BAD_REQUEST', 'Gửi ảnh dạng multipart/form-data (field "file") hoặc JSON { purpose, data }')
+            })
         const purpose = z.enum(PURPOSES).safeParse(form.purpose)
         if (!purpose.success) throw new AppError(400, 'VALIDATION_ERROR', 'purpose phải là avatar, feedback hoặc review')
-        const file = form.file
-        if (!(file instanceof File)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu file ảnh')
-        if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB')
+        let bytes: Uint8Array
+        if (isJson) {
+          const data = typeof form.data === 'string' ? form.data.replace(/^data:[^,]*,/, '') : ''
+          if (!data || !/^[A-Za-z0-9+/=\s]+$/.test(data)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu dữ liệu ảnh base64')
+          bytes = new Uint8Array(Buffer.from(data, 'base64'))
+        } else {
+          const file = form.file
+          if (!(file instanceof File)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu file ảnh')
+          bytes = new Uint8Array(await file.arrayBuffer())
+        }
+        if (bytes.length === 0 || bytes.length > MAX_UPLOAD_BYTES) throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB')
 
-        const bytes = new Uint8Array(await file.arrayBuffer())
         const kind = sniffImage(bytes)
         if (!kind) throw new AppError(415, 'UNSUPPORTED_IMAGE', 'Chỉ nhận ảnh JPEG, PNG hoặc WebP')
 

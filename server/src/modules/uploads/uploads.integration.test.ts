@@ -50,6 +50,16 @@ describe.skipIf(!commerceTestUrl)('upload ảnh', () => {
     expect((await t.app.request('/uploads/../../etc/passwd')).status).toBe(404)
   })
 
+  it('nhận ảnh base64 trong JSON (app mobile)', async () => {
+    const { token } = await t.register()
+    const base64 = Buffer.from(PNG).toString('base64')
+    const res = await t.call('POST', '/uploads', { token, body: { purpose: 'feedback', data: `data:image/png;base64,${base64}` } })
+    expect(res.status).toBe(201)
+    expect(res.body.data.mimeType).toBe('image/png')
+    expect((await t.call('POST', '/uploads', { token, body: { purpose: 'feedback', data: Buffer.from('hello').toString('base64') } })).status).toBe(415)
+    expect((await t.call('POST', '/uploads', { token, body: { purpose: 'feedback' } })).status).toBe(400)
+  })
+
   it('từ chối file không phải ảnh, purpose sai và file quá lớn', async () => {
     const { token } = await t.register()
     expect((await send(token, new Blob(['<html>']))).status).toBe(415)
