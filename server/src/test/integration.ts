@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 import { inArray } from 'drizzle-orm'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
+import postgres from 'postgres'
 import { expect } from 'vitest'
 
 import type { AppDeps } from '@/app.ts'
@@ -25,8 +26,16 @@ if (commerceTestUrl && !new URL(commerceTestUrl).pathname.endsWith('_commerce_te
 
 export async function startCommerceTest(overrides: (db: ReturnType<typeof createDb>['db']) => Partial<AppDeps> = () => ({})) {
   const connection = createDb(commerceTestUrl!)
-  await migrate(connection.db, { migrationsFolder: fileURLToPath(new URL('../../drizzle', import.meta.url)) })
-  await seedCatalog(connection.db)
+  // Các file test chạy song song trên cùng DB → khoá để chỉ một tiến trình migrate + seed tại một thời điểm.
+  const lock = postgres(commerceTestUrl!, { max: 1, onnotice: () => undefined })
+  try {
+    await lock`select pg_advisory_lock(727001)`
+    await migrate(connection.db, { migrationsFolder: fileURLToPath(new URL('../../drizzle', import.meta.url)) })
+    await seedCatalog(connection.db)
+  } finally {
+    await lock`select pg_advisory_unlock(727001)`.catch(() => undefined)
+    await lock.end()
+  }
   const test = createTestApp({
     authRepository: createDrizzleAuthRepository(connection.db),
     commerce: { db: connection.db, allowDemoCheckout: true },

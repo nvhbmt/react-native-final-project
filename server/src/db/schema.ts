@@ -161,3 +161,12 @@ export const cartVouchers = pgTable('cart_vouchers', {
   code: text('code').notNull(),
   appliedAt: timestamp('applied_at', { withTimezone: true }).notNull().defaultNow(),
 })
+
+export const favorites = pgTable('favorites', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  productId: text('product_id').notNull().references(() => catalogProducts.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('favorites_user_product_idx').on(table.userId, table.productId),
+  index('favorites_user_created_idx').on(table.userId, table.createdAt),
+])

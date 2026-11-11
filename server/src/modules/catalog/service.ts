@@ -18,7 +18,7 @@ function priceSummary(row: CatalogProductRow) {
   }
 }
 
-function summary(row: CatalogProductRow) {
+export function productSummary(row: CatalogProductRow) {
   return {
     id: row.id,
     name: row.name,
@@ -77,7 +77,7 @@ export function createCatalogService(repository: CatalogRepository) {
     categories: listCategories,
     async home() {
       const [categoryList, featured] = await Promise.all([listCategories(), repository.featured()])
-      const recommendedProducts = featured.map(summary)
+      const recommendedProducts = featured.map(productSummary)
       const deals = recommendedProducts
         .filter((product) => (product.discountPercent ?? 0) > 0)
         .sort((a, b) => b.discountPercent! - a.discountPercent!)
@@ -103,11 +103,11 @@ export function createCatalogService(repository: CatalogRepository) {
       const nextCursor = rows.length > limit && last
         ? Buffer.from(JSON.stringify({ scope, score: last.score, id: last.product.id })).toString('base64url')
         : null
-      return { items: page.map(({ product }) => summary(product)), nextCursor }
+      return { items: page.map(({ product }) => productSummary(product)), nextCursor }
     },
     async detail(id: string) {
       const product = await requireProduct(id)
-      const result = summary(product)
+      const result = productSummary(product)
       return {
         ...result,
         categoryName: categories[product.category].name,
@@ -122,7 +122,7 @@ export function createCatalogService(repository: CatalogRepository) {
       }
     },
     async related(id: string, limit: number) {
-      return (await repository.related(await requireProduct(id), limit)).map(summary)
+      return (await repository.related(await requireProduct(id), limit)).map(productSummary)
     },
     async sizeGuide(id: string) {
       return (await requireProduct(id)).sizeChart

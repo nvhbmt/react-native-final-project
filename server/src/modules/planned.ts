@@ -49,12 +49,9 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('POST', '/orders/:id/pay', 'payments', true, 'Tạo giao dịch thanh toán cho đơn'),
   e('POST', '/payments/webhook', 'payments', false, 'Webhook từ cổng thanh toán (xác thực bằng chữ ký)'),
 
-  // Góp ý, yêu thích, hộp thư, upload
+  // Góp ý, hộp thư, upload
   e('POST', '/feedback', 'feedback', true, 'Gửi góp ý: mood, topics, comment, images, rating, productId?, orderId?'),
   e('GET', '/feedback', 'feedback', true, 'Góp ý đã gửi'),
-  e('GET', '/favorites', 'favorites', true, 'Sản phẩm yêu thích'),
-  e('PUT', '/favorites/:productId', 'favorites', true, 'Thêm vào yêu thích (idempotent)'),
-  e('DELETE', '/favorites/:productId', 'favorites', true, 'Bỏ yêu thích'),
   e('GET', '/inbox', 'inbox', true, 'Thông báo/tin nhắn, phân trang'),
   e('GET', '/inbox/unread-count', 'inbox', true, 'Số tin chưa đọc (badge tab Inbox)'),
   e('POST', '/inbox/:id/read', 'inbox', true, 'Đánh dấu đã đọc'),

@@ -9,6 +9,7 @@ import { bodyLimit } from 'hono/body-limit'
 import type { Db } from '@/db/client.ts'
 import { AppError, fail, ok } from '@/lib/http.ts'
 import { cartRoutes } from '@/modules/cart/routes.ts'
+import { favoriteRoutes } from '@/modules/favorites/routes.ts'
 import { authRoutes } from '@/modules/auth/routes.ts'
 import type { AuthRepository } from '@/modules/auth/repository.ts'
 import { createAuthService } from '@/modules/auth/service.ts'
@@ -72,6 +73,7 @@ export function buildApp(deps: AppDeps) {
   if (deps.catalog) api.route('/', catalogRoutes(deps.catalog))
   if (deps.commerce) {
     api.route('/', cartRoutes(deps.commerce.db, deps.accessSecret))
+    api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
     api.route('/', reviewRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
   }
