@@ -49,14 +49,13 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('POST', '/orders/:id/pay', 'payments', true, 'Tạo giao dịch thanh toán cho đơn'),
   e('POST', '/payments/webhook', 'payments', false, 'Webhook từ cổng thanh toán (xác thực bằng chữ ký)'),
 
-  // Góp ý, hộp thư, upload
+  // Góp ý, hộp thư
   e('POST', '/feedback', 'feedback', true, 'Gửi góp ý: mood, topics, comment, images, rating, productId?, orderId?'),
   e('GET', '/feedback', 'feedback', true, 'Góp ý đã gửi'),
   e('GET', '/inbox', 'inbox', true, 'Thông báo/tin nhắn, phân trang'),
   e('GET', '/inbox/unread-count', 'inbox', true, 'Số tin chưa đọc (badge tab Inbox)'),
   e('POST', '/inbox/:id/read', 'inbox', true, 'Đánh dấu đã đọc'),
   e('POST', '/inbox/read-all', 'inbox', true, 'Đánh dấu tất cả đã đọc'),
-  e('POST', '/uploads', 'uploads', true, 'Upload ảnh (multipart) cho avatar/feedback/review, trả uploadId + url'),
 
   // Chat AI — trợ lý mua sắm
   e('GET', '/ai/conversations', 'ai-chat', true, 'Danh sách cuộc hội thoại với trợ lý AI'),

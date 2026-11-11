@@ -13,6 +13,7 @@ const schema = z.object({
     .string()
     .default('http://localhost:8081')
     .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)),
+  UPLOAD_DIR: z.string().default('uploads'),
   AI_BASE_URL: z.string().optional(),
   AI_API_KEY: z.string().optional(),
   AI_MODEL: z.string().optional(),

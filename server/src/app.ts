@@ -10,6 +10,7 @@ import type { Db } from '@/db/client.ts'
 import { AppError, fail, ok } from '@/lib/http.ts'
 import { cartRoutes } from '@/modules/cart/routes.ts'
 import { favoriteRoutes } from '@/modules/favorites/routes.ts'
+import { uploadFileRoutes, uploadRoutes } from '@/modules/uploads/routes.ts'
 import { authRoutes } from '@/modules/auth/routes.ts'
 import type { AuthRepository } from '@/modules/auth/repository.ts'
 import { createAuthService } from '@/modules/auth/service.ts'
@@ -22,7 +23,12 @@ import { reviewRoutes } from '@/modules/reviews/routes.ts'
 export type AppDeps = {
   authRepository: AuthRepository
   catalog?: CatalogService
-  commerce?: { db: Db; allowDemoCheckout: boolean }
+  commerce?: {
+    db: Db
+    allowDemoCheckout: boolean
+    /** Thư mục lưu ảnh upload. Mặc định `./uploads`. */
+    uploadDir?: string
+  }
   accessSecret: string
   accessTtlSeconds: number
   refreshTtlSeconds: number
@@ -53,7 +59,9 @@ export function buildApp(deps: AppDeps) {
   const allowOrigin = (origin: string) =>
     deps.corsOrigins.includes(origin) || (deps.allowLocalhostOrigins && localhost.test(origin)) ? origin : null
   app.use('*', cors({ origin: allowOrigin, allowHeaders: ['Content-Type', 'Authorization'], maxAge: 600 }))
-  app.use('/api/*', bodyLimit({ maxSize: 1024 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Dữ liệu gửi lên quá lớn') } }))
+  const jsonLimit = bodyLimit({ maxSize: 1024 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Dữ liệu gửi lên quá lớn') } })
+  // Upload ảnh có giới hạn riêng (5MB) trong route của nó.
+  app.use('/api/*', (c, next) => (c.req.path === '/api/v1/uploads' ? next() : jsonLimit(c, next)))
 
   app.get('/healthz', async (c) => {
     if (deps.checkDatabase) {
@@ -71,7 +79,9 @@ export function buildApp(deps: AppDeps) {
   // Thứ tự quan trọng: router đã triển khai mount trước router placeholder.
   api.route('/auth', authRoutes(authService, { accessSecret: deps.accessSecret, rateLimitMax: deps.authRateLimitMax }))
   if (deps.catalog) api.route('/', catalogRoutes(deps.catalog))
+  const uploadDir = deps.commerce?.uploadDir ?? 'uploads'
   if (deps.commerce) {
+    api.route('/', uploadRoutes(deps.commerce.db, deps.accessSecret, uploadDir))
     api.route('/', cartRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
@@ -80,6 +90,7 @@ export function buildApp(deps: AppDeps) {
   api.route('/', plannedRoutes(deps.accessSecret))
 
   app.route('/api/v1', api)
+  if (deps.commerce) app.route('/uploads', uploadFileRoutes(uploadDir))
 
   app.notFound((c) => fail(c, new AppError(404, 'NOT_FOUND', `Không tìm thấy ${c.req.method} ${c.req.path}`)))
   app.onError((error, c) => {

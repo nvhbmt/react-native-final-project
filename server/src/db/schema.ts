@@ -170,3 +170,21 @@ export const favorites = pgTable('favorites', {
   uniqueIndex('favorites_user_product_idx').on(table.userId, table.productId),
   index('favorites_user_created_idx').on(table.userId, table.createdAt),
 ])
+
+export const uploadPurpose = pgEnum('upload_purpose', ['avatar', 'feedback', 'review'])
+
+/** Ảnh người dùng tải lên; file nằm trên đĩa (`UPLOAD_DIR`), DB giữ metadata + chủ sở hữu. */
+export const uploads = pgTable('uploads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  purpose: uploadPurpose('purpose').notNull(),
+  fileName: text('file_name').notNull(),
+  mimeType: text('mime_type').notNull(),
+  sizeBytes: integer('size_bytes').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('uploads_file_name_idx').on(table.fileName),
+  index('uploads_user_created_idx').on(table.userId, table.createdAt),
+])
+
+export type UploadRow = typeof uploads.$inferSelect
