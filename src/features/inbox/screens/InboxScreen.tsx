@@ -41,6 +41,18 @@ export function InboxScreen() {
         </View>
       ) : (
         <>
+          <View
+            onPress={() => router.push('/assistant')}
+            role="link"
+            className="mx-4 flex-row items-center gap-3 rounded-[8px] bg-[#f3f0ff] p-4 active:opacity-80"
+          >
+            <Ionicons name="sparkles" size={22} color={appColors.primary} />
+            <View className="flex-1">
+              <Text className="text-[15px] leading-[24px] font-bold text-neutral-900">Trợ lý mua sắm AI</Text>
+              <Text className="text-[13px] leading-[20px] text-neutral-600">Hỏi về sản phẩm, so sánh, theo dõi đơn hàng</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={appColors['neutral-400']} />
+          </View>
           {unreadCount > 0 ? (
             <Text role="button" onPress={() => void markAllRead().catch(() => undefined)} className="self-end px-4 text-[13px] font-bold text-primary">
               Đánh dấu tất cả đã đọc

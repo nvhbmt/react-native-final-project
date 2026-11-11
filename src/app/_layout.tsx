@@ -34,6 +34,8 @@ export default function RootLayout() {
         <Stack.Screen name="checkout/success" />
         <Stack.Screen name="orders/index" />
         <Stack.Screen name="orders/[id]" />
+        <Stack.Screen name="assistant/index" />
+        <Stack.Screen name="assistant/[id]" />
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />
         <Stack.Screen name="forgot-password" />

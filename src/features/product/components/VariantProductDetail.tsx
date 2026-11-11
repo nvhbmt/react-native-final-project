@@ -18,6 +18,7 @@ import { appColors } from '@/theme/tamagui.config'
 
 import { useReviewPreview } from '../api/reviews'
 import type { Product, ProductSelection } from '../types'
+import { AskAssistantLink } from './AskAssistantLink'
 import { ColorSwatches } from './ColorSwatches'
 import { SizeSelector } from './SizeSelector'
 import { ThumbnailGallery } from './ThumbnailGallery'
@@ -131,6 +132,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
           onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
         />
         <Divider /></>}
+        <AskAssistantLink productId={product.id} />
         <LinkRow title={reviews.data ? `Reviews (${reviews.data.summary.reviewCount})` : 'Reviews'} onPress={() => router.push(`/product/${product.id}/reviews`)} />
       </View>
     </Screen>

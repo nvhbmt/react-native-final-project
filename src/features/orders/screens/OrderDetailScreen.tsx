@@ -84,6 +84,7 @@ export function OrderDetailScreen() {
           onPress={() => router.push({ pathname: '/product/[id]/write-review', params: { id: item.productId, orderId: order.id } })}
         />
       )) : null}
+      <Button title="Hỏi trợ lý về đơn này" variant="text" leftIcon="chatbubbles-outline" onPress={() => router.push({ pathname: '/assistant', params: { orderId: order.id } })} />
       {order.cancellable ? <Button title={busy ? 'Đang huỷ…' : 'Huỷ đơn'} variant="text" disabled={busy} onPress={cancel} /> : null}
     </Screen>
   )

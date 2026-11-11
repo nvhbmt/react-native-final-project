@@ -22,6 +22,7 @@ import { appColors } from '@/theme/tamagui.config'
 import { productPath } from '../api/productApi'
 import { useReviewPreview } from '../api/reviews'
 import type { Product, ProductFeature } from '../types'
+import { AskAssistantLink } from './AskAssistantLink'
 import { FeatureList } from './FeatureList'
 import { ImageCarousel } from './ImageCarousel'
 import { NotifyCard } from './NotifyCard'
@@ -118,6 +119,10 @@ export function StandardProductDetail({ product }: { product: Product }) {
       </View>
 
       <Divider />
+
+      <View className="px-6 pt-6">
+        <AskAssistantLink productId={product.id} />
+      </View>
 
       <View className="gap-4 px-6 pt-6 pb-6">
         <SectionHeader title="Reviews" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
