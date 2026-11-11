@@ -39,14 +39,6 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('GET', '/users/me/addresses', 'users', true, 'Danh sách địa chỉ giao hàng'),
   e('POST', '/users/me/addresses', 'users', true, 'Thêm địa chỉ giao hàng'),
 
-  // Giỏ hàng — đồng bộ với cartStore phía app
-  e('GET', '/cart', 'cart', true, 'Lấy giỏ hàng và tổng tiền'),
-  e('POST', '/cart/items', 'cart', true, 'Thêm sản phẩm (productId, colorId?, size?, quantity)'),
-  e('PATCH', '/cart/items/:key', 'cart', true, 'Đổi số lượng một dòng'),
-  e('DELETE', '/cart/items/:key', 'cart', true, 'Xoá một dòng'),
-  e('DELETE', '/cart', 'cart', true, 'Xoá toàn bộ giỏ'),
-  e('POST', '/cart/voucher', 'cart', true, 'Áp mã giảm giá'),
-  e('DELETE', '/cart/voucher', 'cart', true, 'Bỏ mã giảm giá'),
 
   // Thanh toán & đơn hàng
   e('GET', '/payment-methods', 'payments', true, 'Phương thức thanh toán đã lưu'),

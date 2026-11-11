@@ -1,14 +1,16 @@
 import { createHash } from 'node:crypto'
 
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 
 import type { Db } from '@/db/client.ts'
-import { catalogProducts, orders, type CheckoutItem } from '@/db/schema.ts'
+import { orders } from '@/db/schema.ts'
 import { AppError, ok } from '@/lib/http.ts'
 import { validate } from '@/lib/validate.ts'
 import { requireAuth } from '@/middleware/auth.ts'
+import { clearCart } from '@/modules/cart/routes.ts'
+import { computeTotalsCents, priceLines } from '@/modules/commerce/pricing.ts'
 
 const paymentMethods = {
   pm_visa: { id: 'pm_visa', brand: 'visa', label: '2334' },
@@ -59,43 +61,20 @@ export function orderRoutes(db: Db, accessSecret: string, allowDemo: boolean) {
         return ok(c, serialize(existing))
       }
 
-      const products = await db.select().from(catalogProducts)
-        .where(inArray(catalogProducts.id, [...new Set(input.items.map(({ productId }) => productId))]))
-      const byId = new Map(products.map((product) => [product.id, product]))
-      const items: CheckoutItem[] = input.items.map(({ productId, quantity, options }) => {
-        const product = byId.get(productId)
-        if (!product || product.available === false) throw new AppError(409, 'PRODUCT_UNAVAILABLE', 'An item in your cart is unavailable.')
-        const colors = product.variants?.colors ?? []
-        const sizes = product.variants?.sizes ?? []
-        const color = colors.find(({ id }) => id === options?.color)
-        if ((colors.length ? !color : options?.color) || (sizes.length ? !sizes.includes(options?.size ?? '') : options?.size)) {
-          throw new AppError(400, 'INVALID_VARIANT', 'Choose a valid color and size for this item.')
-        }
-        const image = color?.image ?? product.images[0]
-        if (!image) throw new AppError(409, 'PRODUCT_UNAVAILABLE', 'An item in your cart is unavailable.')
-        return {
-          key: [productId, options?.color, options?.size].filter(Boolean).join(':'),
-          productId,
-          name: product.name,
-          subtitle: [color?.name, options?.size].filter(Boolean).join(' · ') || product.subtitle,
-          image,
-          priceCents: product.priceCents,
-          quantity,
-          options,
-        }
-      })
+      const items = await priceLines(db, input.items)
       if (new Set(items.map(({ key }) => key)).size !== items.length) {
         throw new AppError(400, 'DUPLICATE_ORDER_ITEM', 'Combine matching items before checkout.')
       }
-      const subtotalCents = items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0)
-      const discountCents = input.voucher === 'SALE10' ? Math.round(subtotalCents * 0.1) : 0
-      const taxCents = Math.round((subtotalCents - discountCents) * 0.1)
+      const { subtotalCents, discountCents, taxCents } = computeTotalsCents(items, input.voucher)
       if (subtotalCents > 2_000_000_000) throw new AppError(400, 'ORDER_LIMIT', 'This order exceeds the checkout limit.')
       const [created] = await db.insert(orders).values({
         userId, requestId: input.requestId, requestHash, paymentMethod: input.paymentMethod,
         status: 'completed', paymentMode: 'demo', items, subtotalCents, discountCents, taxCents,
       }).onConflictDoNothing({ target: [orders.userId, orders.requestId] }).returning()
-      if (created) return ok(c, serialize(created), 201)
+      if (created) {
+        await clearCart(db, userId)
+        return ok(c, serialize(created), 201)
+      }
       const [replayed] = await db.select().from(orders).where(lookup)
       if (!replayed || replayed.requestHash !== requestHash) throw new AppError(409, 'ORDER_REQUEST_CONFLICT', 'This checkout request has already been used.')
       return ok(c, serialize(replayed))

@@ -139,3 +139,25 @@ export const productReviews = pgTable('product_reviews', {
   check('product_reviews_rating_valid', sql`${table.rating} BETWEEN 1 AND 5`),
   check('product_reviews_content_valid', sql`char_length(btrim(${table.content})) BETWEEN 1 AND 1000`),
 ])
+
+/** Giỏ hàng lưu theo tài khoản; `key` = productId + màu + size (khớp key phía app). */
+export const cartItems = pgTable('cart_items', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  key: text('key').notNull(),
+  productId: text('product_id').notNull().references(() => catalogProducts.id, { onDelete: 'cascade' }),
+  color: text('color'),
+  size: text('size'),
+  quantity: integer('quantity').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('cart_items_user_key_idx').on(table.userId, table.key),
+  check('cart_items_quantity_valid', sql`${table.quantity} BETWEEN 1 AND 99`),
+])
+
+/** Mã giảm giá đang áp cho giỏ của user (một mã / giỏ). */
+export const cartVouchers = pgTable('cart_vouchers', {
+  userId: uuid('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  code: text('code').notNull(),
+  appliedAt: timestamp('applied_at', { withTimezone: true }).notNull().defaultNow(),
+})

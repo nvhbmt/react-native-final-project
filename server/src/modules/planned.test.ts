@@ -14,7 +14,7 @@ describe('endpoint placeholder', () => {
 
   it('endpoint cần đăng nhập kiểm tra token trước khi trả 501', async () => {
     const { call } = createTestApp()
-    expect((await call('GET', '/cart')).status).toBe(401)
+    expect((await call('GET', '/ai/conversations')).status).toBe(401)
 
     const reg = await call('POST', '/auth/register', { body: { email: 'a@b.co', password: 'password1', fullName: 'A' } })
     const res = await call('POST', '/ai/conversations/abc/messages', { token: reg.body.data.tokens.accessToken, body: {} })
