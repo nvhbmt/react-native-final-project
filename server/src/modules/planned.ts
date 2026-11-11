@@ -28,10 +28,6 @@ const e = (method: PlannedEndpoint['method'], path: string, module: string, auth
 })
 
 export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
-  // Auth — phần còn lại cần dịch vụ gửi email
-  e('POST', '/auth/forgot-password', 'auth', false, 'Gửi mã/đường dẫn đặt lại mật khẩu qua email'),
-  e('POST', '/auth/reset-password', 'auth', false, 'Đặt lại mật khẩu bằng mã đã gửi'),
-
 
   // Chat AI — trợ lý mua sắm
   e('GET', '/ai/conversations', 'ai-chat', true, 'Danh sách cuộc hội thoại với trợ lý AI'),

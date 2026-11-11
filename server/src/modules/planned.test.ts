@@ -4,14 +4,6 @@ import { createTestApp } from '@/test/helpers.ts'
 import { PLANNED_ENDPOINTS } from './planned.ts'
 
 describe('endpoint placeholder', () => {
-  it('endpoint public trả 501 NOT_IMPLEMENTED', async () => {
-    const { call } = createTestApp()
-    const res = await call('POST', '/auth/forgot-password')
-    expect(res.status).toBe(501)
-    expect(res.body.error.code).toBe('NOT_IMPLEMENTED')
-    expect(res.body.error.details.module).toBe('auth')
-  })
-
   it('endpoint cần đăng nhập kiểm tra token trước khi trả 501', async () => {
     const { call } = createTestApp()
     expect((await call('GET', '/ai/conversations')).status).toBe(401)

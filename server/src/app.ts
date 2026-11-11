@@ -10,6 +10,7 @@ import type { Db } from '@/db/client.ts'
 import type { SepayConfig } from '@/modules/payments/sepay.ts'
 import { paymentWebhookRoutes } from '@/modules/payments/routes.ts'
 import { AppError, fail, ok } from '@/lib/http.ts'
+import type { Mailer } from '@/lib/mailer.ts'
 import { cartRoutes } from '@/modules/cart/routes.ts'
 import { favoriteRoutes } from '@/modules/favorites/routes.ts'
 import { uploadFileRoutes, uploadRoutes } from '@/modules/uploads/routes.ts'
@@ -27,6 +28,8 @@ import { reviewRoutes } from '@/modules/reviews/routes.ts'
 
 export type AppDeps = {
   authRepository: AuthRepository
+  /** Gửi email (mã đặt lại mật khẩu). Mặc định in ra console. */
+  mailer?: Mailer
   catalog?: CatalogService
   commerce?: {
     db: Db
@@ -54,6 +57,7 @@ export function buildApp(deps: AppDeps) {
     accessSecret: deps.accessSecret,
     accessTtlSeconds: deps.accessTtlSeconds,
     refreshTtlSeconds: deps.refreshTtlSeconds,
+    mailer: deps.mailer,
   })
 
   const app = new Hono()

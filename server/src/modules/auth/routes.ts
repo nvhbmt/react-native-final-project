@@ -5,7 +5,7 @@ import { ok } from '@/lib/http.ts'
 import { rateLimit } from '@/lib/rateLimit.ts'
 import { validate } from '@/lib/validate.ts'
 import { requireAuth, type AuthVariables } from '@/middleware/auth.ts'
-import { changePasswordSchema, loginSchema, refreshSchema, registerSchema } from './schemas.ts'
+import { changePasswordSchema, forgotPasswordSchema, loginSchema, refreshSchema, registerSchema, resetPasswordSchema } from './schemas.ts'
 import type { AuthService } from './service.ts'
 
 function clientIp(c: Parameters<typeof getConnInfo>[0]): string {
@@ -49,5 +49,12 @@ export function authRoutes(service: AuthService, options: { accessSecret: string
     })
     .post('/change-password', auth, validate('json', changePasswordSchema), async (c) => {
       return ok(c, await service.changePassword(c.var.auth.sub, c.req.valid('json'), c.req.header('User-Agent')))
+    })
+    .post('/forgot-password', credentialLimit, validate('json', forgotPasswordSchema), async (c) => {
+      await service.forgotPassword(c.req.valid('json').email)
+      return ok(c, { sent: true })
+    })
+    .post('/reset-password', credentialLimit, validate('json', resetPasswordSchema), async (c) => {
+      return ok(c, await service.resetPassword(c.req.valid('json'), c.req.header('User-Agent')))
     })
 }

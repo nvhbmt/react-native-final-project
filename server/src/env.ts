@@ -15,6 +15,9 @@ const schema = z.object({
     .string()
     .default('http://localhost:8081')
     .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)),
+  // Email (mã đặt lại mật khẩu). Để trống SMTP_URL thì chỉ in ra console (dev).
+  SMTP_URL: z.string().optional(),
+  MAIL_FROM: z.string().default('Market <no-reply@market.local>'),
   UPLOAD_DIR: z.string().default('uploads'),
   // SePay — để trống SEPAY_WEBHOOK_API_KEY thì tắt thanh toán chuyển khoản.
   SEPAY_WEBHOOK_API_KEY: z.string().optional(),

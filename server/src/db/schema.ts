@@ -275,3 +275,16 @@ export const paymentTransactions = pgTable('payment_transactions', {
   uniqueIndex('payment_transactions_provider_txn_idx').on(table.provider, table.providerTxnId),
   index('payment_transactions_order_idx').on(table.orderId),
 ])
+
+/** Mã đặt lại mật khẩu (6 số) gửi qua email; chỉ lưu SHA-256, hết hạn sau 15 phút, tối đa 5 lần nhập sai. */
+export const passwordResets = pgTable('password_resets', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  codeHash: text('code_hash').notNull(),
+  attempts: integer('attempts').notNull().default(0),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [index('password_resets_user_idx').on(table.userId, table.createdAt)])
+
+export type PasswordResetRow = typeof passwordResets.$inferSelect

@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm'
 
 import { buildApp } from './app.ts'
 import { createDb } from '@/db/client.ts'
+import { consoleMailer, createSmtpMailer } from '@/lib/mailer.ts'
 import { loadEnv, sepayConfig } from './env.ts'
 import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
 import { createCatalogRepository } from '@/modules/catalog/repository.ts'
@@ -13,6 +14,7 @@ const { db, close } = createDb(env.DATABASE_URL)
 
 const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
+  mailer: env.SMTP_URL ? createSmtpMailer(env.SMTP_URL, env.MAIL_FROM) : consoleMailer,
   catalog: createCatalogService(createCatalogRepository(db)),
   commerce: { db, allowDemoCheckout: env.NODE_ENV !== 'production', uploadDir: env.UPLOAD_DIR, sepay: sepayConfig(env) },
   accessSecret: env.JWT_ACCESS_SECRET,
