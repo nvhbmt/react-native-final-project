@@ -201,10 +201,10 @@ iOS `bundleIdentifier`, không đổi được sau khi đã lên store). Build t
 
 ```bash
 npx eas-cli@latest login
-EXPO_PUBLIC_API_URL=https://<địa-chỉ-api>/api/v1 npx eas-cli@latest build --profile preview --platform android
+EXPO_PUBLIC_API_URL=https://<địa-chỉ-api> npx eas-cli@latest build --profile preview --platform android
 ```
 
-- **Bắt buộc đặt `EXPO_PUBLIC_API_URL`** khi build: bản cài không chạy qua Metro nên không tự dò IP máy dev;
+- **Bắt buộc đặt `EXPO_PUBLIC_API_URL`** (gốc host, không kèm `/api/v1` — app tự thêm) khi build: bản cài không chạy qua Metro nên không tự dò IP máy dev;
   thiếu biến này app gọi `10.0.2.2` (chỉ đúng trên emulator). Có thể đặt sẵn bằng `eas env:create`.
 - Server local: mở tunnel HTTPS (vd. `cloudflared tunnel --url http://localhost:4000` hoặc `ngrok http 4000`)
   rồi dùng URL đó. Trỏ thẳng `http://<IP LAN>` sẽ bị Android 9+ chặn (cleartext) trừ khi thêm
