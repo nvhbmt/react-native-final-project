@@ -76,4 +76,26 @@ describe.skipIf(!commerceTestUrl)('quản trị giao hàng', () => {
     expect((await production.call('POST', `/orders/${order.id}/advance`, { token: customer.token })).body.error.code).toBe('DEMO_ONLY')
     expect((await production.call('POST', `/admin/orders/${order.id}/fulfillment`, { token: admin.token, body: { to: 'shipping' } })).body.data.fulfillment).toBe('shipping')
   })
+
+  it('gửi khuyến mãi chỉ tới khách đã bật nhận; khách thường không gửi được', async () => {
+    const admin = await t.register()
+    await setRole(admin.id, 'admin')
+    const fan = await t.register()
+    const quiet = await t.register()
+    await t.call('PATCH', '/users/me', { token: fan.token, body: { promoNotifications: true } })
+    const before = (await t.call('GET', '/admin/promotions/audience', { token: admin.token })).body.data.recipients
+    expect(before).toBeGreaterThanOrEqual(1)
+
+    const body = { title: 'Giảm 20% cuối tuần', body: 'Áp dụng cho trái cây tươi.', productId: 'pear' }
+    expect((await t.call('POST', '/admin/promotions', { token: fan.token, body })).body.error.code).toBe('FORBIDDEN')
+    expect((await t.call('POST', '/admin/promotions', { token: admin.token, body: { ...body, productId: 'khong-co' } })).body.error.code).toBe('PRODUCT_NOT_FOUND')
+    const sent = await t.call('POST', '/admin/promotions', { token: admin.token, body })
+    expect(sent.status).toBe(201)
+    expect(sent.body.data.sent).toBe(before)
+
+    const fanInbox = (await t.call('GET', '/inbox', { token: fan.token })).body.data.items
+    expect(fanInbox[0]).toMatchObject({ kind: 'system', title: 'Giảm 20% cuối tuần', data: { productId: 'pear' } })
+    const quietInbox = (await t.call('GET', '/inbox', { token: quiet.token })).body.data.items
+    expect(quietInbox.some((m: { title: string }) => m.title === 'Giảm 20% cuối tuần')).toBe(false)
+  })
 })

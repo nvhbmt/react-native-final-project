@@ -1,10 +1,10 @@
-import { and, desc, eq, lt, or, type SQL } from 'drizzle-orm'
+import { and, desc, eq, lt, or, sql, type SQL } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createMiddleware } from 'hono/factory'
 import { z } from 'zod'
 
 import type { Db } from '@/db/client.ts'
-import { orders, users, type OrderRow } from '@/db/schema.ts'
+import { catalogProducts, orders, users, type OrderRow } from '@/db/schema.ts'
 import { AppError, ok } from '@/lib/http.ts'
 import { validate } from '@/lib/validate.ts'
 import { requireAuth, type AuthVariables } from '@/middleware/auth.ts'
@@ -22,6 +22,12 @@ const listQuery = z.object({
 })
 const idParam = z.object({ id: z.uuid() })
 const fulfillmentInput = z.object({ to: z.enum(['shipping', 'delivered']) })
+const promotionInput = z.object({
+  title: z.string().trim().min(1, 'Nhập tiêu đề').max(100),
+  body: z.string().trim().min(1, 'Nhập nội dung').max(500),
+  /** Sản phẩm mở khi khách chạm vào thông báo (tuỳ chọn). */
+  productId: z.string().regex(/^[a-z0-9-]{1,160}$/).optional(),
+})
 
 /**
  * Quyền admin kiểm tra lại trong DB ở mỗi request (không chỉ tin `role` trong access token),
@@ -97,5 +103,27 @@ export function adminRoutes(db: Db, accessSecret: string, sepay?: SepayConfig) {
         throw new AppError(409, 'ORDER_CHANGED', 'Đơn hàng vừa thay đổi trạng thái, vui lòng tải lại')
       }
       return ok(c, serialize(await advanceFulfillment(db, order, c.var.auth.sub), customer))
+    })
+    /** Số khách đang bật "Nhận thông báo khuyến mãi" — hiện trên màn soạn tin. */
+    .get('/admin/promotions/audience', async (c) => {
+      const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(users).where(eq(users.promoNotifications, true))
+      return ok(c, { recipients: row?.count ?? 0 })
+    })
+    /**
+     * Gửi tin khuyến mãi vào Hộp thư của mọi khách đã bật "Nhận thông báo khuyến mãi" (một câu INSERT … SELECT).
+     * Chưa có thông báo đẩy: khách thấy tin khi mở Hộp thư (badge chưa đọc cập nhật).
+     */
+    .post('/admin/promotions', validate('json', promotionInput), async (c) => {
+      const { title, body, productId } = c.req.valid('json')
+      if (productId) {
+        const [product] = await db.select({ id: catalogProducts.id }).from(catalogProducts).where(eq(catalogProducts.id, productId))
+        if (!product) throw new AppError(400, 'PRODUCT_NOT_FOUND', 'Không tìm thấy sản phẩm đính kèm')
+      }
+      const data = productId ? JSON.stringify({ productId }) : null
+      const result = await db.execute(sql`
+        insert into inbox_messages (user_id, kind, title, body, data)
+        select id, 'system', ${title}, ${body}, ${data}::jsonb from users where promo_notifications = true
+        returning id`)
+      return ok(c, { sent: result.length }, 201)
     })
 }

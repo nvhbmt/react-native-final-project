@@ -134,6 +134,13 @@
       "when": 1794426352234,
       "tag": "0018_upload_url",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794429645462,
+      "tag": "0019_rate_limits",
+      "breakpoints": true
     }
   ]
 }

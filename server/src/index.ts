@@ -5,6 +5,7 @@ import { buildApp } from './app.ts'
 import { createDb } from '@/db/client.ts'
 import { consoleMailer, createSmtpMailer } from '@/lib/mailer.ts'
 import { allowDemoCheckout, loadEnv, sepayConfig, smtpConfig, storageConfig } from './env.ts'
+import { createPostgresRateLimitStore, useRateLimitStore } from '@/lib/rateLimit.ts'
 import { createDiskStorage, createSupabaseStorage } from '@/lib/storage.ts'
 import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
 import { createCatalogRepository } from '@/modules/catalog/repository.ts'
@@ -20,6 +21,8 @@ if (!storageCfg && env.NODE_ENV === 'production') {
   console.warn('[storage] Đang lưu ảnh trên ổ đĩa (UPLOAD_DIR). Ảnh sẽ mất khi deploy lại — đặt SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.')
 }
 const { db, close } = createDb(env.DATABASE_URL)
+// Giới hạn request dùng chung qua DB để nhiều instance API cùng một hạn mức.
+useRateLimitStore(createPostgresRateLimitStore(db))
 
 const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),

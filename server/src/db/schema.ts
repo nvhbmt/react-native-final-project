@@ -344,3 +344,10 @@ export const aiMessages = pgTable('ai_messages', {
 
 export type AiConversationRow = typeof aiConversations.$inferSelect
 export type AiMessageRow = typeof aiMessages.$inferSelect
+
+/** Bộ đếm giới hạn request dùng chung giữa các instance API (xem lib/rateLimit.ts). */
+export const rateLimits = pgTable('rate_limits', {
+  key: text('key').primaryKey(),
+  count: integer('count').notNull(),
+  resetAt: timestamp('reset_at', { withTimezone: true }).notNull(),
+}, (table) => [index('rate_limits_reset_idx').on(table.resetAt)])

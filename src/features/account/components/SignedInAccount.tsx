@@ -48,6 +48,8 @@ export function SignedInAccount({ user }: { user: User }) {
           <>
             <AccountMenuRow icon="cube-outline" label="Quản lý giao hàng" onPress={() => router.push('/admin/orders')} />
             <Divider />
+            <AccountMenuRow icon="megaphone-outline" label="Gửi khuyến mãi" onPress={() => router.push('/admin/promotions')} />
+            <Divider />
           </>
         ) : null}
         <AccountMenuRow icon="sparkles-outline" label="Trợ lý mua sắm AI" onPress={() => router.push('/assistant')} />

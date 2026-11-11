@@ -30,6 +30,7 @@ export function InboxScreen() {
   const open = (message: InboxMessage) => {
     if (!message.read) void markRead(message.id).catch(() => undefined)
     if (message.data.orderId) router.push({ pathname: '/orders/[id]', params: { id: message.data.orderId } })
+    else if (message.data.productId) router.push({ pathname: '/product/[id]', params: { id: message.data.productId } })
   }
 
   return (

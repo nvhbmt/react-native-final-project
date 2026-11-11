@@ -358,6 +358,13 @@ npm run admin:grant -- admin@example.com --revoke   # thu quyền, có hiệu l�
 - Migration `0017` thêm cột `orders.fulfillment_updated_by` (FK `users`, `ON DELETE SET NULL`).
 - Chưa có: huỷ/hoàn tiền đơn đã thanh toán từ trang quản trị, nhật ký đầy đủ từng bước (hiện chỉ lưu người cập nhật gần nhất).
 
+**Gửi khuyến mãi** (màn Tài khoản → Gửi khuyến mãi, `/admin/promotions`): `GET /admin/promotions/audience` → `{ recipients }`;
+`POST /admin/promotions { title, body, productId? }` → `{ sent }`, ghi tin `kind: system` vào Hộp thư của mọi khách có
+`promoNotifications = true` (một câu `INSERT … SELECT`); `productId` không tồn tại → `400 PRODUCT_NOT_FOUND`. Chưa có thông báo đẩy.
+
+**Giới hạn request** (đăng nhập/đăng ký, gửi tin AI, upload, góp ý) dùng chung qua bảng `rate_limits` (migration `0019`) khi chạy
+server thật; test dùng bộ đếm trong bộ nhớ. Nút dừng câu trả lời AI vẫn theo từng instance.
+
 ## Đánh giá sản phẩm
 
 Các route sau dùng tiền tố `/api/v1`.
