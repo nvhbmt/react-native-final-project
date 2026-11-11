@@ -40,7 +40,6 @@ yarn-error.*
 /ios
 /android
 
-# Local QA reports, screenshots and temporary verification output
+# Local project documents and temporary verification output
+/docs/
 /tmp/
-/docs/screens-validation.md
-/docs/validation/
