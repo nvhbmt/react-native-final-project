@@ -3,9 +3,10 @@ import type { ReactNode } from 'react'
 
 import { Divider } from '@/components/ui/Divider'
 import { TAX_RATE } from '@/features/cart'
-import { formatPrice, maskCardNumber } from '@/lib/format'
+import { formatPrice, formatVnd, maskCardNumber } from '@/lib/format'
 
 import type { Order } from '../types'
+import { OrderStatusBadge } from './OrderStatusBadge'
 import { PaymentLogo } from './PaymentLogo'
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
@@ -41,21 +42,26 @@ export function OrderSummaryCard({ order }: { order: Order }) {
         <Amount value={order.fees} />
       </Row>
       <Divider className="bg-neutral-300" />
-      <Row label={pm.brand === 'paypal' ? 'PayPal' : 'Card'}>
+      <Row label={pm.kind === 'bank_transfer' ? 'Chuyển khoản' : pm.brand === 'paypal' ? 'PayPal' : 'Card'}>
         <View className="flex-row items-center gap-2">
           <PaymentLogo brand={pm.brand} size={28} />
-          <Text className="text-[12px] leading-[20px] font-bold text-neutral-900">
-            {pm.brand === 'paypal' ? pm.label : maskCardNumber(pm.label)}
-          </Text>
+          {pm.kind === 'demo_card' ? (
+            <Text className="text-[12px] leading-[20px] font-bold text-neutral-900">
+              {pm.brand === 'paypal' ? pm.label : maskCardNumber(pm.label)}
+            </Text>
+          ) : null}
         </View>
       </Row>
+      {order.amountVnd ? (
+        <Row label="Số tiền (VND)">
+          <Text className="text-[16px] leading-[26px] text-neutral-900">{formatVnd(order.amountVnd)}</Text>
+        </Row>
+      ) : null}
       <Divider className="bg-neutral-300" />
       <Row label="Total">
         <View className="flex-row items-center gap-2">
-          <View className="rounded-full bg-success-50 px-2 py-1">
-            <Text className="text-[12px] leading-[20px] text-success-700">Success</Text>
-          </View>
-          <Text className="text-[20px] leading-[30px] text-success-800">{formatPrice(order.total)}</Text>
+          <OrderStatusBadge status={order.status} />
+          <Text className="text-[20px] leading-[30px] text-neutral-900">{formatPrice(order.total)}</Text>
         </View>
       </Row>
     </View>

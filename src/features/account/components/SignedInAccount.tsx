@@ -38,6 +38,8 @@ export function SignedInAccount({ user }: { user: User }) {
       </View>
 
       <View className="overflow-hidden rounded-[8px] border border-neutral-300">
+        <AccountMenuRow icon="receipt-outline" label="Đơn hàng của tôi" onPress={() => router.push('/orders')} />
+        <Divider />
         <AccountMenuRow icon="person-outline" label="Hồ sơ cá nhân" onPress={() => router.push('/profile')} />
         <Divider />
         <AccountMenuRow icon="location-outline" label="Địa chỉ giao hàng" onPress={() => router.push('/addresses')} />

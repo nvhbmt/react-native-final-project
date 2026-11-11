@@ -1,0 +1,23 @@
+import { create } from 'zustand'
+
+import { api } from '@/lib/api'
+
+import type { Order, PaymentMethod } from '../types'
+
+export const ordersApi = {
+  paymentMethods: () => api.get<PaymentMethod[]>('/payment-methods'),
+  get: (id: string) => api.get<Order>(`/orders/${encodeURIComponent(id)}`),
+  pay: (id: string) => api.post<Order>(`/orders/${encodeURIComponent(id)}/pay`),
+  cancel: (id: string) => api.post<Order>(`/orders/${encodeURIComponent(id)}/cancel`),
+}
+
+/** Tăng khi đơn thay đổi (đặt mới, huỷ, đã thanh toán) để danh sách đơn tải lại. */
+const useOrdersVersion = create<{ revision: number }>(() => ({ revision: 0 }))
+export const invalidateOrders = () => useOrdersVersion.setState(({ revision }) => ({ revision: revision + 1 }))
+export const useOrdersRevision = () => String(useOrdersVersion((s) => s.revision))
+
+export const ORDER_STATUS_LABEL: Record<Order['status'], string> = {
+  pending_payment: 'Chờ thanh toán',
+  completed: 'Đã xác nhận',
+  cancelled: 'Đã huỷ',
+}
