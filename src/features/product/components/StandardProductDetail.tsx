@@ -15,6 +15,7 @@ import { CatalogStatus } from '@/features/products/components/CatalogStatus'
 import { useCatalogRequest } from '@/features/products/hooks/useCatalogRequest'
 import { formatProductPrice } from '@/features/products/lib/formatProductPrice'
 import type { Product as CatalogProduct } from '@/features/products/types'
+import { FavoriteButton } from '@/features/favorites'
 import { HeaderActions } from '@/navigation/HeaderActions'
 import { appColors } from '@/theme/tamagui.config'
 
@@ -55,7 +56,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
 
   return (
     <Screen
-      header={<AppHeader title={product.categoryName} align="left" right={<HeaderActions />} />}
+      header={<AppHeader title={product.categoryName} align="left" right={<><FavoriteButton product={{ id: product.id }} /><HeaderActions /></>} />}
       contentClassName="pb-6"
       footer={
         <View className="flex-row gap-3 border-t border-neutral-200 px-6 pt-3 pb-3">

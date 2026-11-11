@@ -5,6 +5,7 @@ import { TamaguiProvider } from 'tamagui'
 
 import { useAuthStore } from '@/features/auth'
 import { startCartSync } from '@/features/cart/api/cartSync'
+import { startFavoritesSync } from '@/features/favorites'
 import { appColors, config } from '@/theme/tamagui.config'
 
 // Đồng bộ màu header/nền của React Navigation với theme Tamagui.
@@ -23,6 +24,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   }, [])
   // Giỏ hàng: khách lưu trên máy, đăng nhập thì đồng bộ với tài khoản.
   useEffect(() => startCartSync(), [])
+  useEffect(() => startFavoritesSync(), [])
 
   return (
     <SafeAreaProvider>

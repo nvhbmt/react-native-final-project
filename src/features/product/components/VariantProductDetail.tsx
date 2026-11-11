@@ -12,6 +12,7 @@ import { Screen } from '@/components/ui/Screen'
 import { useCartStore } from '@/features/cart'
 import { formatProductPrice } from '@/features/products/lib/formatProductPrice'
 import { formatPrice } from '@/lib/format'
+import { FavoriteButton } from '@/features/favorites'
 import { HeaderActions } from '@/navigation/HeaderActions'
 import { appColors } from '@/theme/tamagui.config'
 
@@ -70,7 +71,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
 
   return (
     <Screen
-      header={<AppHeader title={product.categoryName} align="left" right={<HeaderActions />} />}
+      header={<AppHeader title={product.categoryName} align="left" right={<><FavoriteButton product={{ id: product.id }} /><HeaderActions /></>} />}
       contentClassName="px-6 pt-1 pb-6"
       footer={
         <View className="border-t border-neutral-200 px-6 pt-6 pb-3">
