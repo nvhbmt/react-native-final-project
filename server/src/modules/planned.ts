@@ -32,12 +32,6 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('POST', '/auth/forgot-password', 'auth', false, 'Gửi mã/đường dẫn đặt lại mật khẩu qua email'),
   e('POST', '/auth/reset-password', 'auth', false, 'Đặt lại mật khẩu bằng mã đã gửi'),
 
-  // Tài khoản
-  e('PATCH', '/users/me', 'users', true, 'Cập nhật họ tên, số điện thoại, địa chỉ'),
-  e('PUT', '/users/me/avatar', 'users', true, 'Đổi ảnh đại diện (nhận uploadId)'),
-  e('DELETE', '/users/me', 'users', true, 'Xoá tài khoản'),
-  e('GET', '/users/me/addresses', 'users', true, 'Danh sách địa chỉ giao hàng'),
-  e('POST', '/users/me/addresses', 'users', true, 'Thêm địa chỉ giao hàng'),
 
 
   // Thanh toán & đơn hàng

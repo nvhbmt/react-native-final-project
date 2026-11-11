@@ -14,6 +14,7 @@ export const users = pgTable(
     passwordHash: text('password_hash').notNull(),
     fullName: text('full_name').notNull(),
     avatarUrl: text('avatar_url'),
+    phone: text('phone'),
     role: userRole('role').notNull().default('customer'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -188,3 +189,20 @@ export const uploads = pgTable('uploads', {
 ])
 
 export type UploadRow = typeof uploads.$inferSelect
+
+/** Địa chỉ giao hàng; mỗi user tối đa 10, đúng một địa chỉ mặc định (nếu có). */
+export const addresses = pgTable('addresses', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  recipientName: text('recipient_name').notNull(),
+  phone: text('phone').notNull(),
+  line1: text('line1').notNull(),
+  city: text('city').notNull(),
+  isDefault: boolean('is_default').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  index('addresses_user_idx').on(table.userId, table.createdAt),
+  uniqueIndex('addresses_one_default_idx').on(table.userId).where(sql`${table.isDefault}`),
+])
+
+export type AddressRow = typeof addresses.$inferSelect
