@@ -32,8 +32,6 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('POST', '/auth/forgot-password', 'auth', false, 'Gửi mã/đường dẫn đặt lại mật khẩu qua email'),
   e('POST', '/auth/reset-password', 'auth', false, 'Đặt lại mật khẩu bằng mã đã gửi'),
 
-
-
   // Thanh toán & đơn hàng
   e('GET', '/payment-methods', 'payments', true, 'Phương thức thanh toán đã lưu'),
   e('POST', '/payment-methods', 'payments', true, 'Lưu phương thức thanh toán (token từ cổng thanh toán)'),
@@ -42,10 +40,6 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('POST', '/orders/:id/cancel', 'orders', true, 'Huỷ đơn khi chưa giao'),
   e('POST', '/orders/:id/pay', 'payments', true, 'Tạo giao dịch thanh toán cho đơn'),
   e('POST', '/payments/webhook', 'payments', false, 'Webhook từ cổng thanh toán (xác thực bằng chữ ký)'),
-
-  // Góp ý
-  e('POST', '/feedback', 'feedback', true, 'Gửi góp ý: mood, topics, comment, images, rating, productId?, orderId?'),
-  e('GET', '/feedback', 'feedback', true, 'Góp ý đã gửi'),
 
   // Chat AI — trợ lý mua sắm
   e('GET', '/ai/conversations', 'ai-chat', true, 'Danh sách cuộc hội thoại với trợ lý AI'),

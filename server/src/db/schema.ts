@@ -226,3 +226,22 @@ export const inboxMessages = pgTable('inbox_messages', {
 ])
 
 export type InboxMessageRow = typeof inboxMessages.$inferSelect
+
+export const feedbackMood = pgEnum('feedback_mood', ['sad', 'neutral', 'happy'])
+
+export const feedback = pgTable('feedback', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  mood: feedbackMood('mood'),
+  topics: text('topics').array().notNull(),
+  comment: text('comment').notNull().default(''),
+  /** URL tương đối của ảnh đã upload (`purpose=feedback`). */
+  images: text('images').array().notNull(),
+  rating: integer('rating').notNull(),
+  productId: text('product_id').references(() => catalogProducts.id, { onDelete: 'set null' }),
+  orderId: uuid('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  index('feedback_user_created_idx').on(table.userId, table.createdAt),
+  check('feedback_rating_valid', sql`${table.rating} BETWEEN 1 AND 5`),
+])
