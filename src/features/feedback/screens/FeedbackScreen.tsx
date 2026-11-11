@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Button } from '@/components/ui/Button'
 import { StarRating } from '@/components/ui/StarRating'
 import { useAuthStatus } from '@/features/auth'
+import { useInboxStore } from '@/features/inbox'
 import { api, ApiError, uploadImage } from '@/lib/api'
 import { appColors, bodyFontFamily } from '@/theme/tamagui.config'
 
@@ -67,6 +68,7 @@ export function FeedbackScreen() {
       const payload = buildFeedbackPayload(form, uploaded.map(({ id }) => id), { productId: params.productId, orderId: params.orderId })
       if (!payload) return
       await api.post('/feedback', payload)
+      void useInboxStore.getState().refreshUnread()
       close()
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Không gửi được góp ý, vui lòng thử lại')

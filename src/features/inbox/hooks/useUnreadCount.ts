@@ -1,4 +1,6 @@
-// TODO: thay bằng dữ liệu thật (API / store). Hiện trả số giả để hiển thị badge.
+import { useInboxStore } from '../store/inboxStore'
+
+/** Số thông báo chưa đọc (badge tab Inbox). */
 export function useUnreadCount(): number {
-  return 9
+  return useInboxStore((s) => s.unreadCount)
 }
