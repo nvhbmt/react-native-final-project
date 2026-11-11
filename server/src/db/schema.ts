@@ -206,3 +206,23 @@ export const addresses = pgTable('addresses', {
 ])
 
 export type AddressRow = typeof addresses.$inferSelect
+
+export const inboxKind = pgEnum('inbox_kind', ['order', 'payment', 'feedback', 'system'])
+
+/** Thông báo trong app (tab Inbox). Tạo bởi server khi có sự kiện: đặt đơn, nhận tiền, huỷ đơn... */
+export const inboxMessages = pgTable('inbox_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  kind: inboxKind('kind').notNull(),
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  /** Liên kết mở khi chạm, vd. `{ orderId }`. */
+  data: jsonb('data').$type<{ orderId?: string; productId?: string }>(),
+  readAt: timestamp('read_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  index('inbox_user_created_idx').on(table.userId, table.createdAt, table.id),
+  index('inbox_user_unread_idx').on(table.userId).where(sql`${table.readAt} is null`),
+])
+
+export type InboxMessageRow = typeof inboxMessages.$inferSelect

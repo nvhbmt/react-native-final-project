@@ -12,6 +12,7 @@ import { cartRoutes } from '@/modules/cart/routes.ts'
 import { favoriteRoutes } from '@/modules/favorites/routes.ts'
 import { uploadFileRoutes, uploadRoutes } from '@/modules/uploads/routes.ts'
 import { userRoutes } from '@/modules/users/routes.ts'
+import { inboxRoutes } from '@/modules/inbox/routes.ts'
 import { authRoutes } from '@/modules/auth/routes.ts'
 import type { AuthRepository } from '@/modules/auth/repository.ts'
 import { createAuthService } from '@/modules/auth/service.ts'
@@ -84,6 +85,7 @@ export function buildApp(deps: AppDeps) {
   if (deps.commerce) {
     api.route('/', uploadRoutes(deps.commerce.db, deps.accessSecret, uploadDir))
     api.route('/', userRoutes(deps.commerce.db, deps.accessSecret))
+    api.route('/', inboxRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', cartRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
