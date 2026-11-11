@@ -2,8 +2,9 @@
 
 Ứng dụng React Native dựng trên **Expo SDK 58 + Expo Router**, UI bằng **Tamagui v3** với cú pháp
 Tailwind (`@tamagui/tailwind`). Home và Product Listing được dựng theo prototype E-Commercial
-Market Place. Dự án có thêm chi tiết sản phẩm, Reviews, Size guide, Checkout, Payment và Feedback;
-tab Search dùng chung màn danh sách; Favorites, Inbox, Account hiện giữ màn hình placeholder.
+Market Place. Dự án có thêm chi tiết sản phẩm, Reviews, Size guide, Checkout, Payment (SePay/VietQR),
+Feedback, Favorites, Inbox, Account (hồ sơ, địa chỉ, đơn hàng) và trợ lý mua sắm AI; mọi màn đều lấy
+dữ liệu từ backend trong `server/`.
 
 ## Home, Product Listing và Filter
 
@@ -18,20 +19,21 @@ tab Search dùng chung màn danh sách; Favorites, Inbox, Account hiện giữ m
   các lựa chọn mới được áp dụng ngay và giữ khi quay lại.
 - Chọn lại số sao đang chọn để bỏ điều kiện đánh giá; bỏ chọn các checkbox/ô Others và
   xoá hai ô giá để trở lại danh sách đầy đủ. Không thêm nút Reset/Apply ngoài thiết kế gốc.
-- Các lựa chọn giao hàng và quyền lợi hiện dựa trên chính sách shop giả lập tại
-  `src/features/products/data/shoppingPolicies.ts`; nhiều cách giao hàng dùng điều kiện OR,
+- Các lựa chọn giao hàng và quyền lợi lấy từ dữ liệu catalog trên server; nhiều cách giao hàng dùng điều kiện OR,
   nhiều quyền lợi dùng điều kiện AND.
 - Chạm ảnh/tên sản phẩm để mở chi tiết đúng ID, giá và hình ảnh. Nút cộng thêm vào giỏ;
   sản phẩm có biến thể mở màn chọn màu/size trước khi thêm.
-- Icon giỏ trên mọi header mở chung màn Checkout. Giỏ bắt đầu rỗng; thêm từ Listing hoặc
-  chi tiết đều dùng cùng Zustand store, hỗ trợ đổi số lượng, xoá dòng và voucher `SALE10`.
-- Home → danh mục/tìm kiếm → chi tiết → Checkout → Payment → Success → Feedback → Home.
-  Headphone có trong Electronics khi chọn See all; Hoodie shirt có trong Fashion.
-- Size guide và Reviews mở từ chi tiết. Submit ở Feedback lưu góp ý theo sản phẩm/đơn hàng;
-  đánh giá sản phẩm vừa gửi xuất hiện ở Reviews khi quay lại.
-- Thanh toán dùng phương thức giả lập, chốt bản sao sản phẩm/tổng tiền rồi xoá giỏ và voucher.
-  Success và Feedback giữ thông tin đơn đã mua. Dữ liệu giỏ, đơn và góp ý lưu trong bộ nhớ,
-  mất khi tải lại ứng dụng; chưa nối backend hoặc cổng thanh toán thật.
+- Icon giỏ trên mọi header mở chung màn Checkout. Khách: giỏ lưu trên máy; đăng nhập thì giỏ khách được
+  gộp vào giỏ tài khoản (`/cart/merge`) và mọi thay đổi đồng bộ với server. Voucher `SALE10`, `FREESHIP`.
+- Home → danh mục/tìm kiếm → chi tiết → Checkout → Payment → (Chuyển khoản) → Success → Feedback → Home.
+- Payment lấy phương thức từ server: **VietQR qua SePay** khi server cấu hình `SEPAY_*`, thẻ demo khi chạy dev.
+  Chọn VietQR → đơn ở trạng thái chờ thanh toán → màn Chuyển khoản hiện QR, số tài khoản, nội dung CK,
+  tự kiểm tra mỗi 4 giây và chuyển sang Success khi webhook SePay báo đã nhận tiền.
+- Account → Đơn hàng của tôi: lịch sử, chi tiết, thanh toán tiếp, huỷ đơn, viết đánh giá.
+- Favorites: chạm tim trên trang sản phẩm; badge tab hiện số sản phẩm yêu thích.
+- Inbox: thông báo đặt/huỷ đơn, thanh toán, góp ý; badge số tin chưa đọc. Có lối vào trợ lý AI.
+- Trợ lý AI (`/assistant`): câu trả lời stream qua SSE (`expo/fetch`), dừng giữa chừng, đánh giá câu trả lời,
+  mở từ trang sản phẩm / chi tiết đơn thì hội thoại có sẵn ngữ cảnh.
 - Route `/product-listing?category=electronics` và `/product-listing?category=fruits`
   dùng chung thanh tab, với Home được đánh dấu đang chọn.
 - `src/features/products/` chứa dữ liệu, kiểu dữ liệu, xử lý lọc và màn listing;
@@ -53,7 +55,7 @@ npm start            # Expo dev server — quét QR bằng Expo Go hoặc nhấn
 npm run web          # chạy trên trình duyệt
 npm run typecheck    # tsc --noEmit
 npm run lint         # expo lint
-npm test             # 23 kiểm thử giỏ hàng, đơn, góp ý, lọc sản phẩm và API client (Node 22.13+)
+npm test             # kiểm thử giỏ hàng, góp ý, lọc sản phẩm, API client, parser SSE (Node 22.13+)
 ```
 
 Đăng nhập/đăng ký cần backend chạy song song (cần Docker cho Postgres). Mở terminal thứ hai:
@@ -64,8 +66,12 @@ npm install
 cp .env.example .env   # thay JWT_ACCESS_SECRET bằng chuỗi ngẫu nhiên ≥ 32 ký tự
 npm run db:up          # Postgres 17 trong Docker, cổng 5435
 npm run migrate
+npm run db:seed:catalog   # 80 sản phẩm mẫu
 npm run dev            # API tại http://localhost:4000/api/v1
 ```
+
+Thanh toán SePay, email đặt lại mật khẩu và trợ lý AI cần thêm biến môi trường — xem `server/README.md`.
+Thiếu cấu hình thì: chỉ có thẻ demo, mã đặt lại mật khẩu in ra console server, chat báo trợ lý chưa bật.
 
 Không bật backend thì app vẫn duyệt sản phẩm được; màn đăng nhập sẽ báo không kết nối được máy chủ.
 Chi tiết database (tắt, reset, psql) xem `server/README.md`.
@@ -73,13 +79,18 @@ Chi tiết database (tắt, reset, psql) xem `server/README.md`.
 ## Backend và đăng nhập
 
 API nằm trong `server/` (Hono + Drizzle + Postgres), là một cây npm riêng, không nằm trong bundle
-của app. Hiện có luồng xác thực; các API còn lại và chat AI đang là placeholder.
+của app: xác thực, catalog, giỏ hàng, đơn hàng + SePay, đánh giá, yêu thích, hộp thư, góp ý, upload ảnh,
+tài khoản và trợ lý AI.
 Cách chạy và hợp đồng API xem `server/README.md`.
 
 - Khách vẫn duyệt sản phẩm, giỏ hàng như cũ. Tab **Account** hiện Log in / Create account khi chưa
-  đăng nhập; đã đăng nhập thì hiện hồ sơ, Đổi mật khẩu, Đăng xuất, Đăng xuất mọi thiết bị.
-  Avatar trên header hiện chữ cái đầu của tên người dùng.
-- Route: `/login`, `/register`, `/change-password` → `features/auth`.
+  đăng nhập; đã đăng nhập thì có Đơn hàng, Trợ lý AI, Hồ sơ (tên, SĐT, avatar), Địa chỉ giao hàng,
+  Đổi mật khẩu, Đăng xuất (mọi thiết bị), Xoá tài khoản. Log in có "Quên mật khẩu?" (mã 6 số qua email).
+- Route: `/login`, `/register`, `/forgot-password`, `/change-password` → `features/auth`;
+  `/profile`, `/addresses`, `/delete-account` → `features/account`; `/orders`, `/orders/[id]` → `features/orders`;
+  `/checkout/transfer` → `features/checkout`; `/assistant`, `/assistant/[id]` → `features/assistant`.
+- Ảnh (avatar, góp ý) chọn bằng `expo-image-picker`, upload dạng base64 (`src/lib/api/media.ts`);
+  URL `/uploads/...` do server trả về được ghép với địa chỉ API qua `mediaUrl()`.
 - `src/lib/api/` là HTTP client dùng chung: bóc `{ success, data }`, ném `ApiError` có `code`,
   tự gắn access token và tự refresh một lần khi gặp `401 TOKEN_EXPIRED`.
 - `features/auth/store/authStore.ts` (Zustand): access token chỉ giữ trong bộ nhớ; refresh token lưu bằng
@@ -123,7 +134,7 @@ src/
 │       ├── screens/          # Màn hình của tính năng
 │       ├── components/       # Component chỉ dùng trong tính năng
 │       ├── hooks/ store/     # State & logic
-│       ├── api/ data/        # Truy cập dữ liệu; data/*.mock.ts là dữ liệu giả lập
+│       ├── api/              # Gọi backend
 │       ├── types.ts
 │       └── index.ts          # Public API — bên ngoài chỉ import từ đây
 ├── components/
