@@ -36,8 +36,6 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('GET', '/payment-methods', 'payments', true, 'Phương thức thanh toán đã lưu'),
   e('POST', '/payment-methods', 'payments', true, 'Lưu phương thức thanh toán (token từ cổng thanh toán)'),
   e('DELETE', '/payment-methods/:id', 'payments', true, 'Xoá phương thức thanh toán'),
-  e('GET', '/orders', 'orders', true, 'Lịch sử đơn hàng'),
-  e('POST', '/orders/:id/cancel', 'orders', true, 'Huỷ đơn khi chưa giao'),
   e('POST', '/orders/:id/pay', 'payments', true, 'Tạo giao dịch thanh toán cho đơn'),
   e('POST', '/payments/webhook', 'payments', false, 'Webhook từ cổng thanh toán (xác thực bằng chữ ký)'),
 

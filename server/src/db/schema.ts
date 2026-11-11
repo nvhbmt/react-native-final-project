@@ -120,11 +120,14 @@ export const orders = pgTable('orders', {
   subtotalCents: integer('subtotal_cents').notNull(),
   discountCents: integer('discount_cents').notNull(),
   taxCents: integer('tax_cents').notNull(),
+  cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
 }, (table) => [
   uniqueIndex('orders_user_request_idx').on(table.userId, table.requestId),
   index('orders_user_created_idx').on(table.userId, table.createdAt),
 ])
+
+export type OrderRow = typeof orders.$inferSelect
 
 export const productReviews = pgTable('product_reviews', {
   id: uuid('id').primaryKey().defaultRandom(),
