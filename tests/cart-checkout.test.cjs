@@ -2,14 +2,12 @@ const assert = require('node:assert/strict')
 const { beforeEach, test } = require('node:test')
 
 const { computeTotals, useCartStore } = require('../src/features/cart/store/cartStore.ts')
-const { useOrderStore } = require('../src/features/checkout/store/orderStore.ts')
 const { useFeedbackStore } = require('../src/features/feedback/store/feedbackStore.ts')
 
 const hoodie = { productId: 'hoodie-shirt', name: 'Hoodie shirt', subtitle: 'Blue · L', image: 1, price: 2.99, options: { color: 'blue', size: 'L' } }
 
 beforeEach(() => {
   useCartStore.getState().clear()
-  useOrderStore.setState({ lastOrder: null })
   useFeedbackStore.setState({ entries: [] })
 })
 
@@ -48,21 +46,13 @@ test('voucher discount, tax and the payment total use rounded monetary amounts',
   assert.equal(useCartStore.getState().voucher.code, 'SALE10')
 })
 
-test('order keeps the purchased items and totals after checkout clears the cart', () => {
+test('clearing the cart resets its items and voucher', () => {
   useCartStore.getState().addItem({ ...hoodie, quantity: 2 })
   useCartStore.getState().applyVoucher('SALE10')
   const cart = useCartStore.getState()
-  const totals = computeTotals(cart.items, cart.voucher.rate)
-  const order = useOrderStore.getState().placeOrder(cart.items, totals, { id: 'visa', brand: 'visa', label: '2334' })
   cart.clear()
   assert.equal(useCartStore.getState().items.length, 0)
   assert.equal(useCartStore.getState().voucher, null)
-  assert.equal(order.items[0].productId, 'hoodie-shirt')
-  assert.equal(order.items[0].quantity, 2)
-  assert.equal(order.total, totals.total)
-  assert.equal(useOrderStore.getState().lastOrder.id, order.id)
-  cart.items[0].options.size = 'XS'
-  assert.equal(order.items[0].options.size, 'L')
 })
 
 test('submitted feedback preserves product/order context and copies the form payload', () => {

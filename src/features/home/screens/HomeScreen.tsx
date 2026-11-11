@@ -6,6 +6,10 @@ import { YStack } from 'tamagui'
 import { MarketplaceFrame } from '@/components/marketplace/MarketplaceFrame'
 import { SearchField } from '@/components/marketplace/SearchField'
 import { hasActiveFilters, useProductFilters } from '@/features/filters'
+import { listingPath } from '@/features/products/api/listingPath'
+import { CatalogStatus } from '@/features/products/components/CatalogStatus'
+import { useCatalogRequest } from '@/features/products/hooks/useCatalogRequest'
+import type { CatalogHome, ProductPage } from '@/features/products/types'
 
 import { CategoryStrip } from '../components/CategoryStrip'
 import { Deals } from '../components/Deals'
@@ -14,6 +18,9 @@ import { RecommendedProducts } from '../components/RecommendedProducts'
 export function HomeScreen() {
   const [query, setQuery] = useState('')
   const filters = useProductFilters()
+  const filtered = hasActiveFilters(filters)
+  const home = useCatalogRequest<CatalogHome>('/home')
+  const recommendations = useCatalogRequest<ProductPage>(filtered ? listingPath({ filters, limit: 10 }) : undefined)
 
   return (
     <MarketplaceFrame title="All Deals" onBack={() => { if (router.canGoBack()) router.back() }}>
@@ -22,15 +29,21 @@ export function HomeScreen() {
           <SearchField
             value={query} onChangeText={setQuery} placeholder="Search for product"
             onFilter={() => router.push('/filters')}
-            filtered={hasActiveFilters(filters)}
+            filtered={filtered}
             onSubmit={() => router.push({ pathname: '/product-listing', params: { query } })}
           />
         </YStack>
-        <CategoryStrip />
-        <YStack h={24} />
-        <Deals />
-        <YStack h={32} />
-        <RecommendedProducts />
+        {home.data ? <>
+          <CategoryStrip categories={home.data.categories} />
+          <YStack h={24} />
+          <Deals hero={home.data.deals[0] ?? home.data.recommendedProducts[0]} banners={home.data.banners} />
+          <YStack h={32} />
+          <RecommendedProducts
+            products={filtered ? recommendations.data?.items ?? [] : home.data.recommendedProducts}
+            loading={recommendations.loading}
+            onRetry={recommendations.error ? recommendations.retry : undefined}
+          />
+        </> : <CatalogStatus loading={home.loading} message={home.error ? 'Could not load products.' : undefined} onRetry={home.error ? home.retry : undefined} />}
       </ScrollView>
     </MarketplaceFrame>
   )

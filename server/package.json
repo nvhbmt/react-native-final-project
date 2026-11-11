@@ -18,7 +18,8 @@
     "db:psql": "docker compose exec db psql -U market -d market",
     "db:logs": "docker compose logs -f db",
     "db:generate": "drizzle-kit generate",
-    "migrate": "tsx --env-file-if-exists=.env src/db/migrate.ts"
+    "migrate": "tsx --env-file-if-exists=.env src/db/migrate.ts",
+    "db:seed:catalog": "tsx --env-file-if-exists=.env src/db/seedCatalog.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.6",

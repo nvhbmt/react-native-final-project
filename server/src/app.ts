@@ -6,14 +6,21 @@ import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 import { bodyLimit } from 'hono/body-limit'
 
+import type { Db } from '@/db/client.ts'
 import { AppError, fail, ok } from '@/lib/http.ts'
 import { authRoutes } from '@/modules/auth/routes.ts'
 import type { AuthRepository } from '@/modules/auth/repository.ts'
 import { createAuthService } from '@/modules/auth/service.ts'
+import { catalogRoutes } from '@/modules/catalog/routes.ts'
+import type { CatalogService } from '@/modules/catalog/service.ts'
+import { orderRoutes } from '@/modules/orders/routes.ts'
 import { PLANNED_ENDPOINTS, plannedRoutes } from '@/modules/planned.ts'
+import { reviewRoutes } from '@/modules/reviews/routes.ts'
 
 export type AppDeps = {
   authRepository: AuthRepository
+  catalog?: CatalogService
+  commerce?: { db: Db; allowDemoCheckout: boolean }
   accessSecret: string
   accessTtlSeconds: number
   refreshTtlSeconds: number
@@ -61,6 +68,11 @@ export function buildApp(deps: AppDeps) {
   api.get('/', (c) => ok(c, { name: 'market-api', version: 'v1', planned: PLANNED_ENDPOINTS }))
   // Thứ tự quan trọng: router đã triển khai mount trước router placeholder.
   api.route('/auth', authRoutes(authService, { accessSecret: deps.accessSecret, rateLimitMax: deps.authRateLimitMax }))
+  if (deps.catalog) api.route('/', catalogRoutes(deps.catalog))
+  if (deps.commerce) {
+    api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
+    api.route('/', reviewRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
+  }
   api.route('/', plannedRoutes(deps.accessSecret))
 
   app.route('/api/v1', api)

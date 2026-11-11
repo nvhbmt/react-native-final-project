@@ -2,7 +2,7 @@ import { StyleSheet, TextInput } from 'react-native'
 import { Slider, XStack, YStack } from 'tamagui'
 
 import { MarketText } from '@/components/marketplace/MarketText'
-import type { ProductFilters } from '@/features/products/catalog'
+import type { ProductFilters } from '@/features/products/types'
 import { marketplace as m } from '@/theme/marketplace'
 
 import { cleanPrice, MAX_PRICE, normalizePriceRange } from '../lib/priceRange'

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Text, View } from '@tamagui/tailwind'
-import { router } from 'expo-router'
+import { Link, router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, useWindowDimensions } from 'react-native'
 
@@ -11,12 +11,16 @@ import { Divider } from '@/components/ui/Divider'
 import { Screen } from '@/components/ui/Screen'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { useCartStore } from '@/features/cart'
-import { formatPrice } from '@/lib/format'
+import { CatalogStatus } from '@/features/products/components/CatalogStatus'
+import { useCatalogRequest } from '@/features/products/hooks/useCatalogRequest'
+import { formatProductPrice } from '@/features/products/lib/formatProductPrice'
+import type { Product as CatalogProduct } from '@/features/products/types'
 import { HeaderActions } from '@/navigation/HeaderActions'
 import { appColors } from '@/theme/tamagui.config'
 
-import { productApi } from '../api/productApi'
-import type { Product } from '../types'
+import { productPath } from '../api/productApi'
+import { useReviewPreview } from '../api/reviews'
+import type { Product, ProductFeature } from '../types'
 import { FeatureList } from './FeatureList'
 import { ImageCarousel } from './ImageCarousel'
 import { NotifyCard } from './NotifyCard'
@@ -33,7 +37,12 @@ export function StandardProductDetail({ product }: { product: Product }) {
   const [expanded, setExpanded] = useState(false)
   const [notify, setNotify] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
-  const related = productApi.getRelated(product)
+  const related = useCatalogRequest<CatalogProduct[]>(productPath(product.id, '/related'))
+  const reviews = useReviewPreview(product.id, 2)
+  const features: ProductFeature[] = []
+  if (product.shippingOptions.includes('express')) features.push({ icon: 'express', label: 'Express' })
+  if (product.benefits.includes('free-return')) features.push({ icon: 'return', label: '30-day free return' })
+  const unavailable = product.available === false
 
   const addToCart = () =>
     addItem({
@@ -46,20 +55,22 @@ export function StandardProductDetail({ product }: { product: Product }) {
 
   return (
     <Screen
-      header={<AppHeader title={product.category} align="left" right={<HeaderActions />} />}
+      header={<AppHeader title={product.categoryName} align="left" right={<HeaderActions />} />}
       contentClassName="pb-6"
       footer={
         <View className="flex-row gap-3 border-t border-neutral-200 px-6 pt-3 pb-3">
           <View
-            onPress={addToCart}
+            onPress={unavailable ? undefined : addToCart}
             role="button"
             aria-label="Thêm vào giỏ"
+            aria-disabled={unavailable}
             className="size-[44px] items-center justify-center rounded-[4px] border border-primary active:opacity-70"
           >
             <Ionicons name="cart-outline" size={22} color={appColors.primary} />
           </View>
           <Button
-            title="Buy Now"
+            title={unavailable ? 'Out of stock' : 'Buy Now'}
+            disabled={unavailable}
             className="flex-1"
             onPress={() => {
               addToCart()
@@ -70,15 +81,19 @@ export function StandardProductDetail({ product }: { product: Product }) {
       }
     >
       <View className="gap-4 px-6 pt-1 pb-6">
-        <ImageCarousel images={product.images} width={contentWidth} height={Math.round(contentWidth * 0.545)} contentFit={product.imageFit} />
+        <ImageCarousel images={product.images} width={contentWidth} height={Math.round(contentWidth * 0.545)} contentFit="contain" />
+        {product.imageAttribution && <Link href={product.imageAttribution} asChild>
+          <Text className="self-end text-[11px] leading-[16px] text-neutral-500 underline">Image credits</Text>
+        </Link>}
+        <Text className="font-heading text-[18px] leading-[26px] font-bold text-neutral-900">{product.name}</Text>
         <View className="flex-row items-center justify-between">
           <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">
-            {formatPrice(product.price)}
+            {formatProductPrice(product)}
           </Text>
           <View className="flex-row items-center gap-1">
-            <Ionicons name="star" size={20} color={appColors.warning} />
-            <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text>
-            <Text className="text-[14px] leading-[22px] text-neutral-500">({product.reviewCount} reviews)</Text>
+            {product.rating !== null && <><Ionicons name="star" size={20} color={appColors.warning} />
+              <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text></>}
+            {product.reviewCount > 0 && <Text className="text-[14px] leading-[22px] text-neutral-500">({product.reviewCount} source ratings)</Text>}
           </View>
         </View>
       </View>
@@ -94,9 +109,9 @@ export function StandardProductDetail({ product }: { product: Product }) {
         >
           {product.description}
         </ClampedText>
-        {product.features ? (
+        {features.length > 0 ? (
           <View className="pt-6">
-            <FeatureList features={product.features} />
+            <FeatureList features={features} />
           </View>
         ) : null}
       </View>
@@ -105,9 +120,10 @@ export function StandardProductDetail({ product }: { product: Product }) {
 
       <View className="gap-4 px-6 pt-6 pb-6">
         <SectionHeader title="Reviews" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
-        <RatingSummary rating={product.rating} reviewCount={product.reviewCount} breakdown={product.ratingBreakdown} />
+        {reviews.data && <RatingSummary {...reviews.data.summary} />}
+        {(reviews.loading || Boolean(reviews.error)) && <CatalogStatus loading={reviews.loading} message={reviews.error ? 'Could not load reviews.' : undefined} onRetry={reviews.error ? reviews.retry : undefined} />}
         <View className="gap-5 pt-2">
-          {product.reviews.slice(0, 2).map((r) => (
+          {reviews.data?.items.map((r) => (
             <ReviewItem key={r.id} review={r} />
           ))}
         </View>
@@ -115,7 +131,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
 
       <Divider />
 
-      {related.length ? (
+      {related.data?.length ? (
         <View className="gap-4 pt-6 pb-4">
           <View className="px-6">
             <SectionHeader title="Relevant products" onSeeAll={() => router.push({ pathname: '/product-listing', params: { relatedTo: product.id } })} />
@@ -126,12 +142,12 @@ export function StandardProductDetail({ product }: { product: Product }) {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: PADDING, gap: 14 }}
           >
-            {related.map((p) => (
+            {related.data.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </ScrollView>
         </View>
-      ) : null}
+      ) : (related.loading || related.error) ? <CatalogStatus loading={related.loading} message={related.error ? 'Could not load related products.' : undefined} onRetry={related.error ? related.retry : undefined} /> : null}
 
       <View className="px-6 pt-2">
         <NotifyCard value={notify} onChange={setNotify} />

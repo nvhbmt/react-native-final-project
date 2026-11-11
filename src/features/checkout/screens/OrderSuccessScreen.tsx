@@ -1,22 +1,34 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Text, View } from '@tamagui/tailwind'
-import { Redirect, router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
+import { AppHeader } from '@/components/ui/AppHeader'
 import { Screen } from '@/components/ui/Screen'
 import { StarRating } from '@/components/ui/StarRating'
+import { useAuthStatus, useCurrentUser } from '@/features/auth'
+import { CatalogStatus } from '@/features/products/components/CatalogStatus'
+import { useCatalogRequest } from '@/features/products/hooks/useCatalogRequest'
 
 import { OrderSummaryCard } from '../components/OrderSummaryCard'
-import { useOrderStore } from '../store/orderStore'
+import type { Order } from '../types'
 
 export function OrderSuccessScreen() {
-  const order = useOrderStore((s) => s.lastOrder)
-  // Design hiển thị sẵn 5 sao; chạm sao nào thì sáng tới đó rồi mở Feedback.
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const auth = useAuthStatus()
+  const user = useCurrentUser()
+  const request = useCatalogRequest<Order>(id && user ? `/orders/${encodeURIComponent(id)}` : undefined, { auth: true, version: user?.id })
+  const order = request.data
   const [rating, setRating] = useState(5)
 
-  // Vào thẳng URL mà chưa có đơn → về trang chủ.
-  if (!order) return <Redirect href="/" />
+  if (!order) return (
+    <Screen header={<AppHeader title="Order" />}>
+      <CatalogStatus loading={auth === 'unknown' || request.loading} message={auth === 'guest' ? 'Sign in to view your order.' : request.error || !id ? 'Could not load this order.' : undefined} onRetry={request.error ? request.retry : undefined} />
+      {auth === 'guest' && <Button title="Sign in" onPress={() => router.push('/login')} />}
+    </Screen>
+  )
+  const products = [...new Map(order.items.map((item) => [item.productId, item])).values()]
 
   return (
     <Screen
@@ -32,16 +44,24 @@ export function OrderSuccessScreen() {
           <Ionicons name="checkmark-sharp" size={40} color="#ffffff" />
         </View>
         <Text className="text-center font-heading text-[20px] leading-[30px] font-bold text-primary">
-          Order placed successfully!
+          {order.status === 'completed' ? 'Order placed successfully!' : 'Order cancelled'}
         </Text>
         <Text className="max-w-[230px] text-center text-[14px] leading-[22px] text-neutral-500">
-          Commodo eu ut sunt qui minim fugiat elit nisi enim
+          {order.paymentMode === 'demo' ? 'This is a demo order. No payment was charged.' : 'Your order is confirmed.'}
         </Text>
       </View>
 
       <View className="pt-6">
         <OrderSummaryCard order={order} />
       </View>
+
+      {order.status === 'completed' && <View className="gap-3 pt-6">
+        <Text className="font-heading text-[18px] font-bold text-neutral-700">Review your products</Text>
+        {products.map((item) => <View key={item.productId} className="gap-2 rounded-[4px] bg-neutral-100 p-3">
+          <Text numberOfLines={2} className="text-[14px] font-semibold text-neutral-700">{item.name}</Text>
+          <Button title="Write a review" variant="outline" onPress={() => router.push({ pathname: '/product/[id]/write-review', params: { id: item.productId, orderId: order.id } })} />
+        </View>)}
+      </View>}
 
       <View className="items-center gap-2 pt-8">
         <Text className="text-[14px] leading-[22px] text-neutral-900">How was your experience?</Text>
@@ -51,8 +71,7 @@ export function OrderSuccessScreen() {
           className="gap-1"
           onChange={(value) => {
             setRating(value)
-            const productIds = [...new Set(order.items.map((item) => item.productId))]
-            router.push({ pathname: '/feedback', params: { rating: String(value), orderId: order.id, ...(productIds.length === 1 ? { productId: productIds[0] } : {}) } })
+            router.push({ pathname: '/feedback', params: { rating: String(value), orderId: order.id } })
           }}
         />
       </View>

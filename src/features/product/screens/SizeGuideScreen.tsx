@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Text, View } from '@tamagui/tailwind'
-import { Redirect, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 
 import { AppHeader } from '@/components/ui/AppHeader'
@@ -8,6 +8,8 @@ import { Screen } from '@/components/ui/Screen'
 import { cn } from '@/lib/cn'
 import { appColors } from '@/theme/tamagui.config'
 
+import { CatalogStatus } from '@/features/products/components/CatalogStatus'
+import { ProductStatus } from '../components/ProductStatus'
 import { useRouteProduct } from '../hooks/useRouteProduct'
 
 type Unit = 'cm' | 'in'
@@ -21,20 +23,22 @@ const MEASURE_TIPS = [
 const toUnit = (cm: number, unit: Unit) => (unit === 'cm' ? String(cm) : (cm / 2.54).toFixed(1))
 
 export function SizeGuideScreen() {
-  const product = useRouteProduct()
+  const { product, ...request } = useRouteProduct()
   const { size } = useLocalSearchParams<{ size?: string }>()
   const [unit, setUnit] = useState<Unit>('cm')
   const [selected, setSelected] = useState(size)
 
-  if (!product?.sizeChart) return <Redirect href="/" />
+  if (!product) return <ProductStatus title="Size guide" {...request} />
+  if (!product.sizeChart) return <Screen header={<AppHeader title="Size guide" />}><CatalogStatus message="No size guide available." /></Screen>
   const { columns, rows } = product.sizeChart
+  const tips = MEASURE_TIPS.filter((tip) => columns.some((column) => column.key === tip.title.toLowerCase()))
 
   return (
     <Screen header={<AppHeader title="Size guide" />} contentClassName="gap-6 px-6 pt-2 pb-6" safeBottom>
       <View className="flex-row items-center justify-between">
         <View className="flex-1 gap-1">
           <Text className="font-heading text-[18px] leading-[28px] font-bold text-neutral-700">{product.name}</Text>
-          <Text className="text-[12px] leading-[20px] text-neutral-600">Body measurements by size</Text>
+          <Text className="text-[12px] leading-[20px] text-neutral-600">Measurements by size</Text>
         </View>
         {/* Đổi đơn vị cm / inch */}
         <View className="flex-row overflow-hidden rounded-[4px] border border-neutral-500" role="radiogroup">
@@ -93,9 +97,9 @@ export function SizeGuideScreen() {
         })}
       </View>
 
-      <View className="gap-4">
+      {tips.length > 0 && <View className="gap-4">
         <Text className="font-heading text-[18px] leading-[28px] font-bold text-neutral-700">How to measure</Text>
-        {MEASURE_TIPS.map((tip) => (
+        {tips.map((tip) => (
           <View key={tip.title} className="flex-row gap-4">
             <View className="size-[36px] items-center justify-center rounded-[4px] bg-primary-50">
               <MaterialCommunityIcons name="tape-measure" size={20} color={appColors.primary} />
@@ -106,7 +110,7 @@ export function SizeGuideScreen() {
             </View>
           </View>
         ))}
-      </View>
+      </View>}
     </Screen>
   )
 }

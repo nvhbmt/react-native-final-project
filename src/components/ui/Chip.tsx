@@ -7,6 +7,7 @@ import { appColors } from '@/theme/tamagui.config'
 
 type Props = {
   label: string
+  accessibilityLabel?: string
   selected: boolean
   onPress: () => void
   /** Icon bên phải; mặc định không có. */
@@ -17,11 +18,12 @@ type Props = {
 }
 
 /** Chip bo tròn: chọn → nền primary-50, chữ primary; chưa chọn → nền neutral-200. */
-export function Chip({ label, selected, onPress, icon, prefix, role = 'checkbox' }: Props) {
+export function Chip({ label, accessibilityLabel, selected, onPress, icon, prefix, role = 'checkbox' }: Props) {
   return (
     <View
       onPress={onPress}
       role={role}
+      aria-label={accessibilityLabel}
       aria-checked={selected}
       className={cn(
         'h-[36px] flex-row items-center gap-1.5 rounded-full px-3 active:opacity-70',

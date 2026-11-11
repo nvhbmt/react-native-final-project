@@ -7,13 +7,13 @@ import { XStack, YStack } from 'tamagui'
 
 import { MarketHeading, MarketText } from '@/components/marketplace/MarketText'
 import { keyboardAction } from '@/components/marketplace/keyboardAction'
-import type { OtherFilter, ProductFilters, ShippingOption } from '@/features/products/catalog'
+import type { OtherFilter, ProductFilters, ShippingOption } from '@/features/products/types'
 import { marketplace as m } from '@/theme/marketplace'
 
 import { FilterSection } from '../components/FilterSection'
 import { PriceRange } from '../components/PriceRange'
 import { normalizePriceRange } from '../lib/priceRange'
-import { prototypeFilters, useFilterStore } from '../store/filterStore'
+import { useFilterStore } from '../store/filterStore'
 
 const shipping: { id: ShippingOption; label: string }[] = [
   { id: 'instant', label: 'Instant (2 hours delivery)' },
@@ -30,7 +30,7 @@ const benefits: { id: OtherFilter; label: string; icon: 'swap-horizontal' | 'shi
 export function FiltersScreen() {
   const saved = useFilterStore((state) => state.filters)
   const setFilters = useFilterStore((state) => state.setFilters)
-  const [draft, setDraft] = useState(saved ?? prototypeFilters)
+  const [draft, setDraft] = useState(saved)
   const update = (value: ProductFilters) => {
     setDraft(value)
     // Keep text editable, but persist valid bounds for X, system Back and swipe dismiss.

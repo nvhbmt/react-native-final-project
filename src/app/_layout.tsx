@@ -26,6 +26,7 @@ export default function RootLayout() {
         <Stack.Screen name="filters" options={{ presentation: 'modal' }} />
         <Stack.Screen name="product/[id]/index" />
         <Stack.Screen name="product/[id]/reviews" />
+        <Stack.Screen name="product/[id]/write-review" />
         <Stack.Screen name="product/[id]/size-guide" />
         <Stack.Screen name="checkout/index" />
         <Stack.Screen name="checkout/payment" />

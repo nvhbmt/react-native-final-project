@@ -4,10 +4,9 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 
 import { ClampedText } from '@/components/ui/ClampedText'
-import { formatPrice } from '@/lib/format'
+import { formatProductPrice } from '@/features/products/lib/formatProductPrice'
+import type { Product } from '@/features/products/types'
 import { appColors } from '@/theme/tamagui.config'
-
-import type { Product } from '../types'
 
 type Props = {
   product: Product
@@ -25,20 +24,20 @@ export function ProductCard({ product, width = 130 }: Props) {
       style={{ width }}
     >
       <Image
-        source={product.images[0]}
+        source={product.image}
         style={{ width: width - 20, height: width * 0.65, borderRadius: 4 }}
-        contentFit="cover"
+        contentFit="contain"
       />
       <ClampedText lines={1} className="font-heading text-[12px] leading-[20px] font-bold text-neutral-700">
         {product.name}
       </ClampedText>
       <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center gap-1">
+        {product.rating !== null && <View className="flex-row items-center gap-1">
           <Ionicons name="star" size={12} color={appColors.warning} />
           <Text className="text-[12px] leading-[20px] text-neutral-700">{product.rating}</Text>
-        </View>
+        </View>}
         <Text className="font-heading text-[12px] leading-[20px] font-bold text-neutral-900">
-          {formatPrice(product.price)}
+          {formatProductPrice(product)}
         </Text>
       </View>
     </View>

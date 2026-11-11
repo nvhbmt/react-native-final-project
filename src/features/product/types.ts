@@ -1,3 +1,5 @@
+import type { Product as CatalogProduct } from '@/features/products/types'
+
 export type ProductFeature = {
   icon: 'express' | 'return' | 'review' | 'authorized'
   label: string
@@ -6,14 +8,21 @@ export type ProductFeature = {
 export type ProductReview = {
   id: string
   author: string
-  avatar: string | number
+  avatar: string | null
   content: string
   createdAt: string
   /** 1–5 sao */
   rating: number
+  purchaseMode: 'demo' | 'verified'
 }
 
-export type ProductColor = { id: string; name: string; hex: string }
+export type ReviewSummary = {
+  rating: number | null
+  reviewCount: number
+  breakdown: [number, number, number, number, number]
+}
+
+export type ProductColor = { id: string; name: string; hex?: string; swatchImage?: string; image?: string }
 
 /** Bảng size: số đo theo cm cho từng size, mỗi cột là một số đo (Ngực, Eo...). */
 export type SizeChart = {
@@ -21,31 +30,26 @@ export type SizeChart = {
   rows: { size: string; cm: Record<string, number> }[]
 }
 
-export type Product = {
-  id: string
-  name: string
+export type ProductDetail = Pick<CatalogProduct, 'id' | 'name' | 'subtitle' | 'price' | 'priceBasis' | 'priceUnit' | 'rating' | 'reviewCount' | 'available'> & {
   /** Tên danh mục, hiển thị trên header trang chi tiết ("Headphone", "T-Shirt"). */
-  category: string
-  subtitle: string
+  categoryName: string
   description: string
-  price: number
-  images: (string | number)[]
-  imageFit?: 'contain' | 'cover'
-  rating: number
-  reviewCount: number
+  images: string[]
+  imageAttribution: `https://${string}` | null
   /** Số lượt đánh giá theo từng mức sao, index 0 → 5 sao ... index 4 → 1 sao. */
-  ratingBreakdown: [number, number, number, number, number]
-  reviews: ProductReview[]
-  features?: ProductFeature[]
+  ratingBreakdown: [number, number, number, number, number] | null
   /** Có biến thể → trang chi tiết dạng chọn màu/size/số lượng. */
-  variants?: {
+  variants: {
     colors: ProductColor[]
     sizes: string[]
-  }
-  sizeChart?: SizeChart
-  promoLabel?: string
-  relatedIds?: string[]
+  } | null
+  sizeChart: SizeChart | null
+  promoLabel: string | null
+  shippingOptions: CatalogProduct['shippingOptions']
+  benefits: CatalogProduct['benefits']
 }
+
+export type Product = ProductDetail
 
 export type ProductSelection = {
   colorId?: string

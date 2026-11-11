@@ -11,7 +11,7 @@ type Props = {
 /** Nhóm nút size dính liền nhau (XS | S | M | L | XL). */
 export function SizeSelector({ sizes, value, onChange }: Props) {
   return (
-    <View className="flex-row self-start overflow-hidden rounded-[4px] border border-neutral-500" role="radiogroup">
+    <View className="max-w-full flex-row flex-wrap self-start overflow-hidden rounded-[4px] border border-neutral-500" role="radiogroup">
       {sizes.map((size, i) => {
         const selected = size === value
         return (

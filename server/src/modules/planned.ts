@@ -39,18 +39,6 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('GET', '/users/me/addresses', 'users', true, 'Danh sách địa chỉ giao hàng'),
   e('POST', '/users/me/addresses', 'users', true, 'Thêm địa chỉ giao hàng'),
 
-  // Danh mục & sản phẩm (public)
-  e('GET', '/home', 'catalog', false, 'Dữ liệu trang chủ: danh mục, banner, ưu đãi, sản phẩm đề xuất'),
-  e('GET', '/categories', 'catalog', false, 'Danh sách danh mục và danh mục con'),
-  e('GET', '/products', 'catalog', false, 'Tìm/lọc sản phẩm: q, category, subcategory, sort, minPrice, maxPrice, minRating, shipping[], benefits[], cursor'),
-  e('GET', '/products/:id', 'catalog', false, 'Chi tiết sản phẩm kèm biến thể màu/size'),
-  e('GET', '/products/:id/related', 'catalog', false, 'Sản phẩm liên quan'),
-  e('GET', '/products/:id/size-guide', 'catalog', false, 'Bảng size'),
-
-  // Đánh giá
-  e('GET', '/products/:id/reviews', 'reviews', false, 'Danh sách đánh giá, lọc theo số sao, phân trang'),
-  e('POST', '/products/:id/reviews', 'reviews', true, 'Viết đánh giá (chỉ khi đã mua)'),
-
   // Giỏ hàng — đồng bộ với cartStore phía app
   e('GET', '/cart', 'cart', true, 'Lấy giỏ hàng và tổng tiền'),
   e('POST', '/cart/items', 'cart', true, 'Thêm sản phẩm (productId, colorId?, size?, quantity)'),
@@ -64,9 +52,7 @@ export const PLANNED_ENDPOINTS: PlannedEndpoint[] = [
   e('GET', '/payment-methods', 'payments', true, 'Phương thức thanh toán đã lưu'),
   e('POST', '/payment-methods', 'payments', true, 'Lưu phương thức thanh toán (token từ cổng thanh toán)'),
   e('DELETE', '/payment-methods/:id', 'payments', true, 'Xoá phương thức thanh toán'),
-  e('POST', '/orders', 'orders', true, 'Đặt hàng từ giỏ hiện tại, chốt giá và tổng tiền'),
   e('GET', '/orders', 'orders', true, 'Lịch sử đơn hàng'),
-  e('GET', '/orders/:id', 'orders', true, 'Chi tiết đơn hàng'),
   e('POST', '/orders/:id/cancel', 'orders', true, 'Huỷ đơn khi chưa giao'),
   e('POST', '/orders/:id/pay', 'payments', true, 'Tạo giao dịch thanh toán cho đơn'),
   e('POST', '/payments/webhook', 'payments', false, 'Webhook từ cổng thanh toán (xác thực bằng chữ ký)'),

@@ -1,5 +1,7 @@
 import { sql } from 'drizzle-orm'
-import { index, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+import { boolean, check, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+
+import { benefits, categoryIds, shippingOptions, type ProductVariants, type RatingBreakdown, type SizeChart } from '@/modules/catalog/model.ts'
 
 export const userRole = pgEnum('user_role', ['customer', 'admin'])
 
@@ -47,3 +49,93 @@ export const refreshTokens = pgTable(
 
 export type UserRow = typeof users.$inferSelect
 export type RefreshTokenRow = typeof refreshTokens.$inferSelect
+
+export const catalogCategory = pgEnum('catalog_category', categoryIds)
+export const catalogShipping = pgEnum('catalog_shipping', shippingOptions)
+export const catalogBenefit = pgEnum('catalog_benefit', benefits)
+
+export const catalogProducts = pgTable(
+  'catalog_products',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    brand: text('brand').notNull(),
+    category: catalogCategory('category').notNull(),
+    subcategory: text('subcategory').notNull(),
+    subtitle: text('subtitle').notNull(),
+    description: text('description').notNull(),
+    keywords: text('keywords').notNull().default(''),
+    images: text('images').array().notNull(),
+    priceCents: integer('price_cents').notNull(),
+    compareAtPriceCents: integer('compare_at_price_cents'),
+    priceBasis: text('price_basis').$type<'listed' | 'from' | 'reference'>().notNull(),
+    priceUnit: text('price_unit').$type<'item' | 'lb'>().notNull(),
+    priceSourceUrl: text('price_source_url'),
+    ratingTenths: integer('rating_tenths'),
+    reviewCount: integer('review_count').notNull().default(0),
+    ratingBreakdown: jsonb('rating_breakdown').$type<RatingBreakdown>(),
+    sales: integer('sales'),
+    available: boolean('available'),
+    shippingOptions: catalogShipping('shipping_options').array().notNull(),
+    benefits: catalogBenefit('benefits').array().notNull(),
+    variants: jsonb('variants').$type<ProductVariants>(),
+    sizeChart: jsonb('size_chart').$type<SizeChart>(),
+    featured: boolean('featured').notNull().default(false),
+    sourceUrl: text('source_url').notNull(),
+    imageAttribution: text('image_attribution'),
+  },
+  (table) => [
+    index('catalog_products_category_subcategory_idx').on(table.category, table.subcategory),
+    index('catalog_products_price_idx').on(table.priceCents),
+    check('catalog_products_price_valid', sql`${table.priceCents} > 0 AND ${table.compareAtPriceCents} > ${table.priceCents}`),
+    check('catalog_products_rating_valid', sql`${table.ratingTenths} BETWEEN 0 AND 50`),
+    check('catalog_products_counts_valid', sql`${table.reviewCount} >= 0 AND (${table.sales} IS NULL OR ${table.sales} >= 0)`),
+    check('catalog_products_images_nonempty', sql`cardinality(${table.images}) > 0`),
+  ],
+)
+
+export type CatalogProductRow = typeof catalogProducts.$inferSelect
+
+export type CheckoutItem = {
+  key: string
+  productId: string
+  name: string
+  subtitle: string
+  image: string
+  priceCents: number
+  quantity: number
+  options?: { color?: string; size?: string }
+}
+
+export const orders = pgTable('orders', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  requestId: text('request_id').notNull(),
+  requestHash: text('request_hash').notNull(),
+  paymentMethod: text('payment_method').notNull(),
+  status: text('status').$type<'completed' | 'cancelled'>().notNull(),
+  paymentMode: text('payment_mode').$type<'demo' | 'verified'>().notNull(),
+  items: jsonb('items').$type<CheckoutItem[]>().notNull(),
+  subtotalCents: integer('subtotal_cents').notNull(),
+  discountCents: integer('discount_cents').notNull(),
+  taxCents: integer('tax_cents').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('orders_user_request_idx').on(table.userId, table.requestId),
+  index('orders_user_created_idx').on(table.userId, table.createdAt),
+])
+
+export const productReviews = pgTable('product_reviews', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  productId: text('product_id').notNull().references(() => catalogProducts.id, { onDelete: 'cascade' }),
+  rating: integer('rating').notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('product_reviews_user_product_idx').on(table.userId, table.productId),
+  index('product_reviews_product_created_idx').on(table.productId, table.createdAt, table.id),
+  check('product_reviews_rating_valid', sql`${table.rating} BETWEEN 1 AND 5`),
+  check('product_reviews_content_valid', sql`char_length(btrim(${table.content})) BETWEEN 1 AND 1000`),
+])
