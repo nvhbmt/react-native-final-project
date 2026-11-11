@@ -10,3 +10,10 @@ export function formatPrice(value: number): string {
 export function maskCardNumber(last4: string): string {
   return `****** ${last4}`
 }
+
+const vnd = new Intl.NumberFormat('vi-VN')
+
+/** 1250000 → "1.250.000 ₫" */
+export function formatVnd(value: number): string {
+  return `${vnd.format(value)} ₫`
+}

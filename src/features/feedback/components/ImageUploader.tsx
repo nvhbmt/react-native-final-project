@@ -1,30 +1,23 @@
 import { Ionicons } from '@expo/vector-icons'
 import { View } from '@tamagui/tailwind'
 import { Image } from 'expo-image'
-import * as ImagePicker from 'expo-image-picker'
 import { ScrollView } from 'react-native'
 
+import { pickImages, type PickedImage } from '@/lib/api/media'
 import { appColors } from '@/theme/tamagui.config'
 
 const TILE = 80
 const MAX_IMAGES = 5
 
 type Props = {
-  value: string[]
-  onChange: (uris: string[]) => void
+  value: PickedImage[]
+  onChange: (images: PickedImage[]) => void
 }
 
 export function ImageUploader({ value, onChange }: Props) {
   const pick = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsMultipleSelection: true,
-      selectionLimit: MAX_IMAGES - value.length,
-      quality: 0.7,
-    })
-    if (!result.canceled) {
-      onChange([...value, ...result.assets.map((a) => a.uri)].slice(0, MAX_IMAGES))
-    }
+    const picked = await pickImages({ multiple: true, limit: MAX_IMAGES - value.length })
+    if (picked.length) onChange([...value, ...picked].slice(0, MAX_IMAGES))
   }
 
   return (
@@ -44,11 +37,11 @@ export function ImageUploader({ value, onChange }: Props) {
           <Ionicons name="add" size={28} color={appColors['neutral-900']} />
         </View>
       ) : null}
-      {value.map((uri) => (
+      {value.map(({ uri }) => (
         <View key={uri} className="rounded-[4px] bg-[#f5f6f8]" style={{ width: TILE, height: TILE }}>
           <Image source={{ uri }} style={{ width: TILE, height: TILE, borderRadius: 4 }} contentFit="cover" />
           <View
-            onPress={() => onChange(value.filter((u) => u !== uri))}
+            onPress={() => onChange(value.filter((image) => image.uri !== uri))}
             role="button"
             aria-label="Xoá ảnh"
             hitSlop={8}

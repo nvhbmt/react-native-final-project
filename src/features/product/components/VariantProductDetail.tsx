@@ -12,11 +12,13 @@ import { Screen } from '@/components/ui/Screen'
 import { useCartStore } from '@/features/cart'
 import { formatProductPrice } from '@/features/products/lib/formatProductPrice'
 import { formatPrice } from '@/lib/format'
+import { FavoriteButton } from '@/features/favorites'
 import { HeaderActions } from '@/navigation/HeaderActions'
 import { appColors } from '@/theme/tamagui.config'
 
 import { useReviewPreview } from '../api/reviews'
 import type { Product, ProductSelection } from '../types'
+import { AskAssistantLink } from './AskAssistantLink'
 import { ColorSwatches } from './ColorSwatches'
 import { SizeSelector } from './SizeSelector'
 import { ThumbnailGallery } from './ThumbnailGallery'
@@ -70,7 +72,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
 
   return (
     <Screen
-      header={<AppHeader title={product.categoryName} align="left" right={<HeaderActions />} />}
+      header={<AppHeader title={product.categoryName} align="left" right={<><FavoriteButton product={{ id: product.id }} /><HeaderActions /></>} />}
       contentClassName="px-6 pt-1 pb-6"
       footer={
         <View className="border-t border-neutral-200 px-6 pt-6 pb-3">
@@ -130,6 +132,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
           onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
         />
         <Divider /></>}
+        <AskAssistantLink productId={product.id} />
         <LinkRow title={reviews.data ? `Reviews (${reviews.data.summary.reviewCount})` : 'Reviews'} onPress={() => router.push(`/product/${product.id}/reviews`)} />
       </View>
     </Screen>

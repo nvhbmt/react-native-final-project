@@ -13,7 +13,7 @@ type Props = {
 }
 
 export function PaymentMethodOption({ method, selected, onSelect }: Props) {
-  const label = method.brand === 'paypal' ? method.label : maskCardNumber(method.label)
+  const label = method.kind === 'demo_card' && method.brand !== 'paypal' ? maskCardNumber(method.label) : method.label
 
   return (
     <View

@@ -22,6 +22,76 @@
       "when": 1794163288747,
       "tag": "0002_orders_reviews",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794377780691,
+      "tag": "0003_cart",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794377827684,
+      "tag": "0004_favorites",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794377924035,
+      "tag": "0005_uploads",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794377976946,
+      "tag": "0006_users_profile",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794378014682,
+      "tag": "0007_inbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794378049505,
+      "tag": "0008_feedback",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794378111970,
+      "tag": "0009_orders_cancel",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794378251011,
+      "tag": "0010_sepay_payments",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794378326355,
+      "tag": "0011_password_resets",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794378496391,
+      "tag": "0012_ai_chat",
+      "breakpoints": true
     }
   ]
 }

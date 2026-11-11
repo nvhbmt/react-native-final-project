@@ -30,10 +30,19 @@ export default function RootLayout() {
         <Stack.Screen name="product/[id]/size-guide" />
         <Stack.Screen name="checkout/index" />
         <Stack.Screen name="checkout/payment" />
+        <Stack.Screen name="checkout/transfer" />
         <Stack.Screen name="checkout/success" />
+        <Stack.Screen name="orders/index" />
+        <Stack.Screen name="orders/[id]" />
+        <Stack.Screen name="assistant/index" />
+        <Stack.Screen name="assistant/[id]" />
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />
+        <Stack.Screen name="forgot-password" />
         <Stack.Screen name="change-password" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="addresses" />
+        <Stack.Screen name="delete-account" />
         <Stack.Screen
           name="feedback"
           options={{ presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }}

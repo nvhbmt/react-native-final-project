@@ -40,15 +40,20 @@ export function OrderSuccessScreen() {
       }
     >
       <View className="items-center gap-2">
-        <View className="mb-4 size-[74px] items-center justify-center rounded-full bg-success">
-          <Ionicons name="checkmark-sharp" size={40} color="#ffffff" />
+        <View className={`mb-4 size-[74px] items-center justify-center rounded-full ${order.status === 'completed' ? 'bg-success' : order.status === 'pending_payment' ? 'bg-[#f5a524]' : 'bg-neutral-400'}`}>
+          <Ionicons name={order.status === 'completed' ? 'checkmark-sharp' : order.status === 'pending_payment' ? 'time-outline' : 'close'} size={40} color="#ffffff" />
         </View>
         <Text className="text-center font-heading text-[20px] leading-[30px] font-bold text-primary">
-          {order.status === 'completed' ? 'Order placed successfully!' : 'Order cancelled'}
+          {order.status === 'completed' ? (order.paidAt ? 'Thanh toán thành công!' : 'Order placed successfully!') : order.status === 'pending_payment' ? 'Đang chờ thanh toán' : 'Đơn đã huỷ'}
         </Text>
-        <Text className="max-w-[230px] text-center text-[14px] leading-[22px] text-neutral-500">
-          {order.paymentMode === 'demo' ? 'This is a demo order. No payment was charged.' : 'Your order is confirmed.'}
+        <Text className="max-w-[260px] text-center text-[14px] leading-[22px] text-neutral-500">
+          {order.status === 'pending_payment'
+            ? 'Chuyển khoản theo mã QR để hoàn tất đơn hàng.'
+            : order.paymentMode === 'demo' ? 'This is a demo order. No payment was charged.' : `Đơn #${order.code} đã được xác nhận.`}
         </Text>
+        {order.status === 'pending_payment' ? (
+          <Button title="Mở mã thanh toán" className="mt-3" onPress={() => router.replace({ pathname: '/checkout/transfer', params: { id: order.id } })} />
+        ) : null}
       </View>
 
       <View className="pt-6">

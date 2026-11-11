@@ -19,6 +19,12 @@ type AuthState = {
   changePassword: (input: ChangePasswordInput) => Promise<void>
   logout: () => Promise<void>
   logoutAll: () => Promise<void>
+  /** Cập nhật thông tin user sau khi sửa hồ sơ/avatar. */
+  setUser: (user: User) => void
+  /** Xoá phiên trên máy (vd. sau khi xoá tài khoản). */
+  clearLocalSession: () => Promise<void>
+  /** Đặt lại mật khẩu bằng mã email → đăng nhập luôn. */
+  resetPassword: (input: { email: string; code: string; newPassword: string }) => Promise<void>
   /** Làm mới access token. Trả về token mới, hoặc null nếu phiên đã hết (chuyển về guest). */
   refresh: () => Promise<string | null>
 }
@@ -91,6 +97,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
     async logoutAll() {
       await authApi.logoutAll()
       await clearSession()
+    },
+
+    setUser(user) {
+      if (get().user?.id === user.id) set({ user })
+    },
+
+    clearLocalSession: clearSession,
+
+    async resetPassword(input) {
+      await applySession(await authApi.resetPassword(input))
     },
 
     refresh() {

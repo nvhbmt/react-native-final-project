@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { XStack, YStack } from 'tamagui'
 
 import { MarketText } from '@/components/marketplace/MarketText'
+import { useFavoriteCount } from '@/features/favorites'
 import { useUnreadCount } from '@/features/inbox'
 import { TABS } from '@/navigation/tabs'
 import { keyboardAction } from '@/components/marketplace/keyboardAction'
@@ -16,9 +17,9 @@ type Props = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0]
 export function MarketplaceTabBar({ state, emitter, navigateToTab }: Props) {
   const insets = useSafeAreaInsets()
   const current = state.routes[state.index].name
-  const currentParams = state.routes[state.index].params as { category?: string } | undefined
-  const isFruit = current === 'product-listing' && currentParams?.category === 'fruits'
   const unread = useUnreadCount()
+  const favorites = useFavoriteCount()
+  const badges: Record<string, number> = { favorites, inbox: unread }
   // Listing is part of browsing, so Home remains highlighted on its hidden route.
   const active = current === 'product-listing' ? 'index' : current
 
@@ -36,7 +37,7 @@ export function MarketplaceTabBar({ state, emitter, navigateToTab }: Props) {
           }}>
             <YStack position="relative" w={28} h={26} items="center" justify="center">
               <TabBarIcon name={tab.icon} color={color} size={28} />
-              {((tab.name === 'favorites' && !isFruit) || (tab.name === 'inbox' && isFruit && unread > 0)) && <YStack position="absolute" t={-3} l={15} bg="#f04452" rounded={8} px={3} borderWidth={1} borderColor="white"><MarketText fontSize={9} lineHeight="13px" color="white" fontWeight="700">{tab.name === 'favorites' ? '99+' : unread}</MarketText></YStack>}
+              {(badges[tab.name] ?? 0) > 0 && <YStack position="absolute" t={-3} l={15} bg="#f04452" rounded={8} px={3} borderWidth={1} borderColor="white"><MarketText fontSize={9} lineHeight="13px" color="white" fontWeight="700">{badges[tab.name]! > 99 ? '99+' : badges[tab.name]}</MarketText></YStack>}
             </YStack>
             <MarketText fontSize={10} lineHeight="16px" color={color} fontWeight={focused ? '600' : '400'}>{tab.title}</MarketText>
           </YStack>

@@ -9,6 +9,7 @@ export type PublicUser = {
   email: string
   fullName: string
   avatarUrl: string | null
+  phone: string | null
   role: UserRow['role']
   createdAt: string
 }
@@ -19,6 +20,7 @@ export function toPublicUser(user: UserRow): PublicUser {
     email: user.email,
     fullName: user.fullName,
     avatarUrl: user.avatarUrl,
+    phone: user.phone,
     role: user.role,
     createdAt: user.createdAt.toISOString(),
   }

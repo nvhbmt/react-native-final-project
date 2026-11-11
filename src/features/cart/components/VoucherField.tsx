@@ -14,9 +14,12 @@ export function VoucherField() {
   const [error, setError] = useState<string | null>(null)
   const canApply = code.trim().length > 0
 
-  const apply = () => {
-    if (!canApply) return
-    const ok = applyVoucher(code)
+  const [applying, setApplying] = useState(false)
+  const apply = async () => {
+    if (!canApply || applying) return
+    setApplying(true)
+    const ok = await applyVoucher(code)
+    setApplying(false)
     setError(ok ? null : 'Mã giảm giá không hợp lệ')
     if (ok) setCode('')
   }
@@ -52,7 +55,7 @@ export function VoucherField() {
         <View
           onPress={apply}
           role="button"
-          aria-disabled={!canApply}
+          aria-disabled={!canApply || applying}
           className={cn('h-[36px] w-[61px] items-center justify-center rounded-[4px]', canApply ? 'bg-secondary-50 active:opacity-70' : 'bg-secondary-25')}
         >
           <Text className={cn('text-[14px] leading-[22px]', canApply ? 'text-secondary' : 'text-secondary-300')}>Apply</Text>

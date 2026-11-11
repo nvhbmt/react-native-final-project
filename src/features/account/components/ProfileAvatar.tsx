@@ -2,6 +2,7 @@ import { Text, View } from '@tamagui/tailwind'
 import { Image } from 'expo-image'
 
 import { initialsOf, type User } from '@/features/auth'
+import { mediaUrl } from '@/lib/api'
 
 const DEFAULT_AVATAR = require('../../../../assets/marketplace/avatar.png')
 
@@ -9,7 +10,7 @@ const DEFAULT_AVATAR = require('../../../../assets/marketplace/avatar.png')
 export function ProfileAvatar({ user, size }: { user: User | null; size: number }) {
   const frame = { width: size, height: size, borderRadius: size / 2 }
 
-  if (user?.avatarUrl) return <Image source={{ uri: user.avatarUrl }} style={frame} />
+  if (user?.avatarUrl) return <Image source={{ uri: mediaUrl(user.avatarUrl) }} style={frame} />
   if (user) {
     return (
       <View className="items-center justify-center bg-primary" style={frame}>

@@ -1,3 +1,6 @@
 export { ProfileAvatar } from './components/ProfileAvatar'
 export { UserAvatar } from './components/UserAvatar'
 export { AccountScreen } from './screens/AccountScreen'
+export { AddressesScreen } from './screens/AddressesScreen'
+export { DeleteAccountScreen } from './screens/DeleteAccountScreen'
+export { EditProfileScreen } from './screens/EditProfileScreen'

@@ -2,6 +2,7 @@ import { Text, View } from '@tamagui/tailwind'
 import { Image } from 'expo-image'
 
 import { StarRating } from '@/components/ui/StarRating'
+import { mediaUrl } from '@/lib/api'
 
 import type { ProductReview } from '../types'
 
@@ -14,7 +15,7 @@ type Props = {
 export function ReviewItem({ review, showRating = false }: Props) {
   return (
     <View className="flex-row gap-4">
-      {review.avatar ? <Image source={review.avatar} style={{ width: 36, height: 36, borderRadius: 18 }} /> :
+      {review.avatar ? <Image source={mediaUrl(review.avatar)} style={{ width: 36, height: 36, borderRadius: 18 }} /> :
         <View className="size-[36px] items-center justify-center rounded-full bg-neutral-100">
           <Text className="text-[14px] font-bold text-neutral-700">{review.author.trim().slice(0, 1).toUpperCase()}</Text>
         </View>}

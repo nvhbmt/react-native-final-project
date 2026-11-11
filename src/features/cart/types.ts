@@ -8,6 +8,8 @@ export type CartItem = {
   price: number
   quantity: number
   options?: { color?: string; size?: string }
+  /** Server đánh dấu false khi sản phẩm đã ngừng bán. */
+  available?: boolean
 }
 
 export type CartTotals = {
@@ -16,4 +18,11 @@ export type CartTotals = {
   tax: number
   fees: number
   total: number
+}
+
+/** Giỏ hàng trả về từ server (`GET /cart`). */
+export type CartSnapshot = {
+  items: CartItem[]
+  voucher: { code: string; rate: number } | null
+  totals?: CartTotals
 }

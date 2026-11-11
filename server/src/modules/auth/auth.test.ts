@@ -200,3 +200,51 @@ describe('đổi mật khẩu', () => {
     expect(res.body.error.code).toBe('WRONG_PASSWORD')
   })
 })
+
+describe('quên / đặt lại mật khẩu', () => {
+  function withMailbox() {
+    const sent: { to: string; text: string }[] = []
+    const ctx = createTestApp({ mailer: { send: async (mail) => { sent.push(mail) } } })
+    const lastCode = () => sent.at(-1)!.text.match(/\b(\d{6})\b/)![1]!
+    return { ...ctx, sent, lastCode }
+  }
+
+  it('không lộ email chưa đăng ký', async () => {
+    const { call, sent } = withMailbox()
+    const res = await call('POST', '/auth/forgot-password', { body: { email: 'nobody@example.com' } })
+    expect(res.body.data).toEqual({ sent: true })
+    expect(sent).toHaveLength(0)
+  })
+
+  it('đặt lại bằng mã đúng, thu hồi phiên cũ, mã chỉ dùng một lần', async () => {
+    const { call, sent, lastCode } = withMailbox()
+    const old = (await call('POST', '/auth/register', { body: alice })).body.data.tokens
+    await call('POST', '/auth/forgot-password', { body: { email: 'ALICE@example.com' } })
+    expect(sent[0]!.to).toBe('alice@example.com')
+    const code = lastCode()
+
+    const res = await call('POST', '/auth/reset-password', { body: { email: alice.email, code, newPassword: 'brand new pass' } })
+    expect(res.status).toBe(200)
+    expect(res.body.data.tokens.accessToken).toEqual(expect.any(String))
+    expect((await call('POST', '/auth/refresh', { body: { refreshToken: old.refreshToken } })).status).toBe(401)
+    expect((await call('POST', '/auth/login', { body: { email: alice.email, password: 'brand new pass' } })).status).toBe(200)
+    expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code, newPassword: 'another pass 1' } })).body.error.code).toBe('INVALID_RESET_CODE')
+  })
+
+  it('khoá mã sau 5 lần sai và mã mới thay thế mã cũ', async () => {
+    const { call, lastCode } = withMailbox()
+    await call('POST', '/auth/register', { body: alice })
+    await call('POST', '/auth/forgot-password', { body: { email: alice.email } })
+    const first = lastCode()
+    await call('POST', '/auth/forgot-password', { body: { email: alice.email } })
+    const second = lastCode()
+    if (first !== second) {
+      expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code: first, newPassword: 'brand new pass' } })).status).toBe(400)
+    }
+    const wrong = second === '000000' ? '111111' : '000000'
+    for (let i = 0; i < 5; i++) {
+      await call('POST', '/auth/reset-password', { body: { email: alice.email, code: wrong, newPassword: 'brand new pass' } })
+    }
+    expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code: second, newPassword: 'brand new pass' } })).body.error.code).toBe('INVALID_RESET_CODE')
+  })
+})

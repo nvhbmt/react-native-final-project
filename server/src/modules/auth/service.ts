@@ -1,18 +1,25 @@
-import { randomUUID } from 'node:crypto'
+import { createHash, randomInt, randomUUID } from 'node:crypto'
 
 import type { UserRow } from '@/db/schema.ts'
 import { AppError } from '@/lib/http.ts'
+import { consoleMailer, type Mailer } from '@/lib/mailer.ts'
 import { getDummyHash, hashPassword, verifyPassword } from '@/lib/password.ts'
 import { createRefreshToken, hashRefreshToken, signAccessToken } from '@/lib/tokens.ts'
 import type { AuthRepository } from './repository.ts'
-import type { ChangePasswordInput, LoginInput, RegisterInput } from './schemas.ts'
+import type { ChangePasswordInput, LoginInput, RegisterInput, ResetPasswordInput } from './schemas.ts'
 import { toPublicUser, type PublicUser } from './serialize.ts'
 
 export type AuthConfig = {
   accessSecret: string
   accessTtlSeconds: number
   refreshTtlSeconds: number
+  mailer?: Mailer
 }
+
+const RESET_TTL_MS = 15 * 60 * 1000
+const RESET_MAX_ATTEMPTS = 5
+const hashResetCode = (userId: string, code: string) => createHash('sha256').update(`${userId}:${code}`).digest('hex')
+const invalidResetCode = () => new AppError(400, 'INVALID_RESET_CODE', 'Mã không đúng hoặc đã hết hạn')
 
 export type AuthTokens = {
   tokenType: 'Bearer'
@@ -121,6 +128,38 @@ export function createAuthService(repo: AuthRepository, config: AuthConfig) {
       await repo.revokeAllForUser(userId)
       const updated = (await repo.findUserById(userId)) ?? user
       return startSession(updated, userAgent)
+    },
+
+    /**
+     * Gửi mã đặt lại mật khẩu. Luôn trả thành công dù email không tồn tại,
+     * để không lộ email nào đã đăng ký.
+     */
+    async forgotPassword(email: string): Promise<void> {
+      const user = await repo.findUserByEmail(email)
+      if (!user) return
+      const code = String(randomInt(0, 1_000_000)).padStart(6, '0')
+      await repo.createPasswordReset({ userId: user.id, codeHash: hashResetCode(user.id, code), expiresAt: new Date(Date.now() + RESET_TTL_MS) })
+      await (config.mailer ?? consoleMailer).send({
+        to: user.email,
+        subject: 'Mã đặt lại mật khẩu',
+        text: `Xin chào ${user.fullName},\n\nMã đặt lại mật khẩu của bạn là: ${code}\nMã có hiệu lực trong 15 phút. Nếu bạn không yêu cầu, hãy bỏ qua email này.`,
+      })
+    },
+
+    /** Đặt lại mật khẩu bằng mã → đăng xuất mọi thiết bị, trả phiên mới cho thiết bị hiện tại. */
+    async resetPassword(input: ResetPasswordInput, userAgent?: string): Promise<AuthSession> {
+      const user = await repo.findUserByEmail(input.email)
+      const reset = user ? await repo.findActivePasswordReset(user.id) : undefined
+      if (!user || !reset) throw invalidResetCode()
+      if (reset.codeHash !== hashResetCode(user.id, input.code)) {
+        const attempts = await repo.recordPasswordResetAttempt(reset.id)
+        if (attempts >= RESET_MAX_ATTEMPTS) await repo.consumePasswordReset(reset.id)
+        throw invalidResetCode()
+      }
+      if (!(await repo.consumePasswordReset(reset.id))) throw invalidResetCode()
+      await repo.updatePassword(user.id, await hashPassword(input.newPassword))
+      await repo.revokeAllForUser(user.id)
+      return startSession((await repo.findUserById(user.id)) ?? user, userAgent)
     },
   }
 }
