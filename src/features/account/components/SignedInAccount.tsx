@@ -1,25 +1,13 @@
 import { Text, View } from '@tamagui/tailwind'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Alert, Platform } from 'react-native'
 
 import { Divider } from '@/components/ui/Divider'
 import { useAuthStore, type User } from '@/features/auth'
 
+import { confirmAction as confirm } from '../lib/confirm'
 import { AccountMenuRow } from './AccountMenuRow'
 import { ProfileAvatar } from './ProfileAvatar'
-
-/** Hỏi xác nhận: Alert trên native, window.confirm trên web (Alert nhiều nút không chạy trên web). */
-function confirm(title: string, message: string, action: string, onConfirm: () => void) {
-  if (Platform.OS === 'web') {
-    if (globalThis.confirm?.(`${title}\n\n${message}`)) onConfirm()
-    return
-  }
-  Alert.alert(title, message, [
-    { text: 'Huỷ', style: 'cancel' },
-    { text: action, style: 'destructive', onPress: onConfirm },
-  ])
-}
 
 export function SignedInAccount({ user }: { user: User }) {
   const logout = useAuthStore((s) => s.logout)
@@ -50,6 +38,10 @@ export function SignedInAccount({ user }: { user: User }) {
       </View>
 
       <View className="overflow-hidden rounded-[8px] border border-neutral-300">
+        <AccountMenuRow icon="person-outline" label="Hồ sơ cá nhân" onPress={() => router.push('/profile')} />
+        <Divider />
+        <AccountMenuRow icon="location-outline" label="Địa chỉ giao hàng" onPress={() => router.push('/addresses')} />
+        <Divider />
         <AccountMenuRow icon="key-outline" label="Đổi mật khẩu" onPress={() => router.push('/change-password')} />
         <Divider />
         <AccountMenuRow
@@ -68,6 +60,8 @@ export function SignedInAccount({ user }: { user: User }) {
           loading={busy === 'logout'}
           onPress={() => confirm('Đăng xuất?', 'Bạn có chắc muốn đăng xuất khỏi thiết bị này?', 'Đăng xuất', run('logout', logout))}
         />
+        <Divider />
+        <AccountMenuRow icon="trash-outline" label="Xoá tài khoản" danger onPress={() => router.push('/delete-account')} />
       </View>
       {error ? <Text className="text-[12px] leading-[20px] text-danger">{error}</Text> : null}
     </View>

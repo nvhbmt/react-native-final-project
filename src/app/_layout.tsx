@@ -34,6 +34,9 @@ export default function RootLayout() {
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />
         <Stack.Screen name="change-password" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="addresses" />
+        <Stack.Screen name="delete-account" />
         <Stack.Screen
           name="feedback"
           options={{ presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }}

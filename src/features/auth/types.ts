@@ -4,6 +4,7 @@ export type User = {
   email: string
   fullName: string
   avatarUrl: string | null
+  phone: string | null
   role: 'customer' | 'admin'
   createdAt: string
 }

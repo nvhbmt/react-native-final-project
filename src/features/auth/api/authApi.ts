@@ -10,5 +10,8 @@ export const authApi = {
   logout: (refreshToken: string) => api.post<{ loggedOut: true }>('/auth/logout', { refreshToken }, { auth: false }),
   logoutAll: () => api.post<{ loggedOut: true }>('/auth/logout-all'),
   me: () => api.get<User>('/auth/me'),
+  forgotPassword: (email: string) => api.post<{ sent: true }>('/auth/forgot-password', { email }, { auth: false }),
+  resetPassword: (input: { email: string; code: string; newPassword: string }) =>
+    api.post<AuthSession>('/auth/reset-password', input, { auth: false }),
   changePassword: (input: ChangePasswordInput) => api.post<AuthSession>('/auth/change-password', input),
 }
