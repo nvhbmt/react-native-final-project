@@ -3,6 +3,7 @@ import { Text, View } from '@tamagui/tailwind'
 import { router } from 'expo-router'
 
 import { cn } from '@/lib/cn'
+import { selectableText } from '@/lib/selectableText'
 import { appColors } from '@/theme/tamagui.config'
 
 import type { ChatMessage } from '../api/assistantApi'
@@ -17,7 +18,7 @@ export function MessageBubble({ message, activity, onRate }: Props) {
     <View className={cn('max-w-[85%] gap-1', mine ? 'self-end' : 'self-start')}>
       <View className={cn('rounded-[14px] px-3 py-2', mine ? 'rounded-br-[4px] bg-primary' : 'rounded-bl-[4px] bg-neutral-100')}>
         {message.content ? (
-          <Text selectable className={cn('text-[14px] leading-[22px]', mine ? 'text-white' : 'text-neutral-900')}>
+          <Text {...selectableText} className={cn('text-[14px] leading-[22px]', mine ? 'text-white' : 'text-neutral-900')}>
             {parts.map((part, i) => part.type === 'text' ? part.text : (
               <Text
                 key={i}

@@ -39,6 +39,8 @@ const iconColor: Record<Variant, string> = {
 
 type Props = {
   title?: string
+  /** Nhãn trợ năng khi `title` trùng nhau giữa nhiều nút (vd. kèm mã đơn). Mặc định = `title`. */
+  accessibilityLabel?: string
   variant?: Variant
   leftIcon?: IconName
   rightIcon?: IconName
@@ -50,6 +52,7 @@ type Props = {
 
 export function Button({
   title,
+  accessibilityLabel,
   variant = 'primary',
   leftIcon,
   rightIcon,
@@ -64,6 +67,7 @@ export function Button({
       disabled={disabled}
       onPress={disabled ? undefined : onPress}
       role="button"
+      aria-label={accessibilityLabel ?? title}
       aria-disabled={disabled}
       className={className}
     >

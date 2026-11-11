@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Divider } from '@/components/ui/Divider'
 import { Screen } from '@/components/ui/Screen'
 import { SectionHeader } from '@/components/ui/SectionHeader'
+import { usePromoNotifications } from '@/features/account'
 import { useCartStore } from '@/features/cart'
 import { CatalogStatus } from '@/features/products/components/CatalogStatus'
 import { useCatalogRequest } from '@/features/products/hooks/useCatalogRequest'
@@ -37,13 +38,13 @@ export function StandardProductDetail({ product }: { product: Product }) {
   const { width } = useWindowDimensions()
   const contentWidth = Math.min(width, 520) - PADDING * 2
   const [expanded, setExpanded] = useState(false)
-  const [notify, setNotify] = useState(false)
+  const promo = usePromoNotifications()
   const addItem = useCartStore((s) => s.addItem)
   const related = useCatalogRequest<CatalogProduct[]>(productPath(product.id, '/related'))
   const reviews = useReviewPreview(product.id, 2)
   const features: ProductFeature[] = []
-  if (product.shippingOptions.includes('express')) features.push({ icon: 'express', label: 'Express' })
-  if (product.benefits.includes('free-return')) features.push({ icon: 'return', label: '30-day free return' })
+  if (product.shippingOptions.includes('express')) features.push({ icon: 'express', label: 'Giao nhanh' })
+  if (product.benefits.includes('free-return')) features.push({ icon: 'return', label: 'Đổi trả miễn phí 30 ngày' })
   const unavailable = product.available === false
 
   const addToCart = () =>
@@ -71,7 +72,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
             <Ionicons name="cart-outline" size={22} color={appColors.primary} />
           </View>
           <Button
-            title={unavailable ? 'Out of stock' : 'Buy Now'}
+            title={unavailable ? 'Hết hàng' : 'Mua ngay'}
             disabled={unavailable}
             className="flex-1"
             onPress={() => {
@@ -85,7 +86,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
       <View className="gap-4 px-6 pt-1 pb-6">
         <ImageCarousel images={product.images} width={contentWidth} height={Math.round(contentWidth * 0.545)} contentFit="contain" />
         {product.imageAttribution && <Link href={product.imageAttribution} asChild>
-          <Text className="self-end text-[11px] leading-[16px] text-neutral-500 underline">Image credits</Text>
+          <Text className="self-end text-[11px] leading-[16px] text-neutral-500 underline">Nguồn ảnh</Text>
         </Link>}
         <Text className="font-heading text-[18px] leading-[26px] font-bold text-neutral-900">{product.name}</Text>
         <View className="flex-row items-center justify-between">
@@ -95,7 +96,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
           <View className="flex-row items-center gap-1">
             {product.rating !== null && <><Ionicons name="star" size={20} color={appColors.warning} />
               <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text></>}
-            {product.reviewCount > 0 && <Text className="text-[14px] leading-[22px] text-neutral-500">({product.reviewCount} source ratings)</Text>}
+            {product.reviewCount > 0 && <Text className="text-[14px] leading-[22px] text-neutral-500">({product.reviewCount} lượt đánh giá gốc)</Text>}
           </View>
         </View>
       </View>
@@ -103,7 +104,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
       <Divider className="bg-neutral-200" />
 
       <View className="gap-3 px-6 pt-6 pb-6">
-        <SectionHeader title="Description" />
+        <SectionHeader title="Mô tả" />
         <ClampedText
           lines={expanded ? undefined : 2}
           className="text-[14px] leading-[22px] text-neutral-500"
@@ -125,9 +126,9 @@ export function StandardProductDetail({ product }: { product: Product }) {
       </View>
 
       <View className="gap-4 px-6 pt-6 pb-6">
-        <SectionHeader title="Reviews" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
+        <SectionHeader title="Đánh giá" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
         {reviews.data && <RatingSummary {...reviews.data.summary} />}
-        {(reviews.loading || Boolean(reviews.error)) && <CatalogStatus loading={reviews.loading} message={reviews.error ? 'Could not load reviews.' : undefined} onRetry={reviews.error ? reviews.retry : undefined} />}
+        {(reviews.loading || Boolean(reviews.error)) && <CatalogStatus loading={reviews.loading} message={reviews.error ? 'Không tải được đánh giá.' : undefined} onRetry={reviews.error ? reviews.retry : undefined} />}
         <View className="gap-5 pt-2">
           {reviews.data?.items.map((r) => (
             <ReviewItem key={r.id} review={r} />
@@ -140,7 +141,7 @@ export function StandardProductDetail({ product }: { product: Product }) {
       {related.data?.length ? (
         <View className="gap-4 pt-6 pb-4">
           <View className="px-6">
-            <SectionHeader title="Relevant products" onSeeAll={() => router.push({ pathname: '/product-listing', params: { relatedTo: product.id } })} />
+            <SectionHeader title="Sản phẩm liên quan" onSeeAll={() => router.push({ pathname: '/product-listing', params: { relatedTo: product.id } })} />
           </View>
           <ScrollView
             horizontal
@@ -153,10 +154,11 @@ export function StandardProductDetail({ product }: { product: Product }) {
             ))}
           </ScrollView>
         </View>
-      ) : (related.loading || related.error) ? <CatalogStatus loading={related.loading} message={related.error ? 'Could not load related products.' : undefined} onRetry={related.error ? related.retry : undefined} /> : null}
+      ) : (related.loading || related.error) ? <CatalogStatus loading={related.loading} message={related.error ? 'Không tải được sản phẩm liên quan.' : undefined} onRetry={related.error ? related.retry : undefined} /> : null}
 
       <View className="px-6 pt-2">
-        <NotifyCard value={notify} onChange={setNotify} />
+        <NotifyCard value={promo.enabled} onChange={(value) => void promo.setEnabled(value)} />
+        {promo.error ? <Text role="alert" className="pt-2 text-[12px] leading-[20px] text-danger">{promo.error}</Text> : null}
       </View>
     </Screen>
   )

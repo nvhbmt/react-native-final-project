@@ -27,22 +27,22 @@ export function OrderSummaryCard({ order }: { order: Order }) {
 
   return (
     <View className="gap-[18px] rounded-[6px] bg-neutral-100 px-5 py-6">
-      <Row label="Subtotal">
+      <Row label="Tạm tính">
         <Amount value={order.subtotal} />
       </Row>
       {order.discount > 0 ? (
-        <Row label="Discount">
+        <Row label="Giảm giá">
           <Amount value={-order.discount} />
         </Row>
       ) : null}
-      <Row label={`Tax (${Math.round(TAX_RATE * 100)}%)`}>
+      <Row label={`Thuế (${Math.round(TAX_RATE * 100)}%)`}>
         <Amount value={order.tax} />
       </Row>
-      <Row label="Fees">
+      <Row label={order.shippingMethod ? `Phí vận chuyển (${order.shippingMethod.label})` : 'Phí vận chuyển'}>
         <Amount value={order.fees} />
       </Row>
       <Divider className="bg-neutral-300" />
-      <Row label={pm.kind === 'bank_transfer' ? 'Chuyển khoản' : pm.brand === 'paypal' ? 'PayPal' : 'Card'}>
+      <Row label={pm.kind === 'bank_transfer' ? 'Chuyển khoản' : pm.brand === 'paypal' ? 'PayPal' : 'Thẻ'}>
         <View className="flex-row items-center gap-2">
           <PaymentLogo brand={pm.brand} size={28} />
           {pm.kind === 'demo_card' ? (
@@ -58,9 +58,9 @@ export function OrderSummaryCard({ order }: { order: Order }) {
         </Row>
       ) : null}
       <Divider className="bg-neutral-300" />
-      <Row label="Total">
+      <Row label="Tổng cộng">
         <View className="flex-row items-center gap-2">
-          <OrderStatusBadge status={order.status} />
+          <OrderStatusBadge order={order} />
           <Text className="text-[20px] leading-[30px] text-neutral-900">{formatPrice(order.total)}</Text>
         </View>
       </Row>

@@ -30,7 +30,7 @@ export type SizeChart = {
   rows: { size: string; cm: Record<string, number> }[]
 }
 
-export type ProductDetail = Pick<CatalogProduct, 'id' | 'name' | 'subtitle' | 'price' | 'priceBasis' | 'priceUnit' | 'rating' | 'reviewCount' | 'available'> & {
+export type ProductDetail = Pick<CatalogProduct, 'id' | 'name' | 'subtitle' | 'subcategory' | 'price' | 'priceBasis' | 'priceUnit' | 'rating' | 'reviewCount' | 'available'> & {
   /** Tên danh mục, hiển thị trên header trang chi tiết ("Headphone", "T-Shirt"). */
   categoryName: string
   description: string

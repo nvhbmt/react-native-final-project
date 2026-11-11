@@ -25,7 +25,7 @@ export function DeleteAccountScreen() {
   })
 
   return (
-    <AuthScreenFrame header="Delete account" title="Xoá tài khoản" subtitle="Thao tác này không thể hoàn tác.">
+    <AuthScreenFrame header="Xoá tài khoản" title="Xoá tài khoản" subtitle="Thao tác này không thể hoàn tác.">
       <View className="gap-2 rounded-[6px] bg-[#fdf2f2] p-4">
         <Text className="text-[14px] leading-[22px] text-danger">Sẽ bị xoá vĩnh viễn: hồ sơ, giỏ hàng, sản phẩm yêu thích, lịch sử đơn hàng, đánh giá, góp ý, hộp thư và các cuộc trò chuyện với trợ lý.</Text>
       </View>

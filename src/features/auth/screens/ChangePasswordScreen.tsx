@@ -41,7 +41,7 @@ export function ChangePasswordScreen() {
     })
 
   return (
-    <AuthScreenFrame header="Change password" title="Đổi mật khẩu" subtitle="Sau khi đổi, các thiết bị khác sẽ bị đăng xuất.">
+    <AuthScreenFrame header="Đổi mật khẩu" title="Đổi mật khẩu" subtitle="Sau khi đổi, các thiết bị khác sẽ bị đăng xuất.">
       <FormBanner message={form.formError} />
       {done ? (
         <View role="status" className="rounded-[6px] bg-success-50 p-3">
@@ -50,7 +50,7 @@ export function ChangePasswordScreen() {
       ) : null}
       <View className="gap-4">
         <AuthTextField
-          label="Current password"
+          label="Mật khẩu hiện tại"
           password
           value={values.currentPassword}
           onChangeText={change('currentPassword')}
@@ -63,7 +63,7 @@ export function ChangePasswordScreen() {
         />
         <AuthTextField
           ref={newRef}
-          label="New password"
+          label="Mật khẩu mới"
           password
           value={values.newPassword}
           onChangeText={change('newPassword')}
@@ -76,7 +76,7 @@ export function ChangePasswordScreen() {
         />
         <AuthTextField
           ref={confirmRef}
-          label="Confirm new password"
+          label="Nhập lại mật khẩu mới"
           password
           value={values.confirm}
           onChangeText={change('confirm')}
@@ -88,7 +88,7 @@ export function ChangePasswordScreen() {
           onSubmitEditing={onSubmit}
         />
       </View>
-      <SubmitButton title="Update password" loading={form.submitting} onPress={onSubmit} />
+      <SubmitButton title="Cập nhật mật khẩu" loading={form.submitting} onPress={onSubmit} />
       {done ? (
         <View onPress={() => router.back()} role="button" className="items-center active:opacity-60">
           <Text className="text-[14px] leading-[22px] font-bold text-primary">Quay lại tài khoản</Text>

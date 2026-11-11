@@ -12,7 +12,7 @@ export function useCatalogRequest<T>(path?: string, { auth = false, version = ''
     const request = new AbortController()
     const timeout = setTimeout(() => {
       request.abort()
-      setResult({ key, error: new Error('The request timed out.') })
+      setResult({ key, error: new Error('Hết thời gian chờ phản hồi.') })
     }, 12_000)
     api.get<T>(path, { auth, signal: request.signal }).then(
       (data) => { if (!request.signal.aborted) setResult({ key, data }) },

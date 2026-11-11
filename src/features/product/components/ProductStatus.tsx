@@ -7,7 +7,7 @@ export function ProductStatus({ title, loading, error, retry }: { title: string;
   const missing = error instanceof ApiError && error.status === 404
   return (
     <Screen header={<AppHeader title={title} />}>
-      <CatalogStatus loading={loading} message={loading ? undefined : missing || !error ? 'Product not found.' : 'Could not load this product.'} onRetry={error && !missing ? retry : undefined} />
+      <CatalogStatus loading={loading} message={loading ? undefined : missing || !error ? 'Không tìm thấy sản phẩm.' : 'Không tải được sản phẩm này.'} onRetry={error && !missing ? retry : undefined} />
     </Screen>
   )
 }

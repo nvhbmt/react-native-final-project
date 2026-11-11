@@ -25,7 +25,7 @@ function timeAgo(timestamp: number) {
 
 export function InboxItem({ message, onPress }: { message: InboxMessage; onPress: () => void }) {
   return (
-    <View onPress={onPress} role="button" aria-label={message.title} className={cn('flex-row gap-3 px-4 py-3 active:opacity-70', !message.read && 'bg-[#f3f0ff]')}>
+    <View onPress={onPress} role="button" aria-label={message.title} className={cn('flex-row gap-3 px-6 py-3 active:opacity-70', !message.read && 'bg-[#f3f0ff]')}>
       <View className="size-[40px] items-center justify-center rounded-full bg-neutral-100">
         <Ionicons name={icons[message.kind]} size={20} color={appColors.primary} />
       </View>

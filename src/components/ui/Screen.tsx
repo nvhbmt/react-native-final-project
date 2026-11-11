@@ -30,13 +30,16 @@ export function Screen({
   safeBottom = false,
   children,
 }: Props) {
+  // Tiêu đề tab có lề cố định, tách khỏi padding riêng của từng màn để mọi tab thẳng hàng.
   const content = (
-    <View className={cn('flex-1', contentClassName)}>
+    <>
       {title && !header ? (
-        <Text className="font-heading text-[30px] leading-[40px] font-bold text-color">{title}</Text>
+        <View className="px-6 pt-2">
+          <Text className="font-heading text-[30px] leading-[40px] font-bold text-color">{title}</Text>
+        </View>
       ) : null}
-      {children}
-    </View>
+      <View className={cn('flex-1', contentClassName)}>{children}</View>
+    </>
   )
 
   return (

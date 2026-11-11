@@ -1,12 +1,12 @@
+import { Ionicons } from '@expo/vector-icons'
 import { Text, View } from '@tamagui/tailwind'
 import { Image } from 'expo-image'
 
 import { initialsOf, type User } from '@/features/auth'
 import { mediaUrl } from '@/lib/api'
+import { appColors } from '@/theme/tamagui.config'
 
-const DEFAULT_AVATAR = require('../../../../assets/marketplace/avatar.png')
-
-/** Ảnh đại diện; user chưa có ảnh thì hiện chữ cái đầu, guest thì hiện ảnh mặc định. */
+/** Ảnh đại diện; user chưa có ảnh thì hiện chữ cái đầu, guest thì hiện biểu tượng người dùng trung tính. */
 export function ProfileAvatar({ user, size }: { user: User | null; size: number }) {
   const frame = { width: size, height: size, borderRadius: size / 2 }
 
@@ -21,8 +21,8 @@ export function ProfileAvatar({ user, size }: { user: User | null; size: number 
     )
   }
   return (
-    <View className="overflow-hidden bg-[#d9cbf6]" style={frame}>
-      <Image source={DEFAULT_AVATAR} style={{ width: size, height: size }} />
+    <View className="items-center justify-center bg-neutral-200" style={frame}>
+      <Ionicons name="person" size={size * 0.55} color={appColors['neutral-400']} />
     </View>
   )
 }

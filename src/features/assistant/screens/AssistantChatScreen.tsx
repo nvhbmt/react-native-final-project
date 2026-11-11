@@ -71,6 +71,17 @@ export function AssistantChatScreen() {
               placeholder="Nhập câu hỏi…"
               placeholderTextColor={appColors['neutral-400']}
               multiline
+              submitBehavior="submit"
+              returnKeyType="send"
+              onSubmitEditing={(event) => submit(event.nativeEvent.text)}
+              onKeyPress={(event) => {
+                if (Platform.OS !== 'web' || chat.streaming) return
+                const key = event.nativeEvent as typeof event.nativeEvent & { shiftKey?: boolean; isComposing?: boolean }
+                if (key.key === 'Enter' && !key.shiftKey && !key.isComposing) {
+                  event.preventDefault()
+                  submit()
+                }
+              }}
               maxLength={2000}
               accessibilityLabel="Tin nhắn cho trợ lý"
               style={{

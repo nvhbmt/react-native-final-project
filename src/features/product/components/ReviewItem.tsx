@@ -22,9 +22,9 @@ export function ReviewItem({ review, showRating = false }: Props) {
       <View className="flex-1 gap-1">
         <View className="flex-row items-center justify-between">
           <Text numberOfLines={1} className="flex-1 pr-2 text-[14px] leading-[22px] text-neutral-700">{review.author}</Text>
-          <Text className="text-[11px] leading-[18px] text-neutral-500">{new Date(review.createdAt).toLocaleDateString()}</Text>
+          <Text className="text-[11px] leading-[18px] text-neutral-500">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</Text>
         </View>
-        <Text className="text-[11px] text-neutral-500">{review.purchaseMode === 'demo' ? 'Demo order' : 'Verified purchase'}</Text>
+        <Text className="text-[11px] text-neutral-500">{review.purchaseMode === 'demo' ? 'Đơn demo' : 'Đã mua hàng'}</Text>
         {showRating ? <StarRating value={review.rating} size={12} className="gap-0.5" /> : null}
         <Text className="text-[12px] leading-[20px] text-neutral-500">{review.content}</Text>
       </View>

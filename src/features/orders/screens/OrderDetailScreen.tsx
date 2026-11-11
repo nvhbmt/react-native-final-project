@@ -9,12 +9,16 @@ import { Divider } from '@/components/ui/Divider'
 import { Screen } from '@/components/ui/Screen'
 import { confirmAction } from '@/features/account/lib/confirm'
 import { useRequireAuth } from '@/features/auth'
-import { ordersApi } from '@/features/checkout/api/ordersApi'
+import { invalidateOrders, ordersApi } from '@/features/checkout/api/ordersApi'
+import { OrderStatusBadge } from '@/features/checkout/components/OrderStatusBadge'
 import { OrderSummaryCard } from '@/features/checkout/components/OrderSummaryCard'
+import { ShippingAddressCard } from '@/features/checkout/components/ShippingAddressCard'
 import { useOrder } from '@/features/checkout/hooks/useOrder'
 import { invalidateReviews } from '@/features/product/api/reviews'
 import { CatalogStatus } from '@/features/products/components/CatalogStatus'
 import { ApiError } from '@/lib/api'
+
+import { OrderTimeline } from '../components/OrderTimeline'
 import { formatPrice } from '@/lib/format'
 
 export function OrderDetailScreen() {
@@ -22,6 +26,7 @@ export function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const { order, error, retry, update } = useOrder(id)
   const [busy, setBusy] = useState(false)
+  const [advancing, setAdvancing] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
   if (!order) {
@@ -44,15 +49,42 @@ export function OrderDetailScreen() {
       setBusy(false)
     }
   })
+  // Chỉ có ở môi trường demo: giả lập kho/shipper chuyển đơn sang bước kế tiếp.
+  const advance = async () => {
+    setAdvancing(true)
+    setActionError(null)
+    try {
+      update(await ordersApi.advance(order.id))
+      invalidateOrders()
+    } catch (e) {
+      setActionError(e instanceof ApiError ? e.message : 'Không cập nhật được trạng thái, vui lòng thử lại')
+    } finally {
+      setAdvancing(false)
+    }
+  }
+  const nextStep = order.fulfillment === 'processing' ? 'Đang giao' : order.fulfillment === 'shipping' ? 'Đã giao' : null
   const products = [...new Map(order.items.map((item) => [item.productId, item])).values()]
 
   return (
     <Screen header={<AppHeader title={`Đơn #${order.code}`} />} contentClassName="gap-5 px-5 pt-3 pb-8" safeBottom>
-      <Text className="text-[13px] leading-[20px] text-neutral-500">
-        Đặt lúc {new Date(order.createdAt).toLocaleString('vi-VN')}
-        {order.paidAt ? ` · Thanh toán lúc ${new Date(order.paidAt).toLocaleString('vi-VN')}` : ''}
-        {order.paymentMode === 'demo' ? ' · Đơn demo' : ''}
-      </Text>
+      <View className="flex-row items-center justify-between gap-3">
+        <Text className="flex-1 text-[13px] leading-[20px] text-neutral-500">
+          {order.paymentMode === 'demo' ? 'Đơn demo' : 'Thanh toán chuyển khoản'}
+          {order.shippingMethod ? ` · Giao ${order.shippingMethod.label.toLowerCase()}` : ''}
+        </Text>
+        <OrderStatusBadge order={order} />
+      </View>
+
+      <OrderTimeline order={order} />
+      {order.advanceable && nextStep ? (
+        <Button
+          title={advancing ? 'Đang cập nhật…' : `(Demo) Chuyển sang: ${nextStep}`}
+          variant="outline"
+          leftIcon="play-forward-outline"
+          disabled={advancing}
+          onPress={() => void advance()}
+        />
+      ) : null}
 
       <View>
         {order.items.map((item, i) => (
@@ -69,6 +101,8 @@ export function OrderDetailScreen() {
           </Fragment>
         ))}
       </View>
+
+      {order.shippingAddress ? <ShippingAddressCard address={order.shippingAddress} /> : null}
 
       <OrderSummaryCard order={order} />
 

@@ -12,7 +12,7 @@ export function CategoryStrip({ categories }: { categories: CatalogCategory[] })
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
       {categories.map((category) => (
-        <YStack {...keyboardAction} key={category.id} w={84} gap={8} items="center" role="button" aria-label={`Browse ${category.name}`} onPress={() => router.push({ pathname: '/product-listing', params: { category: category.id } })} opacity="1 press:0.8">
+        <YStack {...keyboardAction} key={category.id} w={84} gap={8} items="center" role="button" aria-label={`Xem ${category.name}`} onPress={() => router.push({ pathname: '/product-listing', params: { category: category.id } })} opacity="1 press:0.8">
           <YStack w={84} h={84} rounded={42} bg={m.surface} overflow="hidden">
             {category.image && <Image source={category.image} style={styles.image} contentFit="contain" />}
           </YStack>

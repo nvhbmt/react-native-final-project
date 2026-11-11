@@ -5,7 +5,7 @@ import { YStack } from 'tamagui'
 
 import { MarketplaceHeader } from './MarketplaceHeader'
 
-export function MarketplaceFrame({ title, onBack, children }: PropsWithChildren<{ title: string; onBack: () => void }>) {
+export function MarketplaceFrame({ title, onBack, children }: PropsWithChildren<{ title: string; onBack?: () => void }>) {
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
       <YStack flex={1} bg="white">

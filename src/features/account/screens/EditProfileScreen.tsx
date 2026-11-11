@@ -60,7 +60,7 @@ export function EditProfileScreen() {
   }
 
   return (
-    <AuthScreenFrame header="Profile" title="Hồ sơ cá nhân" subtitle="Thông tin hiển thị trên đánh giá và dùng để liên hệ giao hàng.">
+    <AuthScreenFrame header="Hồ sơ" title="Hồ sơ cá nhân" subtitle="Thông tin hiển thị trên đánh giá và dùng để liên hệ giao hàng.">
       <View className="items-center gap-2">
         <View onPress={avatarBusy ? undefined : changeAvatar} role="button" aria-label="Đổi ảnh đại diện" className="active:opacity-80">
           <ProfileAvatar user={user} size={88} />

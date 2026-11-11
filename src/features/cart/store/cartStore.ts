@@ -122,11 +122,12 @@ export const useCartStore = create<CartState>((set, get) => {
 })
 
 /** Tính tiền từ state — tách hàm thuần để dễ test và tái dùng ở màn Payment/Success. */
-export function computeTotals(items: CartItem[], voucherRate = 0): CartTotals {
+/** `shippingFee`: phí ship đã áp FREESHIP (giỏ hàng chưa chọn hình thức giao → 0). Phí ship không chịu thuế, khớp server. */
+export function computeTotals(items: CartItem[], voucherRate = 0, shippingFee = 0): CartTotals {
   const subtotal = Math.round(items.reduce((sum, i) => sum + i.price * i.quantity, 0) * 100) / 100
   const discount = Math.round(subtotal * voucherRate * 100) / 100
   const taxable = Math.round((subtotal - discount) * 100) / 100
   const tax = Math.round(taxable * TAX_RATE * 100) / 100
-  const fees = 0
+  const fees = Math.round(shippingFee * 100) / 100
   return { subtotal, discount, tax, fees, total: Math.round((taxable + tax + fees) * 100) / 100 }
 }

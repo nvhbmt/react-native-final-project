@@ -16,15 +16,15 @@ import { normalizePriceRange } from '../lib/priceRange'
 import { useFilterStore } from '../store/filterStore'
 
 const shipping: { id: ShippingOption; label: string }[] = [
-  { id: 'instant', label: 'Instant (2 hours delivery)' },
-  { id: 'express', label: 'Express (2 days delivery)' },
-  { id: 'standard', label: 'Standard (7- 10 days delivery)' },
+  { id: 'instant', label: 'Hoả tốc (giao trong 2 giờ)' },
+  { id: 'express', label: 'Nhanh (giao trong 2 ngày)' },
+  { id: 'standard', label: 'Tiêu chuẩn (giao trong 7–10 ngày)' },
 ]
 const benefits: { id: OtherFilter; label: string; icon: 'swap-horizontal' | 'shield-lock-outline' | 'label' | 'map-marker-outline' }[] = [
-  { id: 'free-return', label: '30-day Free Return', icon: 'swap-horizontal' },
-  { id: 'buyer-protection', label: 'Buyer Protection', icon: 'shield-lock-outline' },
-  { id: 'best-deal', label: 'Best Deal', icon: 'label' },
-  { id: 'ship-to-store', label: 'Ship to store', icon: 'map-marker-outline' },
+  { id: 'free-return', label: 'Đổi trả miễn phí 30 ngày', icon: 'swap-horizontal' },
+  { id: 'buyer-protection', label: 'Bảo vệ người mua', icon: 'shield-lock-outline' },
+  { id: 'best-deal', label: 'Giá tốt nhất', icon: 'label' },
+  { id: 'ship-to-store', label: 'Nhận tại cửa hàng', icon: 'map-marker-outline' },
 ]
 
 export function FiltersScreen() {
@@ -44,13 +44,13 @@ export function FiltersScreen() {
   return (
     <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
       <XStack position="relative" h={53} items="center" justify="center" borderBottomWidth={1} borderColor={m.border}>
-        <MarketHeading fontSize={18} lineHeight="30px" color={m.ink}>Filter</MarketHeading>
-        <YStack {...keyboardAction} position="absolute" r={2} w={44} h={44} items="center" justify="center" role="button" aria-label="Close filters" onPress={close}>
+        <MarketHeading fontSize={18} lineHeight="30px" color={m.ink}>Bộ lọc</MarketHeading>
+        <YStack {...keyboardAction} position="absolute" r={2} w={44} h={44} items="center" justify="center" role="button" aria-label="Đóng bộ lọc" onPress={close}>
           <Ionicons name="close-outline" size={22} color={m.muted} />
         </YStack>
       </XStack>
       <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <FilterSection title="Shipping options" first>
+        <FilterSection title="Hình thức giao hàng" first>
           <YStack mt={14}>
             {shipping.map((option) => {
               const checked = draft.shippingOptions?.includes(option.id) ?? false
@@ -65,18 +65,18 @@ export function FiltersScreen() {
             })}
           </YStack>
         </FilterSection>
-        <FilterSection title="Price range" top={18} bottom={13}><PriceRange value={draft} onChange={update} /></FilterSection>
-        <FilterSection title="Average review" top={19} bottom={16}>
-          <XStack role="radiogroup" aria-label="Minimum review rating" items="center" justify="center" gap={10} h={57}>
+        <FilterSection title="Khoảng giá" top={18} bottom={13}><PriceRange value={draft} onChange={update} /></FilterSection>
+        <FilterSection title="Đánh giá trung bình" top={19} bottom={16}>
+          <XStack role="radiogroup" aria-label="Số sao tối thiểu" items="center" justify="center" gap={10} h={57}>
             {[1, 2, 3, 4, 5].map((star) => (
               <YStack {...keyboardAction} key={star} h={44} justify="center" role="radio" aria-label={`${star} stars and up`} aria-checked={draft.minimumRating === star} onPress={() => update({ ...draft, minimumRating: draft.minimumRating === star ? 0 : star })} hitSlop={5}>
                 <Ionicons name="star" size={23} color={star <= draft.minimumRating ? '#f3c63f' : m.starEmpty} />
               </YStack>
             ))}
-            <MarketText color="#42464e" ml={4}>&amp; Up</MarketText>
+            <MarketText color="#42464e" ml={4}>trở lên</MarketText>
           </XStack>
         </FilterSection>
-        <FilterSection title="Others" last>
+        <FilterSection title="Khác" last>
           <YStack gap={24} mt={16}>
             {[benefits.slice(0, 2), benefits.slice(2)].map((row, index) => (
               <XStack key={index} gap={24}>

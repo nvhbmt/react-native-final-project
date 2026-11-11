@@ -20,7 +20,7 @@ export function OrderListItem({ order }: { order: Order }) {
     >
       <View className="flex-row items-center justify-between">
         <Text className="font-heading text-[15px] leading-[24px] font-bold text-neutral-900">#{order.code}</Text>
-        <OrderStatusBadge status={order.status} />
+        <OrderStatusBadge order={order} />
       </View>
       <View className="flex-row items-center gap-3">
         {first ? <Image source={first.image} style={{ width: 48, height: 48, borderRadius: 4 }} contentFit="contain" /> : null}

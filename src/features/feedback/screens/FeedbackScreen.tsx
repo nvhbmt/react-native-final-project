@@ -85,7 +85,7 @@ export function FeedbackScreen() {
         <Animated.View style={{ flex: 1, transform: [{ translateY }] }}>
           <View className="flex-1 overflow-hidden rounded-t-[6px] bg-white">
             <View className="h-[60px] flex-row items-center justify-center border-b border-neutral-300">
-              <Text className="font-heading text-[18px] leading-[28px] font-bold text-neutral-900">Feedback</Text>
+              <Text className="font-heading text-[18px] leading-[28px] font-bold text-neutral-900">Góp ý</Text>
               <View
                 onPress={close}
                 role="button"
@@ -108,11 +108,11 @@ export function FeedbackScreen() {
               </View>
 
               <View className="gap-1.5 pt-7">
-                <Label>Care to share more?</Label>
+                <Label>Bạn muốn chia sẻ thêm?</Label>
                 <TextInput
                   value={form.comment}
                   onChangeText={(comment) => update({ comment })}
-                  placeholder="Type your feedbacks"
+                  placeholder="Nhập góp ý của bạn"
                   placeholderTextColor={appColors['neutral-400']}
                   multiline
                   textAlignVertical="top"
@@ -131,12 +131,12 @@ export function FeedbackScreen() {
               </View>
 
               <View className="gap-1.5 pt-5">
-                <Label>Upload images</Label>
+                <Label>Thêm ảnh</Label>
                 <ImageUploader value={form.images} onChange={(images) => update({ images })} />
               </View>
 
               <View className="gap-3 pt-5">
-                <Label>Rating</Label>
+                <Label>Chấm điểm</Label>
                 <StarRating
                   value={form.rating}
                   size={40}
@@ -147,7 +147,7 @@ export function FeedbackScreen() {
 
               {error ? <Text role="alert" className="pt-4 text-[13px] leading-[20px] text-danger">{error}</Text> : null}
               <Button
-                title={sending ? 'Đang gửi…' : auth === 'guest' ? 'Đăng nhập để gửi' : 'Submit'}
+                title={sending ? 'Đang gửi…' : auth === 'guest' ? 'Đăng nhập để gửi' : 'Gửi góp ý'}
                 className="mt-7"
                 onPress={submit}
                 disabled={!form.rating || sending}

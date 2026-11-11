@@ -23,11 +23,11 @@ export function HomeScreen() {
   const recommendations = useCatalogRequest<ProductPage>(filtered ? listingPath({ filters, limit: 10 }) : undefined)
 
   return (
-    <MarketplaceFrame title="All Deals" onBack={() => { if (router.canGoBack()) router.back() }}>
+    <MarketplaceFrame title="Tất cả ưu đãi">
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         <YStack px={24} mb={24}>
           <SearchField
-            value={query} onChangeText={setQuery} placeholder="Search for product"
+            value={query} onChangeText={setQuery} placeholder="Tìm kiếm sản phẩm"
             onFilter={() => router.push('/filters')}
             filtered={filtered}
             onSubmit={() => router.push({ pathname: '/product-listing', params: { query } })}
@@ -43,7 +43,7 @@ export function HomeScreen() {
             loading={recommendations.loading}
             onRetry={recommendations.error ? recommendations.retry : undefined}
           />
-        </> : <CatalogStatus loading={home.loading} message={home.error ? 'Could not load products.' : undefined} onRetry={home.error ? home.retry : undefined} />}
+        </> : <CatalogStatus loading={home.loading} message={home.error ? 'Không tải được sản phẩm.' : undefined} onRetry={home.error ? home.retry : undefined} />}
       </ScrollView>
     </MarketplaceFrame>
   )

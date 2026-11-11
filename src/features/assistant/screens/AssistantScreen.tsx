@@ -61,7 +61,7 @@ export function AssistantScreen() {
   return (
     <Screen header={<AppHeader title="Trợ lý mua sắm" />} contentClassName="gap-4 px-5 pt-3 pb-8" safeBottom>
       {data && !data.available ? (
-        <Text className="rounded-[6px] bg-[#fff6e5] p-3 text-[13px] leading-[20px] text-[#a15c00]">Trợ lý AI chưa được bật trên máy chủ (thiếu cấu hình AI_*).</Text>
+        <Text className="rounded-[6px] bg-[#fff6e5] p-3 text-[13px] leading-[20px] text-[#a15c00]">Trợ lý mua sắm đang tạm thời chưa khả dụng. Vui lòng thử lại sau.</Text>
       ) : null}
       <Button title={creating ? 'Đang tạo…' : 'Cuộc trò chuyện mới'} leftIcon="add" disabled={creating} onPress={() => void create()} />
       {error ? <Text role="alert" className="text-[13px] text-danger">{error}</Text> : null}

@@ -81,6 +81,16 @@ export function TransferScreen() {
         </View>
       </View>
 
+      {payment.simulated ? (
+        <View role="alert" className="flex-row items-start gap-2 rounded-[6px] border border-danger bg-[#fdecec] p-3">
+          <Ionicons name="warning" size={18} color={appColors.danger} />
+          <Text className="flex-1 text-[13px] leading-[20px] text-danger">
+            <Text className="font-bold text-danger">Chế độ giả lập — đừng chuyển tiền thật.</Text> Tài khoản bên dưới không có thật.
+            Xác nhận thanh toán bằng lệnh <Text className="font-bold text-danger">npm run sepay:simulate</Text> trong thư mục server.
+          </Text>
+        </View>
+      ) : null}
+
       <View className="items-center rounded-[8px] border border-neutral-200 bg-white p-3" style={{ opacity: expired ? 0.35 : 1 }}>
         <Image source={payment.qrUrl} style={{ width: 240, height: 240 }} contentFit="contain" accessibilityLabel="Mã VietQR thanh toán" />
       </View>

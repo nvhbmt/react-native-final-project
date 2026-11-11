@@ -63,6 +63,7 @@ export async function streamMessage(conversationId: string, content: string, han
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
+  let finished = false
   for (;;) {
     const { value, done } = await reader.read()
     if (done) break
@@ -74,8 +75,9 @@ export async function streamMessage(conversationId: string, content: string, han
       if (event === 'start') handlers.onStart(payload.userMessage, payload.assistantMessageId)
       else if (event === 'delta') handlers.onDelta(payload.text)
       else if (event === 'tool') handlers.onTool(payload.name)
-      else if (event === 'done') handlers.onDone(payload.message)
-      else if (event === 'error') handlers.onError(payload.message, payload.assistantMessage)
+      else if (event === 'done') { finished = true; handlers.onDone(payload.message) }
+      else if (event === 'error') { finished = true; handlers.onError(payload.message, payload.assistantMessage) }
     }
   }
+  if (!finished) throw new ApiError(0, 'AI_STREAM_INTERRUPTED', 'Kết nối với trợ lý bị gián đoạn, vui lòng thử lại')
 }

@@ -39,11 +39,11 @@ export function RegisterScreen() {
     })
 
   return (
-    <AuthScreenFrame header="Sign up" title="Create account" subtitle="Tạo tài khoản để lưu đơn hàng và sản phẩm yêu thích.">
+    <AuthScreenFrame brand header="Đăng ký" title="Tạo tài khoản" subtitle="Tạo tài khoản để lưu đơn hàng và sản phẩm yêu thích.">
       <FormBanner message={form.formError} />
       <View className="gap-4">
         <AuthTextField
-          label="Full name"
+          label="Họ và tên"
           value={values.fullName}
           onChangeText={change('fullName')}
           error={form.fieldErrors.fullName}
@@ -69,7 +69,7 @@ export function RegisterScreen() {
         />
         <AuthTextField
           ref={passwordRef}
-          label="Password"
+          label="Mật khẩu"
           password
           value={values.password}
           onChangeText={change('password')}
@@ -83,7 +83,7 @@ export function RegisterScreen() {
         />
         <AuthTextField
           ref={confirmRef}
-          label="Confirm password"
+          label="Nhập lại mật khẩu"
           password
           value={values.confirm}
           onChangeText={change('confirm')}
@@ -96,8 +96,8 @@ export function RegisterScreen() {
           onSubmitEditing={onSubmit}
         />
       </View>
-      <SubmitButton title="Sign up" loading={form.submitting} onPress={onSubmit} />
-      <AuthSwitchLink prompt="Đã có tài khoản?" action="Log in" href="/login" />
+      <SubmitButton title="Đăng ký" loading={form.submitting} onPress={onSubmit} />
+      <AuthSwitchLink prompt="Đã có tài khoản?" action="Đăng nhập" href="/login" />
     </AuthScreenFrame>
   )
 }

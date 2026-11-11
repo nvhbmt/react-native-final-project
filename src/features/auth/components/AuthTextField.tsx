@@ -21,7 +21,15 @@ export function AuthTextField({ label, error, password, ref, ...input }: Props) 
   return (
     <View className="gap-1">
       <Text className="text-[14px] leading-[22px] font-medium text-neutral-700">{label}</Text>
-      <View className="h-[44px] flex-row items-center rounded-[6px] border bg-neutral-100 px-3" style={{ borderColor }}>
+      {/* Focus: viền primary + quầng mờ, nền chuyển trắng; lỗi: viền đỏ + quầng đỏ nhạt. */}
+      <View
+        className="h-[44px] flex-row items-center rounded-[6px] border px-3"
+        style={{
+          borderColor,
+          backgroundColor: focused ? '#ffffff' : appColors['neutral-100'],
+          boxShadow: focused || error ? `0 0 0 3px ${error ? 'rgba(222, 59, 64, 0.15)' : 'rgba(0, 189, 214, 0.18)'}` : undefined,
+        }}
+      >
         <TextInput
           ref={ref}
           {...input}

@@ -41,6 +41,8 @@ test('voucher discount, tax and the payment total use rounded monetary amounts',
   assert.equal(await useCartStore.getState().applyVoucher(' sale10 '), true)
   const cart = useCartStore.getState()
   assert.deepEqual(computeTotals(cart.items, cart.voucher.rate), { subtotal: 8.97, discount: 0.9, tax: 0.81, fees: 0, total: 8.88 })
+  // Phí ship cộng sau thuế, không chịu thuế (khớp server).
+  assert.deepEqual(computeTotals(cart.items, cart.voucher.rate, 5.99), { subtotal: 8.97, discount: 0.9, tax: 0.81, fees: 5.99, total: 14.87 })
   assert.equal(await useCartStore.getState().applyVoucher('unknown'), false)
   assert.equal(useCartStore.getState().voucher.code, 'SALE10')
 })
