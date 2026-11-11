@@ -16,7 +16,8 @@ const phone = z.string().trim().regex(/^\+?[0-9 .-]{8,20}$/, 'Số điện tho�
 const profileInput = z.object({
   fullName: z.string().trim().min(1, 'Vui lòng nhập họ tên').max(100).optional(),
   phone: phone.nullable().optional(),
-}).refine((value) => value.fullName !== undefined || value.phone !== undefined, 'Không có gì để cập nhật')
+  promoNotifications: z.boolean().optional(),
+}).refine((value) => Object.values(value).some((field) => field !== undefined), 'Không có gì để cập nhật')
 const addressInput = z.object({
   recipientName: z.string().trim().min(1, 'Vui lòng nhập tên người nhận').max(100),
   phone,
@@ -45,10 +46,11 @@ export function userRoutes(db: Db, accessSecret: string) {
 
   return app
     .patch('/users/me', validate('json', profileInput), async (c) => {
-      const { fullName, phone: newPhone } = c.req.valid('json')
+      const { fullName, phone: newPhone, promoNotifications } = c.req.valid('json')
       const [user] = await db.update(users).set({
         ...(fullName === undefined ? {} : { fullName }),
         ...(newPhone === undefined ? {} : { phone: newPhone }),
+        ...(promoNotifications === undefined ? {} : { promoNotifications }),
         updatedAt: new Date(),
       }).where(eq(users.id, c.var.auth.sub)).returning()
       if (!user) throw new AppError(401, 'UNAUTHORIZED', 'Tài khoản không còn tồn tại')

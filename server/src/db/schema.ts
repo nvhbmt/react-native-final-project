@@ -15,6 +15,8 @@ export const users = pgTable(
     fullName: text('full_name').notNull(),
     avatarUrl: text('avatar_url'),
     phone: text('phone'),
+    /** Đồng ý nhận thông báo khuyến mãi (mặc định tắt). */
+    promoNotifications: boolean('promo_notifications').notNull().default(false),
     role: userRole('role').notNull().default('customer'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -108,6 +110,14 @@ export type CheckoutItem = {
   options?: { color?: string; size?: string }
 }
 
+/** Bản chụp địa chỉ giao hàng lúc đặt đơn — sửa/xoá sổ địa chỉ sau đó không ảnh hưởng đơn cũ. */
+export type ShippingAddress = {
+  recipientName: string
+  phone: string
+  line1: string
+  city: string
+}
+
 export const orders = pgTable('orders', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
@@ -117,10 +127,25 @@ export const orders = pgTable('orders', {
   status: text('status').$type<'pending_payment' | 'completed' | 'cancelled'>().notNull(),
   paymentMode: text('payment_mode').$type<'demo' | 'verified'>().notNull(),
   items: jsonb('items').$type<CheckoutItem[]>().notNull(),
+  /** Null với các đơn tạo trước khi có bước chọn địa chỉ. */
+  shippingAddress: jsonb('shipping_address').$type<ShippingAddress>(),
   subtotalCents: integer('subtotal_cents').notNull(),
   discountCents: integer('discount_cents').notNull(),
   taxCents: integer('tax_cents').notNull(),
+  /** Hình thức giao (`standard` | `express` | `instant`); null với đơn tạo trước khi có phí ship. */
+  shippingMethod: text('shipping_method').$type<'standard' | 'express' | 'instant'>(),
+  /** Phí ship đã tính (sau FREESHIP); đơn cũ mặc định 0 nên tổng tiền không đổi. */
+  shippingCents: integer('shipping_cents').notNull().default(0),
   cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+  /**
+   * Tiến độ giao hàng, tách khỏi `status` (thanh toán). Chỉ có ý nghĩa khi `status = 'completed'`.
+   * processing → shipping → delivered.
+   */
+  fulfillment: text('fulfillment').$type<'processing' | 'shipping' | 'delivered'>().notNull().default('processing'),
+  shippedAt: timestamp('shipped_at', { withTimezone: true }),
+  deliveredAt: timestamp('delivered_at', { withTimezone: true }),
+  /** Người cập nhật bước giao hàng gần nhất (admin, hoặc chính khách khi bấm nút demo ở dev). */
+  fulfillmentUpdatedBy: uuid('fulfillment_updated_by').references(() => users.id, { onDelete: 'set null' }),
   /** Nội dung chuyển khoản SePay (vd. `DH7K2M9QXA`); null với đơn demo. */
   paymentCode: text('payment_code'),
   /** Số tiền phải chuyển (VND) — chốt lúc tạo đơn theo tỉ giá cấu hình. */
@@ -190,6 +215,8 @@ export const uploads = pgTable('uploads', {
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   purpose: uploadPurpose('purpose').notNull(),
   fileName: text('file_name').notNull(),
+  /** URL ảnh lúc upload (Supabase Storage: tuyệt đối). Null với bản ghi cũ → `/uploads/<fileName>` trên ổ đĩa. */
+  url: text('url'),
   mimeType: text('mime_type').notNull(),
   sizeBytes: integer('size_bytes').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),

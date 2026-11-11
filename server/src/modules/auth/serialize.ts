@@ -10,6 +10,7 @@ export type PublicUser = {
   fullName: string
   avatarUrl: string | null
   phone: string | null
+  promoNotifications: boolean
   role: UserRow['role']
   createdAt: string
 }
@@ -21,6 +22,7 @@ export function toPublicUser(user: UserRow): PublicUser {
     fullName: user.fullName,
     avatarUrl: user.avatarUrl,
     phone: user.phone,
+    promoNotifications: user.promoNotifications,
     role: user.role,
     createdAt: user.createdAt.toISOString(),
   }

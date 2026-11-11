@@ -18,6 +18,8 @@ export type SepayConfig = {
   /** Tiền tố mã thanh toán; phải trùng cấu hình "Cấu trúc mã thanh toán" trên SePay. */
   codePrefix: string
   ttlMinutes: number
+  /** Cấu hình giả để thử luồng ở máy dev (webhook gửi bằng `npm run sepay:simulate`); app hiện cảnh báo không chuyển tiền thật. */
+  simulated?: boolean
 }
 
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'

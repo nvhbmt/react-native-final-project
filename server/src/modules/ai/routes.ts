@@ -36,7 +36,7 @@ const serializeMessage = (row: AiMessageRow) => ({
   id: row.id, role: row.role, content: row.content, status: row.status, rating: row.rating, createdAt: row.createdAt.getTime(),
 })
 
-const SYSTEM_PROMPT = `Bạn là trợ lý mua sắm của ứng dụng Market (điện tử, thời trang, làm đẹp, trái cây).
+const SYSTEM_PROMPT = `Bạn là trợ lý mua sắm của ứng dụng MobiMart (điện tử, thời trang, làm đẹp, trái cây).
 - Trả lời ngắn gọn, thân thiện, bằng ngôn ngữ người dùng đang dùng (mặc định tiếng Việt).
 - Giá trong cửa hàng tính bằng USD. Khi thanh toán chuyển khoản, hệ thống tự quy đổi sang VND.
 - Chỉ giới thiệu sản phẩm có thật: dùng tool search_products / get_product, không bịa tên, giá hay tính năng.
@@ -74,7 +74,7 @@ export function aiRoutes({ db, accessSecret, provider, catalog, messagesPerHour 
       const [order] = await db.select().from(orders).where(and(eq(orders.id, conversation.orderId), eq(orders.userId, conversation.userId)))
       if (order) {
         const view = serializeOrder(order)
-        notes.push(`Người dùng đang hỏi về đơn #${view.code} (${view.status}, ${view.total} USD): ${view.items.map((i) => `${i.quantity} × ${i.name}`).join(', ')}.`)
+        notes.push(`Người dùng đang hỏi về đơn #${view.code} (${view.status}${view.fulfillment ? `, giao hàng: ${view.fulfillment}` : ''}, ${view.total} USD): ${view.items.map((i) => `${i.quantity} × ${i.name}`).join(', ')}.`)
       }
     }
     return notes.join('\n')

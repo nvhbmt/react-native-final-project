@@ -116,7 +116,7 @@ export function createCatalogService(repository: CatalogRepository) {
         ratingBreakdown: product.ratingBreakdown,
         variants: product.variants,
         sizeChart: product.sizeChart,
-        promoLabel: result.discountPercent ? `${result.discountPercent}% off` : null,
+        promoLabel: result.discountPercent ? `Giảm ${result.discountPercent}%` : null,
         sourceUrl: product.sourceUrl,
         priceSourceUrl: product.priceSourceUrl,
       }

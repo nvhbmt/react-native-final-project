@@ -1,0 +1,9 @@
+# Chỉ mở webhook SePay khi dùng ngrok để thử API local.
+# API key vẫn được server xác minh trước khi ghi nhận giao dịch.
+on_http_request:
+  - expressions:
+      - "req.url.path != '/api/v1/payments/webhook' || req.method != 'POST'"
+    actions:
+      - type: deny
+        config:
+          status_code: 404

@@ -1,0 +1,61 @@
+# Render Blueprint: triển khai API MobiMart (thư mục server/) — bản demo, gói miễn phí.
+# DB PostgreSQL và ảnh nằm trên Supabase; Render chỉ chạy server Node (Hono).
+# Tạo: Render Dashboard → New → Blueprint → chọn repo/nhánh. Render hỏi các biến `sync: false` một lần lúc tạo.
+# Gói free không có preDeployCommand nên migration chạy trong bước build (chỉ thêm cột, an toàn chạy lại).
+services:
+  - type: web
+    name: mobimart-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm ci && npm run migrate
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      # Bản demo: giữ thẻ demo + nút "(Demo) Chuyển sang" song song với SePay. Đặt false khi lên production thật.
+      - key: ALLOW_DEMO_CHECKOUT
+        value: "true"
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      # Chuỗi kết nối Supabase (Session pooler, cổng 5432) — cùng giá trị trong server/.env.supabase.local
+      - key: DATABASE_URL
+        sync: false
+      # Lưu ảnh: Supabase Storage
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      # Email: Gmail App Password
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      # Trợ lý AI (Claude)
+      - key: AI_PROVIDER
+        value: anthropic
+      - key: AI_MODEL
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      # SePay thật — để trống tới khi chốt SePay Live (để trống thì chỉ có thẻ demo)
+      - key: SEPAY_SIMULATED
+        value: "false"
+      # Phải trùng "Cấu trúc mã thanh toán" trên SePay
+      - key: SEPAY_CODE_PREFIX
+        value: MM
+      - key: SEPAY_WEBHOOK_API_KEY
+        sync: false
+      - key: SEPAY_BANK
+        sync: false
+      - key: SEPAY_ACCOUNT_NUMBER
+        sync: false
+      - key: SEPAY_ACCOUNT_NAME
+        sync: false
+      - key: USD_TO_VND_RATE
+        value: "25000"
