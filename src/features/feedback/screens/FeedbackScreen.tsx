@@ -7,12 +7,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Button } from '@/components/ui/Button'
 import { StarRating } from '@/components/ui/StarRating'
+import { useAuthStatus } from '@/features/auth'
+import { api, ApiError, uploadImage } from '@/lib/api'
 import { appColors, bodyFontFamily } from '@/theme/tamagui.config'
 
 import { ImageUploader } from '../components/ImageUploader'
 import { MoodPicker } from '../components/MoodPicker'
 import { TopicChips } from '../components/TopicChips'
-import { useFeedbackStore } from '../store/feedbackStore'
+import { buildFeedbackPayload } from '../lib/payload'
 import type { FeedbackInput } from '../types'
 
 const SHEET_TOP = 89
@@ -35,7 +37,9 @@ export function FeedbackScreen() {
     rating: Math.max(0, Math.min(5, Math.round(Number(params.rating) || 0))),
   })
   const update = (patch: Partial<FeedbackInput>) => setForm((f) => ({ ...f, ...patch }))
-  const submitFeedback = useFeedbackStore((state) => state.submitFeedback)
+  const auth = useAuthStatus()
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     Animated.spring(translateY, { toValue: 0, useNativeDriver: true, bounciness: 0, speed: 14 }).start()
@@ -49,10 +53,26 @@ export function FeedbackScreen() {
     Animated.timing(translateY, { toValue: height, duration: 200, useNativeDriver: true }).start(() => router.back())
   }
 
-  const submit = () => {
-    if (closingRef.current || !form.rating) return
-    submitFeedback({ ...form, productId: params.productId, orderId: params.orderId })
-    close()
+  const submit = async () => {
+    if (closingRef.current || sending || !form.rating) return
+    if (auth !== 'authenticated') {
+      router.push('/login')
+      return
+    }
+    setSending(true)
+    setError(null)
+    try {
+      const uploaded = []
+      for (const image of form.images) uploaded.push(await uploadImage(image, 'feedback'))
+      const payload = buildFeedbackPayload(form, uploaded.map(({ id }) => id), { productId: params.productId, orderId: params.orderId })
+      if (!payload) return
+      await api.post('/feedback', payload)
+      close()
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Không gửi được góp ý, vui lòng thử lại')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -123,7 +143,13 @@ export function FeedbackScreen() {
                 />
               </View>
 
-              <Button title="Submit" className="mt-7" onPress={submit} disabled={!form.rating} />
+              {error ? <Text role="alert" className="pt-4 text-[13px] leading-[20px] text-danger">{error}</Text> : null}
+              <Button
+                title={sending ? 'Đang gửi…' : auth === 'guest' ? 'Đăng nhập để gửi' : 'Submit'}
+                className="mt-7"
+                onPress={submit}
+                disabled={!form.rating || sending}
+              />
             </ScrollView>
           </View>
         </Animated.View>

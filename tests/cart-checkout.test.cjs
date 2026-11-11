@@ -2,13 +2,12 @@ const assert = require('node:assert/strict')
 const { beforeEach, test } = require('node:test')
 
 const { computeTotals, setCartRemote, useCartStore } = require('../src/features/cart/store/cartStore.ts')
-const { useFeedbackStore } = require('../src/features/feedback/store/feedbackStore.ts')
+const { buildFeedbackPayload } = require('../src/features/feedback/lib/payload.ts')
 
 const hoodie = { productId: 'hoodie-shirt', name: 'Hoodie shirt', subtitle: 'Blue · L', image: 1, price: 2.99, options: { color: 'blue', size: 'L' } }
 
 beforeEach(() => {
   useCartStore.getState().clear()
-  useFeedbackStore.setState({ entries: [] })
 })
 
 test('cart starts empty and combines matching variants while keeping sizes separate', () => {
@@ -79,21 +78,17 @@ test('clearing the cart resets its items and voucher', async () => {
   assert.equal(useCartStore.getState().voucher, null)
 })
 
-test('submitted feedback preserves product/order context and copies the form payload', () => {
-  const input = { mood: 'happy', topics: ['Delivery'], images: ['file:///photo.png'], comment: 'Good product', rating: 4, productId: 'hoodie-shirt', orderId: 'order-1' }
-  useFeedbackStore.getState().submitFeedback(input)
-  input.topics.push('Service')
-  input.images.length = 0
-  const entry = useFeedbackStore.getState().entries[0]
-  assert.equal(entry.productId, 'hoodie-shirt')
-  assert.equal(entry.orderId, 'order-1')
-  assert.deepEqual(entry.topics, ['Delivery'])
-  assert.deepEqual(entry.images, ['file:///photo.png'])
+test('feedback payload keeps product/order context and copies the form payload', () => {
+  const form = { mood: 'happy', topics: ['Delivery', 'Delivery'], comment: ' Good product ', rating: 4 }
+  const ids = ['upload-1']
+  const payload = buildFeedbackPayload(form, ids, { productId: 'hoodie-shirt', orderId: 'order-1' })
+  ids.push('upload-2')
+  assert.deepEqual(payload, { mood: 'happy', topics: ['Delivery'], comment: 'Good product', imageIds: ['upload-1'], rating: 4, productId: 'hoodie-shirt', orderId: 'order-1' })
+  assert.equal('orderId' in buildFeedbackPayload(form, [], { orderId: '' }), false)
 })
 
 test('feedback requires a rating from one to five', () => {
   for (const rating of [0, 6, NaN, 2.5]) {
-    useFeedbackStore.getState().submitFeedback({ mood: null, topics: [], images: [], comment: '', rating })
+    assert.equal(buildFeedbackPayload({ mood: null, topics: [], comment: '', rating }, []), null)
   }
-  assert.deepEqual(useFeedbackStore.getState().entries, [])
 })

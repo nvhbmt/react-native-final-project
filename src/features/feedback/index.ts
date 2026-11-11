@@ -1,3 +1,3 @@
 export { FeedbackScreen } from './screens/FeedbackScreen'
-export { useFeedbackStore } from './store/feedbackStore'
-export type { FeedbackInput } from './types'
+export { buildFeedbackPayload } from './lib/payload'
+export type { FeedbackInput, FeedbackPayload } from './types'
