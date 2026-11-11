@@ -17,13 +17,14 @@ import { uploadFileRoutes, uploadRoutes } from '@/modules/uploads/routes.ts'
 import { userRoutes } from '@/modules/users/routes.ts'
 import { inboxRoutes } from '@/modules/inbox/routes.ts'
 import { feedbackRoutes } from '@/modules/feedback/routes.ts'
+import { aiRoutes } from '@/modules/ai/routes.ts'
+import type { ChatProvider } from '@/modules/ai/provider.ts'
 import { authRoutes } from '@/modules/auth/routes.ts'
 import type { AuthRepository } from '@/modules/auth/repository.ts'
 import { createAuthService } from '@/modules/auth/service.ts'
 import { catalogRoutes } from '@/modules/catalog/routes.ts'
 import type { CatalogService } from '@/modules/catalog/service.ts'
 import { orderRoutes } from '@/modules/orders/routes.ts'
-import { PLANNED_ENDPOINTS, plannedRoutes } from '@/modules/planned.ts'
 import { reviewRoutes } from '@/modules/reviews/routes.ts'
 
 export type AppDeps = {
@@ -31,6 +32,9 @@ export type AppDeps = {
   /** Gửi email (mã đặt lại mật khẩu). Mặc định in ra console. */
   mailer?: Mailer
   catalog?: CatalogService
+  /** Model cho trợ lý AI; bỏ trống thì /ai/* vẫn chạy nhưng gửi tin trả 503 AI_UNAVAILABLE. */
+  ai?: ChatProvider
+  aiMessagesPerHour?: number
   commerce?: {
     db: Db
     allowDemoCheckout: boolean
@@ -86,8 +90,7 @@ export function buildApp(deps: AppDeps) {
   })
 
   const api = new Hono()
-  api.get('/', (c) => ok(c, { name: 'market-api', version: 'v1', planned: PLANNED_ENDPOINTS }))
-  // Thứ tự quan trọng: router đã triển khai mount trước router placeholder.
+  api.get('/', (c) => ok(c, { name: 'market-api', version: 'v1' }))
   api.route('/auth', authRoutes(authService, { accessSecret: deps.accessSecret, rateLimitMax: deps.authRateLimitMax }))
   if (deps.catalog) api.route('/', catalogRoutes(deps.catalog))
   const uploadDir = deps.commerce?.uploadDir ?? 'uploads'
@@ -100,9 +103,9 @@ export function buildApp(deps: AppDeps) {
     api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, { allowDemo: deps.commerce.allowDemoCheckout, sepay: deps.commerce.sepay }))
     if (deps.commerce.sepay) api.route('/', paymentWebhookRoutes(deps.commerce.db, deps.commerce.sepay))
+    api.route('/', aiRoutes({ db: deps.commerce.db, accessSecret: deps.accessSecret, provider: deps.ai, catalog: deps.catalog, messagesPerHour: deps.aiMessagesPerHour }))
     api.route('/', reviewRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
   }
-  api.route('/', plannedRoutes(deps.accessSecret))
 
   app.route('/api/v1', api)
   if (deps.commerce) app.route('/uploads', uploadFileRoutes(uploadDir))

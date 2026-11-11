@@ -8,6 +8,7 @@ import { loadEnv, sepayConfig } from './env.ts'
 import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
 import { createCatalogRepository } from '@/modules/catalog/repository.ts'
 import { createCatalogService } from '@/modules/catalog/service.ts'
+import { createOpenAiCompatibleProvider } from '@/modules/ai/provider.ts'
 
 const env = loadEnv()
 const { db, close } = createDb(env.DATABASE_URL)
@@ -16,6 +17,9 @@ const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
   mailer: env.SMTP_URL ? createSmtpMailer(env.SMTP_URL, env.MAIL_FROM) : consoleMailer,
   catalog: createCatalogService(createCatalogRepository(db)),
+  ai: env.AI_BASE_URL && env.AI_API_KEY && env.AI_MODEL
+    ? createOpenAiCompatibleProvider({ baseUrl: env.AI_BASE_URL, apiKey: env.AI_API_KEY, model: env.AI_MODEL })
+    : undefined,
   commerce: { db, allowDemoCheckout: env.NODE_ENV !== 'production', uploadDir: env.UPLOAD_DIR, sepay: sepayConfig(env) },
   accessSecret: env.JWT_ACCESS_SECRET,
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,

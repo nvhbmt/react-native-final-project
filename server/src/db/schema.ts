@@ -288,3 +288,32 @@ export const passwordResets = pgTable('password_resets', {
 }, (table) => [index('password_resets_user_idx').on(table.userId, table.createdAt)])
 
 export type PasswordResetRow = typeof passwordResets.$inferSelect
+
+/** Hội thoại với trợ lý mua sắm AI; có thể gắn sản phẩm/đơn hàng làm ngữ cảnh. */
+export const aiConversations = pgTable('ai_conversations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  productId: text('product_id').references(() => catalogProducts.id, { onDelete: 'set null' }),
+  orderId: uuid('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [index('ai_conversations_user_updated_idx').on(table.userId, table.updatedAt)])
+
+export const aiMessages = pgTable('ai_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  conversationId: uuid('conversation_id').notNull().references(() => aiConversations.id, { onDelete: 'cascade' }),
+  role: text('role').$type<'user' | 'assistant'>().notNull(),
+  content: text('content').notNull(),
+  /** streaming → complete | stopped (người dùng dừng) | error */
+  status: text('status').$type<'streaming' | 'complete' | 'stopped' | 'error'>().notNull(),
+  /** 1 = hữu ích, -1 = không hữu ích (chỉ cho tin của trợ lý). */
+  rating: integer('rating'),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  index('ai_messages_conversation_created_idx').on(table.conversationId, table.createdAt, table.id),
+  check('ai_messages_rating_valid', sql`${table.rating} IN (-1, 1)`),
+])
+
+export type AiConversationRow = typeof aiConversations.$inferSelect
+export type AiMessageRow = typeof aiMessages.$inferSelect
