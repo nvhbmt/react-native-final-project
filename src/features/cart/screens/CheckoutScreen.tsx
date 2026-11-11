@@ -15,6 +15,7 @@ import { useCartStore } from '../store/cartStore'
 
 export function CheckoutScreen() {
   const items = useCartStore((s) => s.items)
+  const syncError = useCartStore((s) => s.syncError)
   const { subtotal, discount } = useCartTotals()
 
   return (
@@ -34,6 +35,7 @@ export function CheckoutScreen() {
         ))}
       </View>
 
+      {syncError ? <Text role="alert" className="pt-3 text-[13px] leading-[20px] text-danger">{syncError}</Text> : null}
       <View className="pt-[18px]">
         <VoucherField />
       </View>

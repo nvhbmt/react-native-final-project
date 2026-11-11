@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict')
 const { beforeEach, test } = require('node:test')
 
-const { computeTotals, useCartStore } = require('../src/features/cart/store/cartStore.ts')
+const { computeTotals, setCartRemote, useCartStore } = require('../src/features/cart/store/cartStore.ts')
 const { useFeedbackStore } = require('../src/features/feedback/store/feedbackStore.ts')
 
 const hoodie = { productId: 'hoodie-shirt', name: 'Hoodie shirt', subtitle: 'Blue · L', image: 1, price: 2.99, options: { color: 'blue', size: 'L' } }
@@ -37,18 +37,42 @@ test('invalid quantities cannot produce fractional or negative cart counts', () 
   assert.equal(useCartStore.getState().items[0].quantity, 1)
 })
 
-test('voucher discount, tax and the payment total use rounded monetary amounts', () => {
+test('voucher discount, tax and the payment total use rounded monetary amounts', async () => {
   useCartStore.getState().addItem({ ...hoodie, quantity: 3 })
-  assert.equal(useCartStore.getState().applyVoucher(' sale10 '), true)
+  assert.equal(await useCartStore.getState().applyVoucher(' sale10 '), true)
   const cart = useCartStore.getState()
   assert.deepEqual(computeTotals(cart.items, cart.voucher.rate), { subtotal: 8.97, discount: 0.9, tax: 0.81, fees: 0, total: 8.88 })
-  assert.equal(useCartStore.getState().applyVoucher('unknown'), false)
+  assert.equal(await useCartStore.getState().applyVoucher('unknown'), false)
   assert.equal(useCartStore.getState().voucher.code, 'SALE10')
 })
 
-test('clearing the cart resets its items and voucher', () => {
+test('signed-in carts apply local changes immediately and then adopt the server cart', async () => {
+  const sent = []
+  const server = { items: [{ ...hoodie, key: 'hoodie-shirt:blue:L', price: 3.5, quantity: 5 }], voucher: { code: 'SALE10', rate: 0.1 } }
+  setCartRemote({
+    add: async (line) => { sent.push(['add', line.quantity]); return server },
+    setQuantity: async () => server,
+    remove: async () => server,
+    applyVoucher: async (code) => { if (code !== 'SALE10') throw new Error('bad'); return server },
+    clear: async () => ({ items: [], voucher: null }),
+  })
+  try {
+    useCartStore.getState().addItem({ ...hoodie, quantity: 2 })
+    assert.equal(useCartStore.getState().items[0].quantity, 2)
+    await new Promise((resolve) => setImmediate(resolve))
+    assert.deepEqual(sent, [['add', 2]])
+    assert.equal(useCartStore.getState().items[0].quantity, 5)
+    assert.equal(useCartStore.getState().items[0].price, 3.5)
+    assert.equal(await useCartStore.getState().applyVoucher('nope'), false)
+    assert.equal(await useCartStore.getState().applyVoucher('sale10'), true)
+  } finally {
+    setCartRemote(null)
+  }
+})
+
+test('clearing the cart resets its items and voucher', async () => {
   useCartStore.getState().addItem({ ...hoodie, quantity: 2 })
-  useCartStore.getState().applyVoucher('SALE10')
+  await useCartStore.getState().applyVoucher('SALE10')
   const cart = useCartStore.getState()
   cart.clear()
   assert.equal(useCartStore.getState().items.length, 0)
