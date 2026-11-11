@@ -7,6 +7,8 @@ import { secureHeaders } from 'hono/secure-headers'
 import { bodyLimit } from 'hono/body-limit'
 
 import type { Db } from '@/db/client.ts'
+import type { SepayConfig } from '@/modules/payments/sepay.ts'
+import { paymentWebhookRoutes } from '@/modules/payments/routes.ts'
 import { AppError, fail, ok } from '@/lib/http.ts'
 import { cartRoutes } from '@/modules/cart/routes.ts'
 import { favoriteRoutes } from '@/modules/favorites/routes.ts'
@@ -31,6 +33,8 @@ export type AppDeps = {
     allowDemoCheckout: boolean
     /** Thư mục lưu ảnh upload. Mặc định `./uploads`. */
     uploadDir?: string
+    /** Bật thanh toán chuyển khoản qua SePay khi có cấu hình. */
+    sepay?: SepayConfig
   }
   accessSecret: string
   accessTtlSeconds: number
@@ -90,7 +94,8 @@ export function buildApp(deps: AppDeps) {
     api.route('/', feedbackRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', cartRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
-    api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
+    api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, { allowDemo: deps.commerce.allowDemoCheckout, sepay: deps.commerce.sepay }))
+    if (deps.commerce.sepay) api.route('/', paymentWebhookRoutes(deps.commerce.db, deps.commerce.sepay))
     api.route('/', reviewRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
   }
   api.route('/', plannedRoutes(deps.accessSecret))

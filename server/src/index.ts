@@ -3,7 +3,7 @@ import { sql } from 'drizzle-orm'
 
 import { buildApp } from './app.ts'
 import { createDb } from '@/db/client.ts'
-import { loadEnv } from './env.ts'
+import { loadEnv, sepayConfig } from './env.ts'
 import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
 import { createCatalogRepository } from '@/modules/catalog/repository.ts'
 import { createCatalogService } from '@/modules/catalog/service.ts'
@@ -14,7 +14,7 @@ const { db, close } = createDb(env.DATABASE_URL)
 const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
   catalog: createCatalogService(createCatalogRepository(db)),
-  commerce: { db, allowDemoCheckout: env.NODE_ENV !== 'production', uploadDir: env.UPLOAD_DIR },
+  commerce: { db, allowDemoCheckout: env.NODE_ENV !== 'production', uploadDir: env.UPLOAD_DIR, sepay: sepayConfig(env) },
   accessSecret: env.JWT_ACCESS_SECRET,
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,
   refreshTtlSeconds: env.REFRESH_TOKEN_TTL,

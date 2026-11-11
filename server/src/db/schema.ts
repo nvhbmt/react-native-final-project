@@ -114,17 +114,24 @@ export const orders = pgTable('orders', {
   requestId: text('request_id').notNull(),
   requestHash: text('request_hash').notNull(),
   paymentMethod: text('payment_method').notNull(),
-  status: text('status').$type<'completed' | 'cancelled'>().notNull(),
+  status: text('status').$type<'pending_payment' | 'completed' | 'cancelled'>().notNull(),
   paymentMode: text('payment_mode').$type<'demo' | 'verified'>().notNull(),
   items: jsonb('items').$type<CheckoutItem[]>().notNull(),
   subtotalCents: integer('subtotal_cents').notNull(),
   discountCents: integer('discount_cents').notNull(),
   taxCents: integer('tax_cents').notNull(),
   cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+  /** Nội dung chuyển khoản SePay (vd. `DH7K2M9QXA`); null với đơn demo. */
+  paymentCode: text('payment_code'),
+  /** Số tiền phải chuyển (VND) — chốt lúc tạo đơn theo tỉ giá cấu hình. */
+  amountVnd: integer('amount_vnd'),
+  paymentExpiresAt: timestamp('payment_expires_at', { withTimezone: true }),
+  paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
 }, (table) => [
   uniqueIndex('orders_user_request_idx').on(table.userId, table.requestId),
   index('orders_user_created_idx').on(table.userId, table.createdAt),
+  uniqueIndex('orders_payment_code_idx').on(table.paymentCode),
 ])
 
 export type OrderRow = typeof orders.$inferSelect
@@ -247,4 +254,24 @@ export const feedback = pgTable('feedback', {
 }, (table) => [
   index('feedback_user_created_idx').on(table.userId, table.createdAt),
   check('feedback_rating_valid', sql`${table.rating} BETWEEN 1 AND 5`),
+])
+
+/**
+ * Giao dịch ngân hàng nhận từ webhook SePay. `provider_txn_id` unique → webhook gửi lại không bị xử lý hai lần.
+ * `result`: matched (đã ghi nhận cho đơn), underpaid (thiếu tiền), late (đơn đã trả/huỷ — cần hoàn tiền tay), unmatched.
+ */
+export const paymentTransactions = pgTable('payment_transactions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  provider: text('provider').$type<'sepay'>().notNull(),
+  providerTxnId: text('provider_txn_id').notNull(),
+  orderId: uuid('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  amountVnd: integer('amount_vnd').notNull(),
+  content: text('content').notNull(),
+  referenceCode: text('reference_code'),
+  result: text('result').$type<'matched' | 'underpaid' | 'late' | 'unmatched'>().notNull(),
+  raw: jsonb('raw').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('payment_transactions_provider_txn_idx').on(table.provider, table.providerTxnId),
+  index('payment_transactions_order_idx').on(table.orderId),
 ])
