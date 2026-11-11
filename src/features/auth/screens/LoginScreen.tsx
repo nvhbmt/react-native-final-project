@@ -1,4 +1,5 @@
-import { View } from '@tamagui/tailwind'
+import { Text, View } from '@tamagui/tailwind'
+import { router } from 'expo-router'
 import { useRef, useState } from 'react'
 import type { TextInputInstance } from 'react-native'
 
@@ -66,6 +67,13 @@ export function LoginScreen() {
           onSubmitEditing={onSubmit}
         />
       </View>
+      <Text
+        role="link"
+        onPress={() => router.replace({ pathname: '/forgot-password', params: { email: email.trim() } })}
+        className="self-end text-[14px] leading-[22px] font-bold text-primary"
+      >
+        Quên mật khẩu?
+      </Text>
       <SubmitButton title="Log in" loading={form.submitting} onPress={onSubmit} />
       <AuthSwitchLink prompt="Chưa có tài khoản?" action="Sign up" href="/register" />
     </AuthScreenFrame>

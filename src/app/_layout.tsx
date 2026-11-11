@@ -33,6 +33,7 @@ export default function RootLayout() {
         <Stack.Screen name="checkout/success" />
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />
+        <Stack.Screen name="forgot-password" />
         <Stack.Screen name="change-password" />
         <Stack.Screen name="profile" />
         <Stack.Screen name="addresses" />
