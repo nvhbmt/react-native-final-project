@@ -138,6 +138,40 @@ jobs:
           # Giữ 3 bản web gần nhất để quay về nhanh
           ssh vps "cd $APP_DIR/site && ls -1dt */ | grep -v '^current' | tail -n +4 | xargs -r rm -rf"
 
+      # API key quản lý trên GitHub (Settings → Secrets and variables → Actions) được ghi vào api.env trên VPS.
+      # Secret/biến để trống thì bỏ qua — giá trị đang có trên VPS được giữ nguyên.
+      - name: Đồng bộ biến môi trường API từ GitHub
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_BASE_URL: ${{ vars.AI_BASE_URL }}
+          SEPAY_WEBHOOK_API_KEY: ${{ secrets.SEPAY_WEBHOOK_API_KEY }}
+          SEPAY_BANK: ${{ vars.SEPAY_BANK }}
+          SEPAY_ACCOUNT_NUMBER: ${{ vars.SEPAY_ACCOUNT_NUMBER }}
+          SEPAY_ACCOUNT_NAME: ${{ vars.SEPAY_ACCOUNT_NAME }}
+        run: |
+          : > api-env.update
+          for name in SMTP_USER SMTP_PASS MAIL_FROM AI_API_KEY AI_MODEL AI_PROVIDER AI_BASE_URL \
+                      SEPAY_WEBHOOK_API_KEY SEPAY_BANK SEPAY_ACCOUNT_NUMBER SEPAY_ACCOUNT_NAME; do
+            value="${!name}"
+            [ -z "$value" ] && continue
+            case "$value" in *$'\n'*) echo "::error::$name có xuống dòng"; exit 1 ;; esac
+            # docker compose diễn giải ký tự $ trong env_file
+            case "$value" in *'$'*) echo "::error::$name chứa ký tự \$ — docker compose sẽ hiểu sai"; exit 1 ;; esac
+            printf '%s=%s\n' "$name" "$value" >> api-env.update
+          done
+          if [ -s api-env.update ]; then
+            scp deploy/vps/merge-env.sh vps:/tmp/mobimart-merge-env.sh
+            ssh vps "bash /tmp/mobimart-merge-env.sh $APP_DIR/api.env" < api-env.update
+          else
+            echo "Không có biến nào trên GitHub cần đồng bộ"
+          fi
+          rm -f api-env.update
+
       # Container API chạy migration rồi mới nhận request (CMD trong server/Dockerfile).
       - name: Khởi động lại stack
         run: |
