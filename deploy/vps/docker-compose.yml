@@ -1,0 +1,66 @@
+# Stack MobiMart trên VPS: Postgres + API (server/) + Caddy (HTTPS, phục vụ bản web của app).
+# Thư mục trên VPS: /opt/mobimart (xem deploy/vps/README.md). Image API do GitHub Actions build rồi
+# nạp sẵn (`docker load`), nên VPS không phải build — máy chỉ có 1 CPU / 1GB RAM.
+name: mobimart
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mobimart
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?thiếu POSTGRES_PASSWORD trong .env}
+      POSTGRES_DB: mobimart
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mobimart -d mobimart']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # Không mở cổng ra ngoài: chỉ API trong mạng nội bộ của compose truy cập được.
+
+  api:
+    image: mobimart-api:${API_TAG:-latest}
+    restart: unless-stopped
+    env_file: api.env
+    environment:
+      NODE_ENV: production
+      PORT: '4000'
+      DATABASE_URL: postgres://mobimart:${POSTGRES_PASSWORD}@db:5432/mobimart
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:4000/healthz >/dev/null || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?thiếu SITE_ADDRESS trong .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Bản web: site/<commit>/, symlink site/current trỏ bản đang chạy (đổi symlink = đổi bản, không cần restart)
+      - ./site:/srv/site:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+
+volumes:
+  db-data:
+  uploads:
+  caddy-data:
+  caddy-config:
