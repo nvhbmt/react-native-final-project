@@ -40,6 +40,8 @@ export type AppDeps = {
   commerce?: {
     db: Db
     allowDemoCheckout: boolean
+    /** Nhận thẻ demo (không thu tiền) khi đặt hàng. Chỉ test tự động bật; app chạy thật luôn tắt. */
+    demoCards?: boolean
     /** Thư mục lưu ảnh upload trên ổ đĩa (và phục vụ ảnh cũ ở `/uploads`). Mặc định `./uploads`. */
     uploadDir?: string
     /** Nơi lưu ảnh mới; mặc định ổ đĩa `uploadDir`. Production dùng Supabase Storage. */
@@ -105,7 +107,7 @@ export function buildApp(deps: AppDeps) {
     api.route('/', feedbackRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', cartRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
-    api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, { allowDemo: deps.commerce.allowDemoCheckout, sepay: deps.commerce.sepay }))
+    api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, { allowDemo: deps.commerce.allowDemoCheckout, demoCards: deps.commerce.demoCards, sepay: deps.commerce.sepay }))
     if (deps.commerce.sepay) api.route('/', paymentWebhookRoutes(deps.commerce.db, deps.commerce.sepay))
     api.route('/', adminRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.sepay))
     api.route('/', aiRoutes({ db: deps.commerce.db, accessSecret: deps.accessSecret, provider: deps.ai, catalog: deps.catalog, messagesPerHour: deps.aiMessagesPerHour }))

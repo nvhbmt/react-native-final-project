@@ -5,6 +5,10 @@ export const TEST_SECRET = 'test-secret-that-is-at-least-32-characters-long'
 
 export function createTestApp(overrides: Partial<AppDeps> = {}) {
   const memory = createMemoryAuthRepository()
+  // Test tự động tạo đơn nhanh bằng thẻ demo khi bật chế độ demo (app thật không có thẻ demo).
+  if (overrides.commerce && overrides.commerce.demoCards === undefined) {
+    overrides = { ...overrides, commerce: { ...overrides.commerce, demoCards: overrides.commerce.allowDemoCheckout } }
+  }
   const app = buildApp({
     authRepository: memory.repo,
     accessSecret: TEST_SECRET,

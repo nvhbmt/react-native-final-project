@@ -17,7 +17,7 @@ import {
 import { notify } from '@/modules/inbox/notify.ts'
 import { createPaymentCode, qrImageUrl, toVnd, type SepayConfig } from '@/modules/payments/sepay.ts'
 
-/** Thẻ demo (chỉ dev/test, không thu tiền). */
+/** Thẻ demo không thu tiền — chỉ test tự động dùng (`demoCards`); app không còn hiển thị. Giữ để hiển thị đơn cũ. */
 export const DEMO_METHODS = {
   pm_visa: { id: 'pm_visa', brand: 'visa', label: '2334', kind: 'demo_card' },
   pm_master: { id: 'pm_master', brand: 'mastercard', label: '3774', kind: 'demo_card' },
@@ -109,10 +109,16 @@ export function serializeOrder(order: OrderRow, sepay?: SepayConfig, allowDemo =
   }
 }
 
-export type OrderOptions = { allowDemo: boolean; sepay?: SepayConfig }
+export type OrderOptions = {
+  /** Chế độ demo: nút chuyển bước giao hàng. */
+  allowDemo: boolean
+  /** Nhận thanh toán bằng thẻ demo (không thu tiền). Chỉ bật trong test tự động. */
+  demoCards?: boolean
+  sepay?: SepayConfig
+}
 
 export function orderRoutes(db: Db, accessSecret: string, options: OrderOptions) {
-  const { allowDemo, sepay } = options
+  const { allowDemo, sepay, demoCards = false } = options
   const serialize = (order: OrderRow) => serializeOrder(order, sepay, allowDemo)
   const app = new Hono<{ Variables: AuthVariables }>()
   app.use('/orders', requireAuth(accessSecret))
@@ -133,10 +139,10 @@ export function orderRoutes(db: Db, accessSecret: string, options: OrderOptions)
   }
 
   return app
-    /** Phương thức thanh toán khả dụng: SePay khi đã cấu hình, thẻ demo khi chạy dev/test. */
+    /** Phương thức thanh toán khả dụng: chỉ phương thức thu tiền thật (SePay khi đã cấu hình). */
     .get('/payment-methods', (c) => ok(c, [
       ...(sepay ? [SEPAY_METHOD] : []),
-      ...(allowDemo ? Object.values(DEMO_METHODS) : []),
+      ...(demoCards ? Object.values(DEMO_METHODS) : []),
     ]))
     /** Hình thức giao khả dụng cho một nhóm sản phẩm, kèm phí gốc (chưa áp FREESHIP). */
     .get('/shipping-methods', validate('query', shippingQuery), async (c) => {
@@ -147,7 +153,7 @@ export function orderRoutes(db: Db, accessSecret: string, options: OrderOptions)
       const userId = c.var.auth.sub
       const input = c.req.valid('json')
       const viaSepay = input.paymentMethod === 'sepay'
-      if (viaSepay ? !sepay : !allowDemo) throw new AppError(503, 'CHECKOUT_UNAVAILABLE', 'Phương thức thanh toán này hiện không khả dụng')
+      if (viaSepay ? !sepay : !demoCards) throw new AppError(503, 'CHECKOUT_UNAVAILABLE', 'Phương thức thanh toán này hiện không khả dụng')
 
       const requestHash = createHash('sha256').update(JSON.stringify(input)).digest('hex')
       const lookup = and(eq(orders.userId, userId), eq(orders.requestId, input.requestId))

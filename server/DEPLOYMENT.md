@@ -35,7 +35,7 @@ start `npm start`, health check `/healthz`. Render cấp URL cố định `https
 
 Lưu ý gói Free: service **ngủ sau 15 phút** không có request, request đầu tiên mất khoảng 30–60 giây — mở `/healthz` vài phút
 trước buổi demo. Webhook SePay rơi vào lúc service đang ngủ sẽ được SePay gửi lại. `ALLOW_DEMO_CHECKOUT=true` trong
-Blueprint giữ thẻ demo và nút "(Demo) Chuyển sang" cho bản demo; đặt `false` khi lên production thật.
+Blueprint giữ nút "(Demo) Chuyển sang" cho bản demo (thẻ demo đã bỏ: chỉ thanh toán qua SePay); đặt `false` khi lên production thật.
 
 **Ảnh:** dùng Supabase Storage (`SUPABASE_URL` + `SUPABASE_SECRET_KEY`, xem `README.md` mục "Lưu ảnh"), không cần volume.
 Storage dùng Secret key qua header `apikey`, không phụ thuộc Data API (vẫn có thể tắt Data API).

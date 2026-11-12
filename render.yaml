@@ -18,7 +18,8 @@ services:
         value: production
       - key: NODE_VERSION
         value: "22"
-      # Bản demo: giữ thẻ demo + nút "(Demo) Chuyển sang" song song với SePay. Đặt false khi lên production thật.
+      # Bản demo: nút "(Demo) Chuyển sang" bước giao hàng và cho đánh giá đơn demo cũ. Đặt false khi lên production thật.
+      # (Thẻ demo đã bỏ — chỉ thanh toán qua SePay.)
       - key: ALLOW_DEMO_CHECKOUT
         value: "true"
       - key: JWT_ACCESS_SECRET
@@ -43,7 +44,7 @@ services:
         sync: false
       - key: AI_API_KEY
         sync: false
-      # SePay thật — để trống tới khi chốt SePay Live (để trống thì chỉ có thẻ demo)
+      # SePay thật — để trống thì app KHÔNG có phương thức thanh toán nào (thẻ demo đã bỏ)
       - key: SEPAY_SIMULATED
         value: "false"
       # Phải trùng "Cấu trúc mã thanh toán" trên SePay
