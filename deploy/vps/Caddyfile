@@ -1,5 +1,6 @@
-# Caddy tự xin chứng chỉ HTTPS (Let's Encrypt) cho SITE_ADDRESS, vd. 103-82-193-74.sslip.io
-# (sslip.io trỏ tên miền về đúng IP nên không cần mua domain). Có domain riêng thì đổi SITE_ADDRESS trong .env.
+# Caddy tự xin chứng chỉ HTTPS (Let's Encrypt) cho từng tên trong SITE_ADDRESS,
+# vd. "mobimart.cunpoi.tech, 103-82-193-74.sslip.io"
+# (sslip.io trỏ về đúng IP nên dùng được khi chưa có domain). Đổi tên: sửa SITE_ADDRESS trong /opt/mobimart/.env.
 {$SITE_ADDRESS} {
 	encode zstd gzip
 

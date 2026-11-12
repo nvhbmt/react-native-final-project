@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Chuẩn bị VPS Ubuntu lần đầu (chạy lại an toàn): swap, Docker, tường lửa, thư mục /opt/mobimart, file .env.
-# Chạy với quyền root:  bash setup.sh <SITE_ADDRESS>   vd. bash setup.sh 103-82-193-74.sslip.io
+# Chạy với quyền root:  bash setup.sh <SITE_ADDRESS>   vd. bash setup.sh mobimart.cunpoi.tech
+# (Nhiều tên: "a.example.com, b.example.com" — Caddy xin chứng chỉ cho từng tên.)
 set -euo pipefail
-SITE_ADDRESS="${1:?Cần SITE_ADDRESS, vd. 103-82-193-74.sslip.io}"
+SITE_ADDRESS="${1:?Cần SITE_ADDRESS, vd. mobimart.cunpoi.tech}"
 APP_DIR=/opt/mobimart
 
 # 1. Swap 2GB — máy 1GB RAM dễ hết bộ nhớ khi Postgres + Node cùng chạy
@@ -25,12 +26,14 @@ if command -v ufw >/dev/null; then
   ufw --force enable >/dev/null
 fi
 
+CORS_ORIGINS=$(echo "$SITE_ADDRESS" | tr -d ' ' | sed 's#^#https://#; s#,#,https://#g')
+
 # 4. Thư mục ứng dụng + bí mật sinh ngay trên VPS (không bao giờ nằm trong git)
 mkdir -p "$APP_DIR/web"
 cd "$APP_DIR"
 if [ ! -f .env ]; then
   cat > .env <<ENV
-SITE_ADDRESS=$SITE_ADDRESS
+SITE_ADDRESS="$SITE_ADDRESS"
 POSTGRES_PASSWORD=$(openssl rand -hex 24)
 ENV
 fi
@@ -38,7 +41,7 @@ if [ ! -f api.env ]; then
   cat > api.env <<ENV
 # Biến cho API — sửa xong chạy: cd $APP_DIR && docker compose up -d api
 JWT_ACCESS_SECRET=$(openssl rand -base64 48 | tr -d '\n')
-CORS_ORIGINS=https://$SITE_ADDRESS
+CORS_ORIGINS=$CORS_ORIGINS
 # Bản demo: nút "(Demo) Chuyển sang" bước giao hàng. Đặt false khi lên production thật.
 ALLOW_DEMO_CHECKOUT=true
 SEPAY_SIMULATED=false

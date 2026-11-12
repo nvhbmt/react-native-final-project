@@ -39,10 +39,23 @@ Settings → Secrets and variables → Actions:
 | Secret | `VPS_HOST` | IP VPS |
 | Secret | `VPS_SSH_KEY` | Private key SSH (ed25519) có trong `~root/.ssh/authorized_keys` của VPS |
 | Secret | `VPS_KNOWN_HOSTS` | Kết quả `ssh-keyscan -H <IP>` (chống giả mạo máy chủ) |
-| Variable | `SITE_ADDRESS` | Tên miền trỏ về VPS, vd. `103-82-193-74.sslip.io` (sslip.io không cần mua domain) |
+| Variable | `SITE_ADDRESS` | Tên miền chính của app: `mobimart.cunpoi.tech` (dự phòng: `103-82-193-74.sslip.io`) |
 
-Đổi sang domain riêng: trỏ bản ghi A về IP VPS → đổi variable `SITE_ADDRESS` → sửa `SITE_ADDRESS` trong
-`/opt/mobimart/.env` và `CORS_ORIGINS` trong `api.env` → chạy lại workflow.
+## Tên miền
+
+Đang dùng **`mobimart.cunpoi.tech`** (DNS của `cunpoi.tech` ở Cloudflare). Bản ghi cần có:
+
+| Type | Name | Content | Proxy status |
+| --- | --- | --- | --- |
+| A | `mobimart` | `103.82.193.74` | **DNS only** (mây xám) |
+
+Để **DNS only**: Caddy tự xin chứng chỉ Let's Encrypt qua HTTP-01, và câu trả lời AI stream SSE không bị
+Cloudflare gom bộ đệm. Bật proxy (mây cam) thì phải đặt SSL/TLS = Full (strict) và tắt "Always Use HTTPS"
+cho subdomain này, nếu không Caddy không xin được chứng chỉ.
+
+Caddy phục vụ cả hai tên (`SITE_ADDRESS="mobimart.cunpoi.tech, 103-82-193-74.sslip.io"` trong
+`/opt/mobimart/.env`, `CORS_ORIGINS` tương ứng trong `api.env`), nên tên sslip.io vẫn chạy khi đổi DNS.
+Variable `SITE_ADDRESS` trên GitHub chỉ ghi **một** tên — tên mà bản web và app gọi API tới.
 
 ## Bật SePay / email / AI trên VPS
 
@@ -52,7 +65,7 @@ nano /opt/mobimart/api.env          # điền SEPAY_*, SMTP_USER/SMTP_PASS, AI_M
 cd /opt/mobimart && docker compose up -d api
 ```
 
-Webhook SePay: `https://<SITE_ADDRESS>/api/v1/payments/webhook`, chứng thực **API Key** = `SEPAY_WEBHOOK_API_KEY`.
+Webhook SePay: `https://mobimart.cunpoi.tech/api/v1/payments/webhook`, chứng thực **API Key** = `SEPAY_WEBHOOK_API_KEY`.
 Thẻ demo đã bỏ, nên **chưa điền SePay thì app không đặt hàng được**.
 
 ## Vận hành
@@ -68,4 +81,4 @@ docker compose exec -T db pg_dump -U mobimart mobimart | gzip > backup-$(date +%
 Quay về bản trước: `docker image ls mobimart-api` → sửa `API_TAG` trong `.env` → `docker compose up -d api`
 (image cũ được giữ 72 giờ). Migration chỉ thêm cột/bảng nên chạy image cũ trên DB mới vẫn an toàn.
 
-App Android/iOS: build với `EXPO_PUBLIC_API_URL=https://<SITE_ADDRESS>` (xem `HANDOFF.md`, mục Build APK).
+App Android/iOS: build với `EXPO_PUBLIC_API_URL=https://mobimart.cunpoi.tech` (xem `HANDOFF.md`, mục Build APK).
