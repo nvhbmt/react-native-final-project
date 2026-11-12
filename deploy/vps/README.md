@@ -57,7 +57,27 @@ Caddy phục vụ cả hai tên (`SITE_ADDRESS="mobimart.cunpoi.tech, 103-82-193
 `/opt/mobimart/.env`, `CORS_ORIGINS` tương ứng trong `api.env`), nên tên sslip.io vẫn chạy khi đổi DNS.
 Variable `SITE_ADDRESS` trên GitHub chỉ ghi **một** tên — tên mà bản web và app gọi API tới.
 
-## Bật SePay / email / AI trên VPS
+## API key trên GitHub (khuyên dùng)
+
+Điền ở **Settings → Secrets and variables → Actions** rồi chạy lại workflow (Actions → CI/CD → Run workflow,
+nhánh `main`) hoặc đợi lần merge sau. Job deploy ghi các giá trị vào `/opt/mobimart/api.env` và khởi động lại API.
+Để trống = không đụng tới giá trị đang có trên VPS. Không được chứa ký tự `$` hoặc xuống dòng.
+
+| Loại | Tên | Ví dụ / ghi chú |
+| --- | --- | --- |
+| Secret | `SMTP_USER` | Gmail gửi mail, vd. `mobimart.app@gmail.com` |
+| Secret | `SMTP_PASS` | App Password 16 ký tự (Google Account → Security → App passwords) |
+| Variable | `MAIL_FROM` | Tuỳ chọn, vd. `MobiMart <mobimart.app@gmail.com>` |
+| Secret | `AI_API_KEY` | Key Anthropic `sk-ant-…` |
+| Variable | `AI_MODEL` | vd. `claude-haiku-5-5` |
+| Variable | `AI_PROVIDER` | Tuỳ chọn: `anthropic` (mặc định trên VPS) hoặc `openai-compatible` |
+| Variable | `AI_BASE_URL` | Chỉ khi `AI_PROVIDER=openai-compatible` |
+| Secret | `SEPAY_WEBHOOK_API_KEY` | Tuỳ chọn — đang đặt sẵn trên VPS |
+| Variable | `SEPAY_BANK`, `SEPAY_ACCOUNT_NUMBER`, `SEPAY_ACCOUNT_NAME` | Tuỳ chọn — đang đặt sẵn trên VPS |
+
+Muốn xoá một giá trị: sửa tay trên VPS (GitHub để trống thì không xoá).
+
+## Sửa tay trên VPS
 
 ```bash
 ssh root@<IP>
