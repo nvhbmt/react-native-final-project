@@ -1,10 +1,13 @@
 import { Text, View } from '@tamagui/tailwind'
 import { router } from 'expo-router'
 import { useState } from 'react'
+import { Switch } from 'react-native'
 
 import { Divider } from '@/components/ui/Divider'
 import { useAuthStore, type User } from '@/features/auth'
+import { appColors } from '@/theme/tamagui.config'
 
+import { usePromoNotifications } from '../hooks/usePromoNotifications'
 import { confirmAction as confirm } from '../lib/confirm'
 import { AccountMenuRow } from './AccountMenuRow'
 import { ProfileAvatar } from './ProfileAvatar'
@@ -14,6 +17,7 @@ export function SignedInAccount({ user }: { user: User }) {
   const logoutAll = useAuthStore((s) => s.logoutAll)
   const [busy, setBusy] = useState<'logout' | 'logout-all' | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const promo = usePromoNotifications()
 
   const run = (kind: 'logout' | 'logout-all', action: () => Promise<void>) => async () => {
     setBusy(kind)
@@ -28,7 +32,7 @@ export function SignedInAccount({ user }: { user: User }) {
   }
 
   return (
-    <View className="gap-6">
+    <View className="gap-6 px-6">
       <View className="flex-row items-center gap-4">
         <ProfileAvatar user={user} size={64} />
         <View className="flex-1 gap-[2px]">
@@ -40,6 +44,14 @@ export function SignedInAccount({ user }: { user: User }) {
       <View className="overflow-hidden rounded-[8px] border border-neutral-300">
         <AccountMenuRow icon="receipt-outline" label="Đơn hàng của tôi" onPress={() => router.push('/orders')} />
         <Divider />
+        {user.role === 'admin' ? (
+          <>
+            <AccountMenuRow icon="cube-outline" label="Quản lý giao hàng" onPress={() => router.push('/admin/orders')} />
+            <Divider />
+            <AccountMenuRow icon="megaphone-outline" label="Gửi khuyến mãi" onPress={() => router.push('/admin/promotions')} />
+            <Divider />
+          </>
+        ) : null}
         <AccountMenuRow icon="sparkles-outline" label="Trợ lý mua sắm AI" onPress={() => router.push('/assistant')} />
         <Divider />
         <AccountMenuRow icon="person-outline" label="Hồ sơ cá nhân" onPress={() => router.push('/profile')} />
@@ -47,6 +59,22 @@ export function SignedInAccount({ user }: { user: User }) {
         <AccountMenuRow icon="location-outline" label="Địa chỉ giao hàng" onPress={() => router.push('/addresses')} />
         <Divider />
         <AccountMenuRow icon="key-outline" label="Đổi mật khẩu" onPress={() => router.push('/change-password')} />
+        <Divider />
+        <AccountMenuRow
+          icon="notifications-outline"
+          label="Nhận thông báo khuyến mãi"
+          onPress={() => void promo.setEnabled(!promo.enabled)}
+          right={
+            <Switch
+              value={promo.enabled}
+              onValueChange={(value) => void promo.setEnabled(value)}
+              trackColor={{ false: appColors['neutral-400'], true: appColors.primary }}
+              thumbColor="#ffffff"
+              ios_backgroundColor={appColors['neutral-400']}
+              accessibilityLabel="Nhận thông báo khuyến mãi"
+            />
+          }
+        />
         <Divider />
         <AccountMenuRow
           icon="phone-portrait-outline"
@@ -67,7 +95,7 @@ export function SignedInAccount({ user }: { user: User }) {
         <Divider />
         <AccountMenuRow icon="trash-outline" label="Xoá tài khoản" danger onPress={() => router.push('/delete-account')} />
       </View>
-      {error ? <Text className="text-[12px] leading-[20px] text-danger">{error}</Text> : null}
+      {error || promo.error ? <Text className="text-[12px] leading-[20px] text-danger">{error ?? promo.error}</Text> : null}
     </View>
   )
 }

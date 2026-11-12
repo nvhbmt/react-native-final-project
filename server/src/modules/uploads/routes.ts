@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { and, eq, inArray } from 'drizzle-orm'
@@ -11,6 +11,7 @@ import type { Db } from '@/db/client.ts'
 import { uploads, type UploadRow } from '@/db/schema.ts'
 import { AppError, ok } from '@/lib/http.ts'
 import { rateLimit } from '@/lib/rateLimit.ts'
+import type { ObjectStorage } from '@/lib/storage.ts'
 import { requireAuth, type AuthVariables } from '@/middleware/auth.ts'
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024
@@ -26,8 +27,11 @@ export function sniffImage(bytes: Uint8Array): { mime: string; ext: string } | n
   return null
 }
 
-/** URL tương đối mà app ghép với địa chỉ API (`/uploads/<file>`). */
-export const uploadUrl = (row: Pick<UploadRow, 'fileName'>) => `/uploads/${row.fileName}`
+/**
+ * URL ảnh trả cho app: URL đã lưu lúc upload (Supabase Storage → tuyệt đối), hoặc với bản ghi cũ trên ổ đĩa
+ * là URL tương đối `/uploads/<file>` mà app ghép với địa chỉ API.
+ */
+export const uploadUrl = (row: Pick<UploadRow, 'fileName' | 'url'>) => row.url ?? `/uploads/${row.fileName}`
 
 export function serializeUpload(row: UploadRow) {
   return { id: row.id, url: uploadUrl(row), purpose: row.purpose, mimeType: row.mimeType, size: row.sizeBytes }
@@ -43,7 +47,7 @@ export async function requireOwnUploads(db: Db, userId: string, ids: string[], p
   return ids.map((id) => byId.get(id)!)
 }
 
-export function uploadRoutes(db: Db, accessSecret: string, uploadDir: string) {
+export function uploadRoutes(db: Db, accessSecret: string, storage: ObjectStorage) {
   const app = new Hono<{ Variables: AuthVariables }>()
   const perUser = rateLimit({ windowMs: 60 * 60 * 1000, max: 60, key: (c) => `upload:${(c.get('auth' as never) as { sub?: string } | undefined)?.sub ?? 'anon'}` })
 
@@ -80,10 +84,9 @@ export function uploadRoutes(db: Db, accessSecret: string, uploadDir: string) {
         if (!kind) throw new AppError(415, 'UNSUPPORTED_IMAGE', 'Chỉ nhận ảnh JPEG, PNG hoặc WebP')
 
         const fileName = `${randomUUID()}.${kind.ext}`
-        await mkdir(uploadDir, { recursive: true })
-        await writeFile(join(uploadDir, fileName), bytes)
+        await storage.put(fileName, bytes, kind.mime)
         const [row] = await db.insert(uploads).values({
-          userId: c.var.auth.sub, purpose: purpose.data, fileName, mimeType: kind.mime, sizeBytes: bytes.length,
+          userId: c.var.auth.sub, purpose: purpose.data, fileName, url: storage.publicUrl(fileName), mimeType: kind.mime, sizeBytes: bytes.length,
         }).returning()
         return ok(c, serializeUpload(row!), 201)
       },

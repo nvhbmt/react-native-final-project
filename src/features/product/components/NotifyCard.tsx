@@ -15,14 +15,14 @@ export function NotifyCard({ value, onChange }: Props) {
       <View className="size-[44px] items-center justify-center rounded-[4px] bg-primary">
         <Ionicons name="notifications-outline" size={22} color="#ffffff" />
       </View>
-      <Text className="flex-1 text-[12px] leading-[20px] text-neutral-700">Notify me of promotions</Text>
+      <Text className="flex-1 text-[12px] leading-[20px] text-neutral-700">Nhận thông báo khuyến mãi</Text>
       <Switch
         value={value}
         onValueChange={onChange}
         trackColor={{ false: appColors['neutral-400'], true: appColors.primary }}
         thumbColor="#ffffff"
         ios_backgroundColor={appColors['neutral-400']}
-        accessibilityLabel="Notify me of promotions"
+        accessibilityLabel="Nhận thông báo khuyến mãi"
       />
     </View>
   )

@@ -15,13 +15,13 @@ type Props = {
   filtered?: boolean
 }
 
-export function SearchField({ value, onChangeText, onFilter, onSubmit, placeholder = 'Search', filtered }: Props) {
+export function SearchField({ value, onChangeText, onFilter, onSubmit, placeholder = 'Tìm kiếm', filtered }: Props) {
   return (
     <XStack gap={14} h={36}>
       <XStack flex={1} items="center" bg={m.input} rounded={4} px={12} gap={6}>
         <Ionicons name="search-outline" size={15} color={m.ink} />
         <TextInput
-          accessibilityLabel="Search products"
+          accessibilityLabel="Tìm sản phẩm"
           value={value}
           onChangeText={onChangeText}
           onSubmitEditing={onSubmit}
@@ -36,7 +36,7 @@ export function SearchField({ value, onChangeText, onFilter, onSubmit, placehold
       </XStack>
       <YStack
         {...keyboardAction}
-        role="button" aria-label="Filter products" onPress={onFilter}
+        role="button" aria-label="Lọc sản phẩm" onPress={onFilter}
         w={36} h={36} items="center" justify="center"
         rounded={4} bg={filtered ? '#e6fbfe' : m.input}
         hitSlop={4} opacity="1 press:0.65"

@@ -16,7 +16,7 @@ export default function TabsLayout() {
         />
       ))}
       {/* Custom tab bar omits this route. SDK 58 redirects routes with href: null. */}
-      <Tabs.Screen name="product-listing" options={{ title: 'Products' }} />
+      <Tabs.Screen name="product-listing" options={{ title: 'Sản phẩm' }} />
     </Tabs>
   )
 }

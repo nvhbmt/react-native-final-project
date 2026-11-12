@@ -4,23 +4,36 @@ import { sql } from 'drizzle-orm'
 import { buildApp } from './app.ts'
 import { createDb } from '@/db/client.ts'
 import { consoleMailer, createSmtpMailer } from '@/lib/mailer.ts'
-import { loadEnv, sepayConfig } from './env.ts'
+import { allowDemoCheckout, loadEnv, sepayConfig, smtpConfig, storageConfig } from './env.ts'
+import { createPostgresRateLimitStore, useRateLimitStore } from '@/lib/rateLimit.ts'
+import { createDiskStorage, createSupabaseStorage } from '@/lib/storage.ts'
 import { createDrizzleAuthRepository } from '@/modules/auth/repository.ts'
 import { createCatalogRepository } from '@/modules/catalog/repository.ts'
 import { createCatalogService } from '@/modules/catalog/service.ts'
 import { createOpenAiCompatibleProvider } from '@/modules/ai/provider.ts'
+import { createAnthropicProvider } from '@/modules/ai/anthropicProvider.ts'
 
 const env = loadEnv()
+const smtp = smtpConfig(env)
+const storageCfg = storageConfig(env)
+const storage = storageCfg ? createSupabaseStorage(storageCfg) : createDiskStorage(env.UPLOAD_DIR)
+if (!storageCfg && env.NODE_ENV === 'production') {
+  console.warn('[storage] Đang lưu ảnh trên ổ đĩa (UPLOAD_DIR). Ảnh sẽ mất khi deploy lại — đặt SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.')
+}
 const { db, close } = createDb(env.DATABASE_URL)
+// Giới hạn request dùng chung qua DB để nhiều instance API cùng một hạn mức.
+useRateLimitStore(createPostgresRateLimitStore(db))
 
 const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
-  mailer: env.SMTP_URL ? createSmtpMailer(env.SMTP_URL, env.MAIL_FROM) : consoleMailer,
+  mailer: smtp ? createSmtpMailer(smtp.transport, smtp.from) : consoleMailer,
   catalog: createCatalogService(createCatalogRepository(db)),
-  ai: env.AI_BASE_URL && env.AI_API_KEY && env.AI_MODEL
-    ? createOpenAiCompatibleProvider({ baseUrl: env.AI_BASE_URL, apiKey: env.AI_API_KEY, model: env.AI_MODEL })
+  ai: env.AI_API_KEY && env.AI_MODEL
+    ? env.AI_PROVIDER === 'anthropic'
+      ? createAnthropicProvider({ apiKey: env.AI_API_KEY, model: env.AI_MODEL })
+      : createOpenAiCompatibleProvider({ baseUrl: env.AI_BASE_URL!, apiKey: env.AI_API_KEY, model: env.AI_MODEL })
     : undefined,
-  commerce: { db, allowDemoCheckout: env.NODE_ENV !== 'production', uploadDir: env.UPLOAD_DIR, sepay: sepayConfig(env) },
+  commerce: { db, allowDemoCheckout: allowDemoCheckout(env), uploadDir: env.UPLOAD_DIR, storage, sepay: sepayConfig(env) },
   accessSecret: env.JWT_ACCESS_SECRET,
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,
   refreshTtlSeconds: env.REFRESH_TOKEN_TTL,

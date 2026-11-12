@@ -43,12 +43,21 @@ export async function startCommerceTest(overrides: (db: ReturnType<typeof create
   })
   const userIds: string[] = []
 
-  async function register(fullName = 'Test user') {
+  /** `withAddress: false` khi test cần tài khoản có sổ địa chỉ trống. */
+  async function register(fullName = 'Test user', { withAddress = true } = {}) {
     const email = `${randomUUID()}@example.test`
     const result = await test.call('POST', '/auth/register', { body: { email, password: 'test-password-123', fullName } })
     expect(result.status).toBe(201)
     userIds.push(result.body.data.user.id)
-    return { token: result.body.data.tokens.accessToken as string, id: result.body.data.user.id as string, email }
+    const token = result.body.data.tokens.accessToken as string
+    const id = result.body.data.user.id as string
+    if (!withAddress) return { token, id, email, addressId: '' }
+    // Mỗi tài khoản test có sẵn một địa chỉ mặc định để đặt đơn.
+    const address = await test.call('POST', '/users/me/addresses', {
+      token, body: { recipientName: fullName, phone: '0901234567', line1: '1 Lê Lợi, Quận 1', city: 'TP. Hồ Chí Minh', isDefault: true },
+    })
+    expect(address.status).toBe(201)
+    return { token, id, email, addressId: address.body.data[0].id as string }
   }
 
   async function stop() {

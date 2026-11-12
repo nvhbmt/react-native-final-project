@@ -5,6 +5,7 @@ import { AppError } from '@/lib/http.ts'
 import { consoleMailer, type Mailer } from '@/lib/mailer.ts'
 import { getDummyHash, hashPassword, verifyPassword } from '@/lib/password.ts'
 import { createRefreshToken, hashRefreshToken, signAccessToken } from '@/lib/tokens.ts'
+import { resetCodeEmailHtml } from './emails.ts'
 import type { AuthRepository } from './repository.ts'
 import type { ChangePasswordInput, LoginInput, RegisterInput, ResetPasswordInput } from './schemas.ts'
 import { toPublicUser, type PublicUser } from './serialize.ts'
@@ -141,8 +142,9 @@ export function createAuthService(repo: AuthRepository, config: AuthConfig) {
       await repo.createPasswordReset({ userId: user.id, codeHash: hashResetCode(user.id, code), expiresAt: new Date(Date.now() + RESET_TTL_MS) })
       await (config.mailer ?? consoleMailer).send({
         to: user.email,
-        subject: 'Mã đặt lại mật khẩu',
-        text: `Xin chào ${user.fullName},\n\nMã đặt lại mật khẩu của bạn là: ${code}\nMã có hiệu lực trong 15 phút. Nếu bạn không yêu cầu, hãy bỏ qua email này.`,
+        subject: `MobiMart – Mã đặt lại mật khẩu: ${code}`,
+        text: `Xin chào ${user.fullName},\n\nMã đặt lại mật khẩu của bạn là: ${code}\nMã có hiệu lực trong 15 phút. Nếu bạn không yêu cầu, hãy bỏ qua email này.\n\nMobiMart`,
+        html: resetCodeEmailHtml(user.fullName, code),
       })
     },
 

@@ -6,7 +6,7 @@ import { useRouteProduct } from '../hooks/useRouteProduct'
 export function ProductDetailScreen() {
   const { product, ...request } = useRouteProduct()
 
-  if (!product) return <ProductStatus title="Product" {...request} />
+  if (!product) return <ProductStatus title="Sản phẩm" {...request} />
 
   // Sản phẩm có biến thể (màu/size) dùng layout chọn biến thể, còn lại dùng layout chuẩn.
   return product.variants && (product.variants.colors.length || product.variants.sizes.length) ? (

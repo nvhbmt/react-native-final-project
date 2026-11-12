@@ -39,7 +39,7 @@ describe.skipIf(!commerceTestUrl)('giỏ hàng theo tài khoản', () => {
   })
 
   it('gộp giỏ khách, bỏ qua dòng lỗi; đặt hàng xong thì giỏ trống', async () => {
-    const { token } = await t.register()
+    const { token, addressId } = await t.register()
     const merged = await t.call('POST', '/cart/merge', {
       token,
       body: { items: [{ productId: 'orange', quantity: 2 }, { productId: 'does-not-exist', quantity: 1 }], voucher: 'SALE10' },
@@ -49,7 +49,7 @@ describe.skipIf(!commerceTestUrl)('giỏ hàng theo tài khoản', () => {
 
     const order = await t.call('POST', '/orders', {
       token,
-      body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', items: [{ productId: 'orange', quantity: 2 }] },
+      body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId, items: [{ productId: 'orange', quantity: 2 }] },
     })
     expect(order.status).toBe(201)
     expect((await t.call('GET', '/cart', { token })).body.data).toMatchObject({ items: [], voucher: null })

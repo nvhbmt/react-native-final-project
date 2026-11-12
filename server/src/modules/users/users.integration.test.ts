@@ -31,6 +31,16 @@ describe.skipIf(!commerceTestUrl)('tài khoản', () => {
     expect((await t.call('GET', '/auth/me', { token })).body.data.fullName).toBe('New name')
   })
 
+  it('lưu lựa chọn nhận thông báo khuyến mãi theo tài khoản', async () => {
+    const { token } = await t.register()
+    expect((await t.call('GET', '/auth/me', { token })).body.data.promoNotifications).toBe(false)
+    const on = await t.call('PATCH', '/users/me', { token, body: { promoNotifications: true } })
+    expect(on.body.data).toMatchObject({ promoNotifications: true, fullName: 'Test user' })
+    expect((await t.call('GET', '/auth/me', { token })).body.data.promoNotifications).toBe(true)
+    expect((await t.call('PATCH', '/users/me', { token, body: { promoNotifications: 'yes' } })).status).toBe(400)
+    expect((await t.call('PATCH', '/users/me', { token, body: { promoNotifications: false } })).body.data.promoNotifications).toBe(false)
+  })
+
   it('đổi avatar chỉ bằng ảnh avatar của chính mình', async () => {
     const a = await t.register()
     const b = await t.register()
@@ -44,12 +54,12 @@ describe.skipIf(!commerceTestUrl)('tài khoản', () => {
   })
 
   it('địa chỉ: địa chỉ đầu là mặc định, đổi mặc định, xoá thì chuyển mặc định', async () => {
-    const { token } = await t.register()
+    const { token } = await t.register('Test user', { withAddress: false })
     const first = (await t.call('POST', '/users/me/addresses', { token, body: address })).body.data
     expect(first[0].isDefault).toBe(true)
     const two = (await t.call('POST', '/users/me/addresses', { token, body: { ...address, line1: '2 Hai Bà Trưng', isDefault: true } })).body.data
     expect(two.map((a: { line1: string; isDefault: boolean }) => [a.line1, a.isDefault])).toEqual([['2 Hai Bà Trưng', true], ['1 Lê Lợi, Q1', false]])
-    const other = await t.register()
+    const other = await t.register('Other', { withAddress: false })
     expect((await t.call('DELETE', `/users/me/addresses/${two[0].id}`, { token: other.token })).body.data).toEqual([])
     const left = (await t.call('DELETE', `/users/me/addresses/${two[0].id}`, { token })).body.data
     expect(left).toHaveLength(1)

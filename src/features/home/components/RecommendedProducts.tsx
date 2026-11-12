@@ -15,11 +15,11 @@ export function RecommendedProducts({ products, loading, onRetry }: { products: 
   return (
     <YStack gap={20}>
       <XStack px={24} items="center" justify="space-between">
-        <MarketHeading>Recommended for you</MarketHeading>
-        <MarketText {...keyboardAction} role="button" aria-label="View all recommended products" onPress={() => router.push('/product-listing')} color={m.muted} hitSlop={8}>View all</MarketText>
+        <MarketHeading>Gợi ý cho bạn</MarketHeading>
+        <MarketText {...keyboardAction} role="button" aria-label="Xem tất cả sản phẩm gợi ý" onPress={() => router.push('/product-listing')} color={m.muted} hitSlop={8}>Xem tất cả</MarketText>
       </XStack>
-      {loading || onRetry ? <CatalogStatus loading={loading} message={onRetry ? 'Could not load products.' : undefined} onRetry={onRetry} /> : <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
-        {products.length === 0 && <MarketText color={m.secondary}>No products found.</MarketText>}
+      {loading || onRetry ? <CatalogStatus loading={loading} message={onRetry ? 'Không tải được sản phẩm.' : undefined} onRetry={onRetry} /> : <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
+        {products.length === 0 && <MarketText color={m.secondary}>Không tìm thấy sản phẩm.</MarketText>}
         {products.map((product) => (
           <YStack {...keyboardAction} key={product.id} w={132} h={208} rounded={3} bg={m.surface} overflow="hidden" role="button" aria-label={`${product.name}, ${formatProductPrice(product)}`} onPress={() => router.push({ pathname: '/product/[id]', params: { id: product.id } })}>
             <Image source={product.image} style={styles.image} contentFit="contain" />

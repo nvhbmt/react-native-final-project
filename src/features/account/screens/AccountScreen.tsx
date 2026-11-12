@@ -13,7 +13,7 @@ export function AccountScreen() {
   const user = useCurrentUser()
 
   return (
-    <Screen title="Account" contentClassName="gap-6 px-6 pt-2 pb-6">
+    <Screen title="Tài khoản" contentClassName="gap-6 pt-2 pb-6">
       {status === 'unknown' ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={appColors.primary} />

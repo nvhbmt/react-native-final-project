@@ -24,17 +24,18 @@ import type { CatalogCategory, CategoryId, SortOrder } from '../types'
 const categoryIds = new Set<string>(['electronics', 'fashion', 'beauty', 'fruits'])
 const electronicsTabs = ['phone', 'tablet', 'laptop']
 const sortOptions: { value: SortOrder; label: string }[] = [
-  { value: 'sales', label: 'Best Sales' }, { value: 'matched', label: 'Best Matched' }, { value: 'popular', label: 'Popular' },
+  { value: 'sales', label: 'Bán chạy' }, { value: 'matched', label: 'Phù hợp nhất' }, { value: 'popular', label: 'Phổ biến' },
 ]
 
 type ListingParams = { category?: string; query?: string; relatedTo?: string }
 
-export function ProductListingScreen() {
+/** `tab`: dùng làm tab Tìm kiếm — màn gốc, không có nút back. */
+export function ProductListingScreen({ tab = false }: { tab?: boolean }) {
   const params = useLocalSearchParams<ListingParams>()
-  return <ProductListingContent key={JSON.stringify(params)} params={params} />
+  return <ProductListingContent key={JSON.stringify(params)} params={params} tab={tab} />
 }
 
-function ProductListingContent({ params }: { params: ListingParams }) {
+function ProductListingContent({ params, tab }: { params: ListingParams; tab: boolean }) {
   const category = params.category && categoryIds.has(params.category) ? params.category as CategoryId : undefined
   const isFruit = category === 'fruits'
   const isElectronics = category === 'electronics'
@@ -72,7 +73,10 @@ function ProductListingContent({ params }: { params: ListingParams }) {
   const relevant = fruitPreview ? products.items.slice(4, 6) : []
 
   return (
-    <MarketplaceFrame title={params.relatedTo ? 'Relevant products' : selectedCategory?.name ?? 'All Deals'} onBack={() => router.canGoBack() ? router.back() : router.replace('/')}>
+    <MarketplaceFrame
+      title={tab ? 'Tìm kiếm' : params.relatedTo ? 'Sản phẩm liên quan' : selectedCategory?.name ?? 'Tất cả ưu đãi'}
+      onBack={tab ? undefined : () => router.canGoBack() ? router.back() : router.replace('/')}
+    >
       <FlatList
         data={rows}
         keyExtractor={(row) => row.map((product) => product.id).join('-')}
@@ -86,9 +90,9 @@ function ProductListingContent({ params }: { params: ListingParams }) {
             {isFruit && banners.length > 0 && <YStack mt={24} mb={22}><BannerCarousel slides={banners} /></YStack>}
             {isElectronics && <>
               <XStack items="center" justify="space-between" mt={24} mb={12}>
-                <MarketHeading>Categories</MarketHeading>
-                <XStack {...keyboardAction} role="button" aria-label="See all electronics categories" onPress={() => setExpanded(true)} items="center" hitSlop={8}>
-                  <MarketText fontSize={11} color={m.muted}>See all</MarketText><Ionicons name="caret-forward" size={11} color={m.muted} />
+                <MarketHeading>Danh mục</MarketHeading>
+                <XStack {...keyboardAction} role="button" aria-label="Xem tất cả danh mục điện tử" onPress={() => setExpanded(true)} items="center" hitSlop={8}>
+                  <MarketText fontSize={11} color={m.muted}>Xem tất cả</MarketText><Ionicons name="caret-forward" size={11} color={m.muted} />
                 </XStack>
               </XStack>
               <XStack gap={14}>
@@ -114,20 +118,20 @@ function ProductListingContent({ params }: { params: ListingParams }) {
           ? <XStack gap={14}>{row.map((product) => <ProductGridCard key={product.id} product={product} />)}{row.length === 1 && <YStack flex={1} />}</XStack>
           : <ProductRow product={row[0]} />}
         ListEmptyComponent={products.loading || products.error
-          ? <CatalogStatus loading={products.loading} message={products.error ? 'Could not load products.' : undefined} onRetry={products.error ? products.retry : undefined} />
+          ? <CatalogStatus loading={products.loading} message={products.error ? 'Không tải được sản phẩm.' : undefined} onRetry={products.error ? products.retry : undefined} />
           : <EmptyProducts />}
         ListFooterComponent={(
           <YStack>
             {!products.loading && !products.error && (isElectronics || (isFruit && !filtered && !search.trim() && products.items.length > 4)) && <YStack mt={isFruit ? 24 : 14}><SeeAllButton expanded={expanded} onPress={() => {
               setExpanded(!expanded)
             }} /></YStack>}
-            {products.hasMore && !fruitPreview && <YStack mt={14}><SeeAllButton label="Load more" onPress={products.loadMore} /></YStack>}
-            {(products.loadingMore || products.moreError) && <CatalogStatus loading={products.loadingMore} message={products.moreError ? 'Could not load more products.' : undefined} onRetry={products.moreError ? products.retryMore : undefined} />}
+            {products.hasMore && !fruitPreview && <YStack mt={14}><SeeAllButton label="Xem thêm" onPress={products.loadMore} /></YStack>}
+            {(products.loadingMore || products.moreError) && <CatalogStatus loading={products.loadingMore} message={products.moreError ? 'Không tải thêm được sản phẩm.' : undefined} onRetry={products.moreError ? products.retryMore : undefined} />}
             {isElectronics && banners.length > 0 && <YStack mt={24}><BannerCarousel slides={banners} /></YStack>}
             {relevant.length > 0 && <YStack mt={48}>
               <XStack items="center" justify="space-between" mb={18}>
-                <MarketHeading>Relevant products</MarketHeading>
-                <XStack {...keyboardAction} role="button" aria-label="See all relevant products" onPress={() => setExpanded(true)} items="center" hitSlop={8} gap={3}><MarketText fontSize={12} color={m.muted}>See all</MarketText><Ionicons name="chevron-forward" size={14} color={m.muted} /></XStack>
+                <MarketHeading>Sản phẩm liên quan</MarketHeading>
+                <XStack {...keyboardAction} role="button" aria-label="Xem tất cả sản phẩm liên quan" onPress={() => setExpanded(true)} items="center" hitSlop={8} gap={3}><MarketText fontSize={12} color={m.muted}>Xem tất cả</MarketText><Ionicons name="chevron-forward" size={14} color={m.muted} /></XStack>
               </XStack>
               <YStack gap={14}>{relevant.map((product) => <ProductRow key={product.id} product={product} accent={m.muted} />)}</YStack>
             </YStack>}

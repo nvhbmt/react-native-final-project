@@ -13,9 +13,9 @@ export type TabConfig = {
 
 // Thêm/bớt/sắp xếp tab ở đây — layout đọc mảng này để dựng menu.
 export const TABS: TabConfig[] = [
-  { name: 'index', title: 'Home', icon: 'home-outline', activeIcon: 'home' },
-  { name: 'search', title: 'Search', icon: 'magnify', activeIcon: 'magnify' },
-  { name: 'favorites', title: 'Favorites', icon: 'heart-outline', activeIcon: 'heart' },
-  { name: 'inbox', title: 'Inbox', icon: 'message-text-outline', activeIcon: 'message-text' },
-  { name: 'account', title: 'Account', icon: 'account-circle-outline', activeIcon: 'account-circle' },
+  { name: 'index', title: 'Trang chủ', icon: 'home-outline', activeIcon: 'home' },
+  { name: 'search', title: 'Tìm kiếm', icon: 'magnify', activeIcon: 'magnify' },
+  { name: 'favorites', title: 'Yêu thích', icon: 'heart-outline', activeIcon: 'heart' },
+  { name: 'inbox', title: 'Hộp thư', icon: 'message-text-outline', activeIcon: 'message-text' },
+  { name: 'account', title: 'Tài khoản', icon: 'account-circle-outline', activeIcon: 'account-circle' },
 ]

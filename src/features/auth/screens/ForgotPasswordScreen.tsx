@@ -44,7 +44,8 @@ export function ForgotPasswordScreen() {
 
   return (
     <AuthScreenFrame
-      header="Forgot password"
+      brand
+      header="Quên mật khẩu"
       title={step === 'email' ? 'Quên mật khẩu' : 'Nhập mã xác nhận'}
       subtitle={step === 'email'
         ? 'Nhập email đã đăng ký, chúng tôi sẽ gửi mã 6 số để đặt lại mật khẩu.'
@@ -103,7 +104,7 @@ export function ForgotPasswordScreen() {
           </Text>
         </>
       )}
-      <AuthSwitchLink prompt="Nhớ mật khẩu rồi?" action="Log in" href="/login" />
+      <AuthSwitchLink prompt="Nhớ mật khẩu rồi?" action="Đăng nhập" href="/login" />
     </AuthScreenFrame>
   )
 }

@@ -5,6 +5,8 @@ export type User = {
   fullName: string
   avatarUrl: string | null
   phone: string | null
+  /** Đồng ý nhận thông báo khuyến mãi. */
+  promoNotifications: boolean
   role: 'customer' | 'admin'
   createdAt: string
 }

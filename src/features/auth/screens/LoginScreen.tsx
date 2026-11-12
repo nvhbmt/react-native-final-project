@@ -30,7 +30,7 @@ export function LoginScreen() {
     })
 
   return (
-    <AuthScreenFrame header="Log in" title="Welcome back" subtitle="Đăng nhập để đồng bộ giỏ hàng, đơn hàng và trò chuyện với trợ lý.">
+    <AuthScreenFrame brand header="Đăng nhập" title="Chào mừng trở lại" subtitle="Đăng nhập để đồng bộ giỏ hàng, đơn hàng và trò chuyện với trợ lý.">
       <FormBanner message={form.formError} />
       <View className="gap-4">
         <AuthTextField
@@ -51,7 +51,7 @@ export function LoginScreen() {
         />
         <AuthTextField
           ref={passwordRef}
-          label="Password"
+          label="Mật khẩu"
           password
           value={password}
           onChangeText={(t) => {
@@ -74,8 +74,8 @@ export function LoginScreen() {
       >
         Quên mật khẩu?
       </Text>
-      <SubmitButton title="Log in" loading={form.submitting} onPress={onSubmit} />
-      <AuthSwitchLink prompt="Chưa có tài khoản?" action="Sign up" href="/register" />
+      <SubmitButton title="Đăng nhập" loading={form.submitting} onPress={onSubmit} />
+      <AuthSwitchLink prompt="Chưa có tài khoản?" action="Đăng ký" href="/register" />
     </AuthScreenFrame>
   )
 }

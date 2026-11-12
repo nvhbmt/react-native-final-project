@@ -19,7 +19,7 @@ export function createMemoryAuthRepository() {
     async createUser(input) {
       if ([...users.values()].some((user) => user.email === input.email)) return undefined
       const now = new Date()
-      const user: UserRow = { id: randomUUID(), avatarUrl: null, phone: null, role: 'customer', createdAt: now, updatedAt: now, ...input }
+      const user: UserRow = { id: randomUUID(), avatarUrl: null, phone: null, promoNotifications: false, role: 'customer', createdAt: now, updatedAt: now, ...input }
       users.set(user.id, user)
       return user
     },

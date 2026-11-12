@@ -1,5 +1,7 @@
+export type { Address } from './api/accountApi'
 export { ProfileAvatar } from './components/ProfileAvatar'
 export { UserAvatar } from './components/UserAvatar'
+export { usePromoNotifications } from './hooks/usePromoNotifications'
 export { AccountScreen } from './screens/AccountScreen'
 export { AddressesScreen } from './screens/AddressesScreen'
 export { DeleteAccountScreen } from './screens/DeleteAccountScreen'

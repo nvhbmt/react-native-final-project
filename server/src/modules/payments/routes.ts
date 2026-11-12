@@ -13,6 +13,9 @@ type Result = 'matched' | 'underpaid' | 'late' | 'unmatched' | 'duplicate' | 'ig
 /** Ghi nhận một giao dịch tiền vào. Idempotent theo id giao dịch SePay. */
 export async function applySepayTransaction(db: Db, config: SepayConfig, txn: SepayWebhook): Promise<Result> {
   if (txn.transferType !== 'in') return 'ignored'
+  // Một SePay account có thể theo dõi nhiều tài khoản ngân hàng. Chỉ tài khoản
+  // đang hiển thị trên QR của app mới được phép xác nhận đơn hàng.
+  if (!txn.accountNumber || txn.accountNumber.replace(/\s/g, '') !== config.accountNumber.replace(/\s/g, '')) return 'ignored'
   const code = extractPaymentCode(config.codePrefix, txn.code, txn.content, txn.description)
 
   return db.transaction(async (tx) => {

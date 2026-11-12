@@ -76,7 +76,7 @@ export function VariantProductDetail({ product }: { product: Product & { variant
       contentClassName="px-6 pt-1 pb-6"
       footer={
         <View className="border-t border-neutral-200 px-6 pt-6 pb-3">
-          <Button title={unavailable ? 'Out of stock' : 'Add to cart'} leftIcon="cart-outline" disabled={unavailable} onPress={addToCart} />
+          <Button title={unavailable ? 'Hết hàng' : 'Thêm vào giỏ'} leftIcon="cart-outline" disabled={unavailable} onPress={addToCart} />
         </View>
       }
     >
@@ -103,21 +103,21 @@ export function VariantProductDetail({ product }: { product: Product & { variant
       </View>
 
       {colors.length > 0 && <View className="gap-2 pt-7">
-        <Label>Color</Label>
+        <Label>Màu sắc</Label>
         <ColorSwatches colors={colors} value={selection.colorId} onChange={(colorId) => { update({ colorId }); setImageIndex(0) }} />
       </View>}
 
       {sizes.length > 0 && <View className="gap-2 pt-6">
-        <Label>Size</Label>
+        <Label>Kích cỡ</Label>
         <SizeSelector sizes={sizes} value={selection.size} onChange={(size) => update({ size })} />
       </View>}
 
       <View className="gap-2 pt-6">
-        <Label>Quantity</Label>
+        <Label>Số lượng</Label>
         <View className="flex-row items-center justify-between">
           <QuantityStepper value={selection.quantity} onChange={(quantity) => update({ quantity })} />
           <View className="flex-row items-center gap-1.5">
-            <Text className="text-[12px] leading-[20px] text-neutral-550">Total</Text>
+            <Text className="text-[12px] leading-[20px] text-neutral-550">Tổng cộng</Text>
             <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">
               {formatPrice(product.price * selection.quantity)}
             </Text>
@@ -128,12 +128,12 @@ export function VariantProductDetail({ product }: { product: Product & { variant
       <View className="pt-6">
         <Divider />
         {product.sizeChart && <><LinkRow
-          title="Size guide"
+          title="Bảng size"
           onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
         />
         <Divider /></>}
         <AskAssistantLink productId={product.id} />
-        <LinkRow title={reviews.data ? `Reviews (${reviews.data.summary.reviewCount})` : 'Reviews'} onPress={() => router.push(`/product/${product.id}/reviews`)} />
+        <LinkRow title={reviews.data ? `Đánh giá (${reviews.data.summary.reviewCount})` : 'Đánh giá'} onPress={() => router.push(`/product/${product.id}/reviews`)} />
       </View>
     </Screen>
   )

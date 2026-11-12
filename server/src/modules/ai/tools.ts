@@ -89,7 +89,7 @@ export function createToolRunner(db: Db, catalog: CatalogService | undefined, us
           return rows.map((row) => {
             const order = serializeOrder(row)
             return {
-              code: order.code, status: order.status, totalUsd: order.total, createdAt: new Date(order.createdAt).toISOString(),
+              code: order.code, status: order.status, fulfillment: order.fulfillment, totalUsd: order.total, createdAt: new Date(order.createdAt).toISOString(),
               items: order.items.map((item) => `${item.quantity} × ${item.name}`),
             }
           })

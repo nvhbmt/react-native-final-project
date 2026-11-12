@@ -5,9 +5,11 @@ import { useEffect } from 'react'
 
 import { AppProviders } from '@/providers/AppProviders'
 import { useAppFonts } from '@/theme/useAppFonts'
+import { injectWebGlobalStyles } from '@/theme/webGlobalStyles'
 
 // Giữ splash cho tới khi font nạp xong, tránh nháy font hệ thống.
 SplashScreen.preventAutoHideAsync()
+injectWebGlobalStyles()
 
 export default function RootLayout() {
   const fontsReady = useAppFonts()
@@ -34,6 +36,8 @@ export default function RootLayout() {
         <Stack.Screen name="checkout/success" />
         <Stack.Screen name="orders/index" />
         <Stack.Screen name="orders/[id]" />
+        <Stack.Screen name="admin/orders" />
+        <Stack.Screen name="admin/promotions" />
         <Stack.Screen name="assistant/index" />
         <Stack.Screen name="assistant/[id]" />
         <Stack.Screen name="login" />

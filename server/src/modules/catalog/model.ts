@@ -16,20 +16,20 @@ export type RatingBreakdown = [number, number, number, number, number]
 
 export const categories = {
   electronics: {
-    name: 'Electronics',
-    subcategories: { phone: 'Smartphones', tablet: 'Tablets', laptop: 'Laptops', headphone: 'Headphones' },
+    name: 'Điện tử',
+    subcategories: { phone: 'Điện thoại', tablet: 'Máy tính bảng', laptop: 'Laptop', headphone: 'Tai nghe' },
   },
   fashion: {
-    name: 'Fashion',
-    subcategories: { hoodie: 'Hoodies & sweatshirts', 't-shirt': 'T-shirts', shoes: 'Shoes', apparel: 'Other apparel' },
+    name: 'Thời trang',
+    subcategories: { hoodie: 'Hoodie & áo nỉ', 't-shirt': 'Áo thun', shoes: 'Giày', apparel: 'Trang phục khác' },
   },
   beauty: {
-    name: 'Beauty',
-    subcategories: { makeup: 'Makeup', skincare: 'Skincare' },
+    name: 'Làm đẹp',
+    subcategories: { makeup: 'Trang điểm', skincare: 'Chăm sóc da' },
   },
   fruits: {
-    name: 'Fresh Fruits',
-    subcategories: { tropical: 'Tropical', citrus: 'Citrus', orchard: 'Orchard', berries: 'Berries', other: 'Other fruits' },
+    name: 'Trái cây tươi',
+    subcategories: { tropical: 'Nhiệt đới', citrus: 'Họ cam quýt', orchard: 'Trái cây vườn', berries: 'Quả mọng', other: 'Trái cây khác' },
   },
 } satisfies Record<CategoryId, { name: string; subcategories: Record<string, string> }>
 

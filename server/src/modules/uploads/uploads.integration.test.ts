@@ -4,6 +4,7 @@ import { join } from 'node:path'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import type { ObjectStorage } from '@/lib/storage.ts'
 import { commerceTestUrl, startCommerceTest } from '@/test/integration.ts'
 import { sniffImage } from './routes.ts'
 
@@ -67,5 +68,30 @@ describe.skipIf(!commerceTestUrl)('upload ảnh', () => {
     const big = new Uint8Array(5 * 1024 * 1024 + 1)
     big.set(PNG)
     expect((await send(token, new Blob([big]))).status).toBe(413)
+  })
+})
+
+describe.skipIf(!commerceTestUrl)('upload ảnh lên storage ngoài (Supabase)', () => {
+  let t: Awaited<ReturnType<typeof startCommerceTest>>
+  const stored = new Map<string, { bytes: Uint8Array; mime: string }>()
+  // Storage giả thay cho Supabase: ghi nhận file và trả URL tuyệt đối như bucket public.
+  const storage: ObjectStorage = {
+    kind: 'supabase',
+    async put(name, bytes, mime) { stored.set(name, { bytes, mime }) },
+    publicUrl: (name) => `https://ref.supabase.co/storage/v1/object/public/uploads/${name}`,
+  }
+  beforeAll(async () => { t = await startCommerceTest((db) => ({ commerce: { db, allowDemoCheckout: true, storage } })) })
+  afterAll(async () => { await t?.stop() })
+
+  it('lưu URL tuyệt đối của storage và dùng cho avatar', async () => {
+    const { token } = await t.register()
+    const res = await t.call('POST', '/uploads', { token, body: { purpose: 'avatar', data: Buffer.from(PNG).toString('base64') } })
+    expect(res.status).toBe(201)
+    const url: string = res.body.data.url
+    expect(url.startsWith('https://ref.supabase.co/storage/v1/object/public/uploads/')).toBe(true)
+    expect(url).toMatch(/\/[0-9a-f-]{36}\.png$/)
+    expect([...stored.values()][0]).toMatchObject({ mime: 'image/png' })
+    const user = (await t.call('PUT', '/users/me/avatar', { token, body: { uploadId: res.body.data.id } })).body.data
+    expect(user.avatarUrl).toBe(url)
   })
 })

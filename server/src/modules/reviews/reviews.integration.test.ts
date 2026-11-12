@@ -20,6 +20,7 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
   let connection: ReturnType<typeof createDb>
   let call: ReturnType<typeof createTestApp>['call']
   const userIds: string[] = []
+  const addressOf = new Map<string, string>()
 
   beforeAll(async () => {
     connection = createDb(url!)
@@ -46,17 +47,23 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
     })
     expect(result.status).toBe(201)
     userIds.push(result.body.data.user.id)
-    return result.body.data.tokens.accessToken as string
+    const token = result.body.data.tokens.accessToken as string
+    const address = await call('POST', '/users/me/addresses', {
+      token, body: { recipientName: fullName, phone: '0901234567', line1: '1 Lê Lợi', city: 'TP. Hồ Chí Minh', isDefault: true },
+    })
+    expect(address.status).toBe(201)
+    addressOf.set(token, address.body.data[0].id)
+    return token
   }
 
-  const checkout = (productId: string) => ({
-    requestId: randomUUID(), paymentMethod: 'pm_visa', items: [{ productId, quantity: 2 }],
+  const checkout = (productId: string, token: string) => ({
+    requestId: randomUUID(), paymentMethod: 'pm_visa', addressId: addressOf.get(token), items: [{ productId, quantity: 2 }],
   })
 
   it('computes prices on the server and replays checkout without duplicating private orders', async () => {
     const buyer = await register('Buyer')
     const other = await register('Other customer')
-    const body = { ...checkout('banana'), voucher: 'SALE10', total: 0 }
+    const body = { ...checkout('banana', buyer), voucher: 'SALE10', total: 0 }
     const responses = await Promise.all([
       call('POST', '/orders', { body, token: buyer }),
       call('POST', '/orders', { body, token: buyer }),
@@ -64,11 +71,11 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
     expect(responses.map(({ status }) => status).sort()).toEqual([200, 201])
     const order = responses[0]!.body.data
     expect(responses[1]!.body.data.id).toBe(order.id)
-    expect(order).toMatchObject({ subtotal: 1.22, discount: 0.12, tax: 0.11, total: 1.21, paymentMode: 'demo' })
+    expect(order).toMatchObject({ subtotal: 1.22, discount: 0.12, tax: 0.11, fees: 2.99, total: 4.2, paymentMode: 'demo' })
     expect((await call('GET', `/orders/${order.id}`, { token: buyer })).body.data.id).toBe(order.id)
     expect((await call('GET', `/orders/${order.id}`, { token: other })).status).toBe(404)
     expect((await call('POST', '/orders', { body: { ...body, paymentMethod: 'pm_master' }, token: buyer })).status).toBe(409)
-    expect((await call('POST', '/orders', { body: checkout('vuori-strato-tech-tee-black'), token: buyer })).body.error.code).toBe('INVALID_VARIANT')
+    expect((await call('POST', '/orders', { body: checkout('vuori-strato-tech-tee-black', buyer), token: buyer })).body.error.code).toBe('INVALID_VARIANT')
   })
 
   it('blocks guests, wrong orders and duplicates, and publishes an eligible review', async () => {
@@ -79,7 +86,7 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
     expect((await call('POST', productPath, { body })).status).toBe(401)
     expect((await call('POST', productPath, { body, token: buyer })).status).toBe(403)
 
-    const order = (await call('POST', '/orders', { body: checkout('banana'), token: buyer })).body.data
+    const order = (await call('POST', '/orders', { body: checkout('banana', buyer), token: buyer })).body.data
     expect((await call('GET', `${productPath}/eligibility?orderId=${order.id}`, { token: other })).body.data.eligible).toBe(false)
     expect((await call('POST', productPath, { body: { ...body, orderId: order.id }, token: other })).status).toBe(403)
     expect((await call('POST', '/products/pear/reviews', { body: { ...body, orderId: order.id }, token: buyer })).status).toBe(403)
@@ -103,7 +110,7 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
     const path = '/products/orange/reviews'
     for (const rating of [3, 5]) {
       const token = await register(`Buyer ${rating}`)
-      expect((await call('POST', '/orders', { body: checkout('orange'), token })).status).toBe(201)
+      expect((await call('POST', '/orders', { body: checkout('orange', token), token })).status).toBe(201)
       expect((await call('POST', path, { body: { rating, content: 'Orange review' }, token })).status).toBe(201)
     }
     const first = (await call('GET', `${path}?limit=1`)).body.data
@@ -117,7 +124,7 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
 
   it('disallows demo checkout and demo proof of purchase when the demo flag is off', async () => {
     const token = await register('Demo customer')
-    const body = checkout('pear')
+    const body = checkout('pear', token)
     expect((await call('POST', '/orders', { body, token })).status).toBe(201)
     const secure = createTestApp({ commerce: { db: connection.db, allowDemoCheckout: false } }).call
     expect((await secure('POST', '/orders', { body, token })).status).toBe(503)

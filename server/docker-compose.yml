@@ -18,5 +18,14 @@ services:
       timeout: 3s
       retries: 20
 
+  # Hộp thư giả cho dev: nhận mọi email server gửi qua SMTP (cổng 1025), xem tại http://localhost:8025.
+  # Không gửi ra ngoài. Bật bằng `npm run mail:up`, đặt SMTP_URL=smtp://localhost:1025 trong .env.
+  mailpit:
+    image: axllent/mailpit:v1.20.0
+    restart: unless-stopped
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
 volumes:
   market-pg:

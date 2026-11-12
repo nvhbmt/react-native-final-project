@@ -5,7 +5,7 @@ export type Address = { id: string; recipientName: string; phone: string; line1:
 export type AddressInput = Omit<Address, 'id' | 'isDefault'> & { isDefault?: boolean }
 
 export const accountApi = {
-  updateProfile: (input: { fullName?: string; phone?: string | null }) => api.patch<User>('/users/me', input),
+  updateProfile: (input: { fullName?: string; phone?: string | null; promoNotifications?: boolean }) => api.patch<User>('/users/me', input),
   setAvatar: (uploadId: string | null) => api.put<User>('/users/me/avatar', { uploadId }),
   deleteAccount: (password: string) => api.delete<{ deleted: true }>('/users/me', { body: { password } }),
   addresses: () => api.get<Address[]>('/users/me/addresses'),

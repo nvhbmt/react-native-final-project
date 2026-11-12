@@ -19,15 +19,16 @@ describe.skipIf(!commerceTestUrl)('thanh toán SePay', () => {
     headers: { 'Content-Type': 'application/json', Authorization: `Apikey ${key}` },
     body: JSON.stringify({ id: ++txnId, gateway: 'MBBank', accountNumber: sepay.accountNumber, transferType: 'in', code: null, ...body }),
   })
-  const order = async (token: string) => (await t.call('POST', '/orders', {
-    token, body: { requestId: crypto.randomUUID(), paymentMethod: 'sepay', items: [{ productId: 'banana', quantity: 3 }] },
+  const order = async ({ token, addressId }: { token: string; addressId: string }) => (await t.call('POST', '/orders', {
+    token, body: { requestId: crypto.randomUUID(), paymentMethod: 'sepay', addressId, items: [{ productId: 'banana', quantity: 3 }] },
   })).body.data
 
   it('chỉ có SePay khi tắt demo; đơn chờ thanh toán có QR và số tiền VND', async () => {
-    const { token } = await t.register()
+    const user = await t.register()
+    const { token } = user
     expect((await t.call('GET', '/payment-methods', { token })).body.data.map((m: { id: string }) => m.id)).toEqual(['sepay'])
-    expect((await t.call('POST', '/orders', { token, body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', items: [{ productId: 'banana', quantity: 1 }] } })).status).toBe(503)
-    const created = await order(token)
+    expect((await t.call('POST', '/orders', { token, body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId: user.addressId, items: [{ productId: 'banana', quantity: 1 }] } })).status).toBe(503)
+    const created = await order(user)
     expect(created).toMatchObject({ status: 'pending_payment', paymentMode: 'verified', cancellable: true })
     expect(created.amountVnd).toBe(Math.round(created.total * 25_000))
     expect(created.payment).toMatchObject({ provider: 'sepay', accountNumber: sepay.accountNumber, amountVnd: created.amountVnd, expired: false })
@@ -36,21 +37,27 @@ describe.skipIf(!commerceTestUrl)('thanh toán SePay', () => {
   })
 
   it('webhook sai key bị từ chối; đúng key ghi nhận tiền một lần và xác nhận đơn', async () => {
-    const { token } = await t.register()
-    const created = await order(token)
+    const user = await t.register()
+    const { token } = user
+    const created = await order(user)
     const body = { content: `NGUYEN VAN A CHUYEN TIEN ${created.payment.content}`, transferAmount: created.amountVnd }
     expect((await webhook(body, 'wrong-key')).status).toBe(401)
+    expect(await (await webhook({ ...body, accountNumber: '9999999999' })).json()).toMatchObject({ result: 'ignored' })
+    expect(await (await webhook({ ...body, accountNumber: null })).json()).toMatchObject({ result: 'ignored' })
+    expect((await t.call('GET', `/orders/${created.id}`, { token })).body.data.status).toBe('pending_payment')
 
     const first = await webhook(body)
     expect(await first.json()).toEqual({ success: true, result: 'matched' })
     const paid = (await t.call('GET', `/orders/${created.id}`, { token })).body.data
-    expect(paid).toMatchObject({ status: 'completed', payment: null, cancellable: false })
+    expect(paid).toMatchObject({ status: 'completed', payment: null, cancellable: false, fulfillment: 'processing', advanceable: false })
     expect(paid.paidAt).toBeTypeOf('number')
+    // Môi trường không bật demo → không tự chuyển bước giao hàng được.
+    expect((await t.call('POST', `/orders/${created.id}/advance`, { token })).body.error.code).toBe('DEMO_ONLY')
 
     // SePay gửi lại cùng id giao dịch → không xử lý lần hai
     const replay = await t.app.request('/api/v1/payments/webhook', {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Apikey ${sepay.webhookApiKey}` },
-      body: JSON.stringify({ id: txnId, transferType: 'in', content: body.content, transferAmount: body.transferAmount }),
+      body: JSON.stringify({ id: txnId, accountNumber: sepay.accountNumber, transferType: 'in', content: body.content, transferAmount: body.transferAmount }),
     })
     expect((await replay.json() as { result: string }).result).toBe('duplicate')
     expect((await t.call('POST', `/orders/${created.id}/cancel`, { token })).body.error.code).toBe('ORDER_NOT_CANCELLABLE')
@@ -60,8 +67,9 @@ describe.skipIf(!commerceTestUrl)('thanh toán SePay', () => {
   })
 
   it('thiếu tiền, không khớp mã, tiền ra và tiền đến sau khi huỷ', async () => {
-    const { token } = await t.register()
-    const created = await order(token)
+    const user = await t.register()
+    const { token } = user
+    const created = await order(user)
     const content = created.payment.content
     expect(await (await webhook({ content, transferAmount: created.amountVnd - 1 })).json()).toMatchObject({ result: 'underpaid' })
     expect((await t.call('GET', `/orders/${created.id}`, { token })).body.data.status).toBe('pending_payment')
@@ -74,8 +82,9 @@ describe.skipIf(!commerceTestUrl)('thanh toán SePay', () => {
   })
 
   it('POST /orders/:id/pay trả lại hướng dẫn chuyển khoản cho đơn đang chờ', async () => {
-    const { token } = await t.register()
-    const created = await order(token)
+    const user = await t.register()
+    const { token } = user
+    const created = await order(user)
     const pay = (await t.call('POST', `/orders/${created.id}/pay`, { token })).body.data
     expect(pay.payment.content).toBe(created.payment.content)
     const other = await t.register()

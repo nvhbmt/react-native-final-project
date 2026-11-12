@@ -25,7 +25,7 @@ export function WriteReviewScreen() {
   const [pending, setPending] = useState(false)
   const submitting = useRef(false)
 
-  if (!product) return <ProductStatus title="Write a review" {...request} />
+  if (!product) return <ProductStatus title="Viết đánh giá" {...request} />
   const productId = product.id
   const viewReviews = () => router.dismissTo({ pathname: '/product/[id]/reviews', params: { id: productId } })
 
@@ -45,7 +45,7 @@ export function WriteReviewScreen() {
         invalidateReviews()
         viewReviews()
       } else {
-        setError(failure instanceof ApiError ? failure.message : 'Could not submit your review. Please try again.')
+        setError(failure instanceof ApiError ? failure.message : 'Không gửi được đánh giá. Vui lòng thử lại.')
       }
     } finally {
       clearTimeout(timeout)
@@ -55,30 +55,30 @@ export function WriteReviewScreen() {
   }
 
   return (
-    <Screen header={<AppHeader title="Write a review" />} contentClassName="gap-5 px-6 pt-4 pb-6" safeBottom>
+    <Screen header={<AppHeader title="Viết đánh giá" />} contentClassName="gap-5 px-6 pt-4 pb-6" safeBottom>
       <Text className="font-heading text-[18px] leading-[28px] font-bold text-neutral-700">{product.name}</Text>
       {eligibility.auth === 'guest' ? (
-        <Button title="Sign in to write a review" onPress={() => router.push('/login')} />
+        <Button title="Đăng nhập để viết đánh giá" onPress={() => router.push('/login')} />
       ) : eligibility.loading || eligibility.error || eligibility.auth === 'unknown' ? (
-        <CatalogStatus loading={eligibility.loading || eligibility.auth === 'unknown'} message={eligibility.error ? 'Could not verify your purchase.' : undefined} onRetry={eligibility.error ? eligibility.retry : undefined} />
+        <CatalogStatus loading={eligibility.loading || eligibility.auth === 'unknown'} message={eligibility.error ? 'Không xác minh được đơn mua của bạn.' : undefined} onRetry={eligibility.error ? eligibility.retry : undefined} />
       ) : eligibility.data?.eligible ? (
         <>
           <View className="gap-3">
-            <Text className="text-[14px] font-semibold text-neutral-700">Rating</Text>
+            <Text className="text-[14px] font-semibold text-neutral-700">Số sao</Text>
             <StarRating value={rating} size={28} className="gap-4" onChange={setRating} />
           </View>
           <View className="gap-2">
-            <Text className="text-[14px] font-semibold text-neutral-700">Your review</Text>
-            <TextInput accessibilityLabel="Your review" placeholder="Tell others about this product" multiline maxLength={1000} value={content} onChangeText={setContent} editable={!pending} style={styles.input} />
+            <Text className="text-[14px] font-semibold text-neutral-700">Nhận xét của bạn</Text>
+            <TextInput accessibilityLabel="Nhận xét của bạn" placeholder="Chia sẻ cảm nhận về sản phẩm này" multiline maxLength={1000} value={content} onChangeText={setContent} editable={!pending} style={styles.input} />
             <Text className="text-right text-[12px] text-neutral-500">{content.length}/1000</Text>
           </View>
           {error ? <Text role="alert" className="text-[14px] text-red-700">{error}</Text> : null}
-          <Button title={pending ? 'Submitting…' : 'Submit review'} disabled={pending || !rating || !content.trim()} onPress={submit} />
+          <Button title={pending ? 'Đang gửi…' : 'Gửi đánh giá'} disabled={pending || !rating || !content.trim()} onPress={submit} />
         </>
       ) : (
         <>
-          <Text className="text-[14px] text-neutral-600">{eligibility.data?.reason === 'already_reviewed' ? 'You have already reviewed this product.' : 'Complete an order for this product to write a review.'}</Text>
-          <Button title="View reviews" variant="outline" onPress={viewReviews} />
+          <Text className="text-[14px] text-neutral-600">{eligibility.data?.reason === 'already_reviewed' ? 'Bạn đã đánh giá sản phẩm này.' : 'Hãy hoàn tất một đơn hàng có sản phẩm này để viết đánh giá.'}</Text>
+          <Button title="Xem đánh giá" variant="outline" onPress={viewReviews} />
         </>
       )}
     </Screen>

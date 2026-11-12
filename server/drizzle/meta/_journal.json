@@ -92,6 +92,55 @@
       "when": 1794378496391,
       "tag": "0012_ai_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794404048901,
+      "tag": "0013_order_shipping_address",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794405228575,
+      "tag": "0014_order_shipping_fee",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794405782321,
+      "tag": "0015_order_fulfillment",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794406235078,
+      "tag": "0016_user_promo_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794424586641,
+      "tag": "0017_order_fulfillment_actor",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794426352234,
+      "tag": "0018_upload_url",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794429645462,
+      "tag": "0019_rate_limits",
+      "breakpoints": true
     }
   ]
 }

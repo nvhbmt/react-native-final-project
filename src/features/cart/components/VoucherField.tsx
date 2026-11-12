@@ -26,7 +26,7 @@ export function VoucherField() {
 
   return (
     <View className="gap-1">
-      <Text className="text-[14px] leading-[22px] text-neutral-700">Voucher</Text>
+      <Text className="text-[14px] leading-[22px] text-neutral-700">Mã giảm giá</Text>
       <View className="flex-row items-center gap-4">
         <TextInput
           value={code}
@@ -35,7 +35,7 @@ export function VoucherField() {
             setError(null)
           }}
           onSubmitEditing={apply}
-          placeholder="Enter voucher code"
+          placeholder="Nhập mã giảm giá"
           placeholderTextColor={appColors['neutral-400']}
           autoCapitalize="characters"
           returnKeyType="done"
@@ -55,16 +55,17 @@ export function VoucherField() {
         <View
           onPress={apply}
           role="button"
+          aria-label="Áp dụng mã giảm giá"
           aria-disabled={!canApply || applying}
           className={cn('h-[36px] w-[61px] items-center justify-center rounded-[4px]', canApply ? 'bg-secondary-50 active:opacity-70' : 'bg-secondary-25')}
         >
-          <Text className={cn('text-[14px] leading-[22px]', canApply ? 'text-secondary' : 'text-secondary-300')}>Apply</Text>
+          <Text className={cn('text-[14px] leading-[22px]', canApply ? 'text-secondary' : 'text-secondary-300')}>Áp dụng</Text>
         </View>
       </View>
       {error ? <Text className="text-[12px] leading-[20px] text-danger">{error}</Text> : null}
       {voucher ? (
         <Text className="text-[12px] leading-[20px] text-success-700">
-          Đã áp dụng {voucher.code} (-{Math.round(voucher.rate * 100)}%)
+          Đã áp dụng {voucher.code} ({voucher.code === 'FREESHIP' ? 'miễn phí vận chuyển' : `-${Math.round(voucher.rate * 100)}%`})
         </Text>
       ) : null}
     </View>

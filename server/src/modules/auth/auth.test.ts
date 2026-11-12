@@ -203,7 +203,7 @@ describe('đổi mật khẩu', () => {
 
 describe('quên / đặt lại mật khẩu', () => {
   function withMailbox() {
-    const sent: { to: string; text: string }[] = []
+    const sent: { to: string; subject: string; text: string; html?: string }[] = []
     const ctx = createTestApp({ mailer: { send: async (mail) => { sent.push(mail) } } })
     const lastCode = () => sent.at(-1)!.text.match(/\b(\d{6})\b/)![1]!
     return { ...ctx, sent, lastCode }
@@ -229,6 +229,17 @@ describe('quên / đặt lại mật khẩu', () => {
     expect((await call('POST', '/auth/refresh', { body: { refreshToken: old.refreshToken } })).status).toBe(401)
     expect((await call('POST', '/auth/login', { body: { email: alice.email, password: 'brand new pass' } })).status).toBe(200)
     expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code, newPassword: 'another pass 1' } })).body.error.code).toBe('INVALID_RESET_CODE')
+  })
+
+  it('email có tiêu đề MobiMart, bản HTML chứa mã và escape họ tên', async () => {
+    const { call, sent, lastCode } = withMailbox()
+    await call('POST', '/auth/register', { body: { ...alice, fullName: '<b>Alice</b> & Co' } })
+    await call('POST', '/auth/forgot-password', { body: { email: alice.email } })
+    const mail = sent[0]!
+    expect(mail.subject).toBe(`MobiMart – Mã đặt lại mật khẩu: ${lastCode()}`)
+    expect(mail.html).toContain(lastCode())
+    expect(mail.html).toContain('&lt;b&gt;Alice&lt;/b&gt; &amp; Co')
+    expect(mail.html).not.toContain('<b>Alice</b>')
   })
 
   it('khoá mã sau 5 lần sai và mã mới thay thế mã cũ', async () => {

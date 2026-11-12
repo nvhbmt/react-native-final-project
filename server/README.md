@@ -1,11 +1,14 @@
-# Market API (`server/`)
+# MobiMart API (`server/`)
 
-Backend cho app React Native: **Hono + Drizzle ORM + Postgres 17**, chạy trên Node 22.
+Backend cho app MobiMart (React Native): **Hono + Drizzle ORM + Postgres 17**, chạy trên Node 22.
 Cây npm riêng, độc lập với app Expo ở thư mục gốc — chạy `npm install` bên trong `server/`.
 
-Gồm: **xác thực** (kể cả quên mật khẩu qua email), **catalog**, **giỏ hàng**, **đơn hàng** với thanh toán
-chuyển khoản **SePay (VietQR)**, **đánh giá**, **yêu thích**, **hộp thư**, **góp ý**, **upload ảnh**,
-**tài khoản** (hồ sơ, avatar, địa chỉ, xoá tài khoản) và **trợ lý mua sắm AI** (stream SSE).
+Triển khai với Supabase PostgreSQL và host Node: xem [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+Gồm: **xác thực** (kể cả quên mật khẩu qua email), **catalog**, **giỏ hàng**, **đơn hàng** (địa chỉ giao hàng,
+phí vận chuyển, tiến độ giao hàng) với thanh toán chuyển khoản **SePay (VietQR)**, **đánh giá**, **yêu thích**,
+**hộp thư**, **góp ý**, **upload ảnh**, **tài khoản** (hồ sơ, avatar, địa chỉ, tuỳ chọn khuyến mãi, xoá tài khoản)
+và **trợ lý mua sắm AI** (stream SSE).
 
 ## Chạy local
 
@@ -16,8 +19,13 @@ cp .env.example .env          # rồi thay JWT_ACCESS_SECRET bằng chuỗi ng�
 npm run db:up                 # Postgres trên cổng 5435 (tạo sẵn cả DB market_test)
 npm run migrate
 npm run db:seed:catalog       # 80 sản phẩm mẫu. Chạy lại giữ nguyên các bản ghi đã có.
+npm run db:seed:reviews       # (tuỳ chọn) 24 đánh giá tiếng Việt cho 8 sản phẩm nổi bật, mỗi bài kèm đơn demo đã giao
+npm run mail:up               # (tuỳ chọn) hộp thư giả Mailpit để nhận email — xem mục "Email"
 npm run dev                   # http://localhost:4000/api/v1
 ```
+
+Sau khi pull code mới, chạy lại `npm run migrate` (vd. các migration `0013`–`0017`: địa chỉ giao hàng, phí ship,
+tiến độ giao hàng của đơn, tuỳ chọn nhận khuyến mãi của user). Migration chỉ thêm cột, dữ liệu cũ giữ nguyên.
 
 Điện thoại thật không gọi được `localhost` — dùng IP LAN của máy dev (`http://192.168.x.x:4000`).
 Server lắng nghe trên `0.0.0.0`. Khi `NODE_ENV=development`, mọi origin `http://localhost:<cổng>` đều được
@@ -45,7 +53,7 @@ npm test
 
 ## Database (Docker)
 
-Chỉ Postgres chạy trong Docker (`docker-compose.yml`), API chạy trực tiếp bằng Node để hot reload.
+Postgres (và Mailpit tuỳ chọn) chạy trong Docker (`docker-compose.yml`), API chạy trực tiếp bằng Node để hot reload.
 Cần Docker Desktop hoặc OrbStack.
 
 | | Giá trị |
@@ -62,6 +70,7 @@ npm run db:down      # tắt container, GIỮ dữ liệu
 npm run db:reset     # XOÁ volume, tạo DB mới rồi chạy migration
 npm run db:psql      # mở psql vào DB market (\dt để xem bảng)
 npm run db:logs      # xem log Postgres
+npm run mail:up      # bật Mailpit: SMTP cổng 1025, giao diện http://localhost:8025
 ```
 
 - `scripts/init-test-db.sql` tạo `market_test`, nhưng **chỉ chạy lần đầu volume được tạo**. Nếu volume có
@@ -116,8 +125,23 @@ Quy ước:
 | POST | `/api/v1/auth/forgot-password` | — | `{ email }` → luôn `{ sent: true }`; gửi mã 6 số (15 phút) nếu email tồn tại |
 | POST | `/api/v1/auth/reset-password` | — | `{ email, code, newPassword }` → `{ user, tokens }`, thu hồi mọi phiên cũ |
 
-Email gửi qua SMTP khi đặt `SMTP_URL` (vd. `smtps://user:pass@smtp.gmail.com:465`) và `MAIL_FROM`.
-Không đặt thì nội dung email (kèm mã) được in ra console của server — đủ để thử khi dev.
+### Email
+
+Email (mã đặt lại mật khẩu, có bản HTML và bản chữ) gửi qua SMTP. Chọn **một** cách cấu hình; không đặt gì thì
+nội dung email (kèm mã) được in ra console của server. Đặt cả hai cách cùng lúc → server dừng lúc khởi động.
+
+- **Gmail (gửi thật):** bật Xác minh 2 bước, tạo App Password tại https://myaccount.google.com/apppasswords
+  (tên `MobiMart`), rồi đặt `SMTP_USER=<địa chỉ Gmail>` và `SMTP_PASS=<App Password 16 ký tự>` (dấu cách tự bỏ).
+  Mặc định `smtp.gmail.com:465`, người gửi `MobiMart <SMTP_USER>` (Gmail buộc người gửi trùng tài khoản).
+  Giới hạn của Gmail khoảng 500 thư/ngày — đủ cho demo; production nhiều người dùng nên chuyển dịch vụ email giao dịch.
+- **Dev — Mailpit (hộp thư giả, không gửi ra ngoài):** `npm run mail:up`, đặt `SMTP_URL=smtp://localhost:1025`,
+  khởi động lại server. Xem thư tại http://localhost:8025.
+- Nhà cung cấp khác: `SMTP_URL` đầy đủ, hoặc `SMTP_USER`/`SMTP_PASS` kèm `SMTP_HOST`/`SMTP_PORT`.
+
+```bash
+npm run mail:test                    # kiểm tra kết nối + đăng nhập SMTP, không gửi thư
+npm run mail:test -- ban@gmail.com   # gửi thư thử
+```
 
 `tokens = { tokenType: 'Bearer', accessToken, expiresIn, refreshToken, refreshTokenExpiresAt }`.
 
@@ -187,7 +211,7 @@ Tất cả cần `Authorization: Bearer`. Dưới tiền tố `/api/v1`:
 | `POST /cart/merge` | `{ items, voucher? }` gộp giỏ khách sau khi đăng nhập, bỏ qua dòng không hợp lệ |
 | `POST/DELETE /cart/voucher` | Áp / bỏ mã (`SALE10`, `FREESHIP`) |
 | `GET /favorites` · `PUT/DELETE /favorites/:productId` | `{ items, ids }` · thêm/bỏ (idempotent) |
-| `PATCH /users/me` | `{ fullName?, phone? }` |
+| `PATCH /users/me` | `{ fullName?, phone?, promoNotifications? }` — `promoNotifications`: đồng ý nhận thông báo khuyến mãi (mặc định `false`, có trong `user`) |
 | `PUT /users/me/avatar` | `{ uploadId \| null }` — ảnh đã upload với `purpose=avatar` |
 | `DELETE /users/me` | `{ password }` — xoá vĩnh viễn, dữ liệu liên quan xoá theo cascade |
 | `GET/POST /users/me/addresses` · `PATCH/DELETE /users/me/addresses/:id` | Tối đa 10, luôn giữ một địa chỉ mặc định |
@@ -197,20 +221,52 @@ Tất cả cần `Authorization: Bearer`. Dưới tiền tố `/api/v1`:
 | `POST /uploads` | Multipart (`file`, `purpose`) hoặc JSON `{ purpose, data: <base64> }`. JPEG/PNG/WebP ≤ 5MB (kiểm tra magic bytes). Trả `{ id, url }` |
 | `GET /uploads/:file` | Phục vụ ảnh (ngoài `/api/v1`), URL tương đối — app ghép với địa chỉ API |
 
-Ảnh lưu trong `UPLOAD_DIR` (mặc định `./uploads`, đã gitignore). Production nên trỏ tới volume bền vững.
+### Lưu ảnh (avatar, góp ý, đánh giá)
+
+- **Mặc định — ổ đĩa:** ảnh lưu trong `UPLOAD_DIR` (mặc định `./uploads`, đã gitignore), phục vụ qua `/uploads/<file>`.
+  Phù hợp dev; trên host deploy không có volume bền vững thì ảnh **mất sau mỗi lần deploy** (server in cảnh báo khi `NODE_ENV=production`).
+- **Supabase Storage (khuyên dùng khi deploy):** đặt `SUPABASE_URL` (Project URL) và `SUPABASE_SECRET_KEY`
+  (Secret key `sb_secret_…` ở Project Settings → API Keys, chỉ ở server; khoá `service_role` JWT cũ đặt ở
+  `SUPABASE_SERVICE_ROLE_KEY` vẫn dùng được), tuỳ chọn `SUPABASE_STORAGE_BUCKET` (mặc định `uploads`). Ảnh mới lưu vào bucket
+  public, `uploads.url` lưu URL tuyệt đối và app dùng thẳng (không qua API). Kiểm tra định dạng bằng magic bytes,
+  tên file UUID do server đặt, bucket giới hạn 5MB và chỉ JPEG/PNG/WebP.
+
+```bash
+npm run storage:setup                # tạo bucket public nếu chưa có
+npm run storage:migrate              # chạy thử: liệt kê ảnh cũ trên ổ đĩa sẽ chuyển
+npm run storage:migrate -- --apply   # tải ảnh cũ lên bucket, cập nhật uploads.url, users.avatar_url, feedback.images
+```
+
+Migration `0018` thêm cột `uploads.url` (null với ảnh cũ → vẫn dùng `/uploads/<file>`).
 
 ## Đơn hàng và thanh toán SePay
 
 | Method và path | Hành vi |
 | --- | --- |
 | `GET /payment-methods` | `sepay` (khi đã cấu hình) + thẻ demo (khi `NODE_ENV` ≠ production) |
-| `POST /orders` | `{ requestId, paymentMethod, items, voucher? }`. Server tính giá từ catalog; gửi lại cùng `requestId` + cùng nội dung trả đơn cũ. Thẻ demo → `completed` ngay. `sepay` → `pending_payment` kèm `payment` (ngân hàng, STK, chủ TK, `amountVnd`, nội dung CK, `qrUrl`, hạn). Giỏ server được xoá. |
+| `GET /shipping-methods?products=a,b` | Công khai. Hình thức giao mà **mọi** sản phẩm đều hỗ trợ: `[{ id, label, eta, fee }]` (phí gốc USD) |
+| `POST /orders` | `{ requestId, paymentMethod, addressId, shippingMethod?, items, voucher? }`. `addressId` bắt buộc, phải thuộc sổ địa chỉ của chính user (sai → `400 ADDRESS_NOT_FOUND`); server chụp lại địa chỉ vào đơn. `shippingMethod` mặc định `standard`; không áp dụng cho mọi sản phẩm → `400 SHIPPING_UNAVAILABLE`. Server tính giá từ catalog; gửi lại cùng `requestId` + cùng nội dung trả đơn cũ. Thẻ demo → `completed` ngay. `sepay` → `pending_payment` kèm `payment` (ngân hàng, STK, chủ TK, `amountVnd`, nội dung CK, `qrUrl`, hạn, `simulated`). Giỏ server được xoá. |
 | `GET /orders` · `GET /orders/:id` | Lịch sử (phân trang cursor) · chi tiết của chính user |
 | `POST /orders/:id/pay` | Lấy lại / gia hạn hướng dẫn chuyển khoản cho đơn đang chờ (mã CK giữ nguyên) |
-| `POST /orders/:id/cancel` | Huỷ đơn chờ thanh toán hoặc đơn demo. Đơn đã trả tiền thật → `409 ORDER_NOT_CANCELLABLE` |
+| `POST /orders/:id/cancel` | Huỷ đơn chờ thanh toán hoặc đơn demo **còn đang xử lý**. Đơn đã trả tiền thật hoặc đã gửi đi → `409 ORDER_NOT_CANCELLABLE` |
+| `POST /orders/:id/advance` | **Chỉ dev/test** (cùng điều kiện thẻ demo, production → `403 DEMO_ONLY`): chuyển bước giao hàng `processing → shipping → delivered`, gửi thông báo hộp thư. Hết bước → `409 ORDER_NOT_ADVANCEABLE` |
 | `POST /payments/webhook` | Webhook SePay, xác thực `Authorization: Apikey <SEPAY_WEBHOOK_API_KEY>` |
 
-Luồng SePay: khách quét QR (`qr.sepay.vn`) hoặc chuyển tay với nội dung `DH` + 8 ký tự → SePay thấy tiền vào
+Đơn hàng trả thêm: `shippingAddress` (bản chụp `{ recipientName, phone, line1, city }`), `shippingMethod`
+(`{ id, label, eta }`), `fees` (phí ship), `fulfillment` (`processing` | `shipping` | `delivered`, `null` khi chưa
+thanh toán/đã huỷ), `shippedAt`, `deliveredAt`, `advanceable`. Đơn tạo trước các migration này có
+`shippingAddress`/`shippingMethod` = `null`, `fees` = 0.
+
+| Hình thức giao | Thời gian | Phí |
+| --- | --- | --- |
+| `standard` Tiêu chuẩn | 7–10 ngày | $2.99 |
+| `express` Nhanh | 2 ngày | $5.99 |
+| `instant` Hoả tốc | 2 giờ | $9.99 |
+
+Tổng = tạm tính − giảm giá + thuế 10% (trên tạm tính sau giảm) + phí ship. Phí ship **không chịu thuế**;
+`FREESHIP` đưa phí ship về 0, `SALE10` giảm 10% tạm tính.
+
+Luồng SePay: khách quét QR (`qr.sepay.vn`) hoặc chuyển tay với nội dung `MM` + 8 ký tự → SePay thấy tiền vào
 tài khoản và gọi webhook → server tìm mã trong `code`/`content`, ghi giao dịch vào `payment_transactions`
 (unique theo id giao dịch SePay nên gửi lại không bị xử lý hai lần), rồi:
 
@@ -229,23 +285,85 @@ SEPAY_WEBHOOK_API_KEY=...        # tự đặt chuỗi ngẫu nhiên, dán cùng
 SEPAY_BANK=MBBank                # tên ngân hàng theo SePay
 SEPAY_ACCOUNT_NUMBER=0123456789
 SEPAY_ACCOUNT_NAME="NGUYEN VAN A"
-SEPAY_CODE_PREFIX=DH             # khớp "Cấu trúc mã thanh toán" trên SePay
+SEPAY_CODE_PREFIX=MM             # khớp "Cấu trúc mã thanh toán" trên SePay
 SEPAY_PAYMENT_TTL_MINUTES=30
 USD_TO_VND_RATE=25000
+SEPAY_SIMULATED=false            # true = giả lập ở máy dev, xem mục bên dưới
 ```
 
-Trên my.sepay.vn: liên kết tài khoản ngân hàng → **Cấu hình công ty → Cấu trúc mã thanh toán**: tiền tố `DH`,
-hậu tố 8 ký tự chữ + số → **Tích hợp Webhooks**: URL `https://<domain>/api/v1/payments/webhook`, sự kiện
-"Có tiền vào", chứng thực **API Key** = `SEPAY_WEBHOOK_API_KEY`. Khi dev, mở tunnel (vd. `ngrok http 4000`)
-để SePay gọi được máy local, hoặc tự giả lập webhook:
+Trên my.sepay.vn: liên kết tài khoản ngân hàng → **Cấu hình công ty → Cấu trúc mã thanh toán**: thêm mẫu riêng
+tiền tố `MM`, hậu tố đúng 8 ký tự chữ + số (giữ mẫu `DH` của ứng dụng khác) → **Tích hợp Webhooks**:
+URL `https://<domain>/api/v1/payments/webhook`, sự kiện
+"Có tiền vào", chứng thực **API Key** = `SEPAY_WEBHOOK_API_KEY`. Khi dev, chạy server rồi mở tunnel:
 
 ```bash
-curl -X POST http://localhost:4000/api/v1/payments/webhook \
-  -H "Authorization: Apikey $SEPAY_WEBHOOK_API_KEY" -H 'Content-Type: application/json' \
-  -d '{"id":123456,"gateway":"MBBank","transactionDate":"2026-11-11 10:00:00","accountNumber":"0123456789",
-       "code":null,"content":"DHABCD2345 chuyen tien","transferType":"in","transferAmount":67000,
-       "accumulated":0,"subAccount":null,"referenceCode":"FT123","description":""}'
+ngrok http 4000 --traffic-policy-file scripts/sepay-ngrok-policy.yml
 ```
+
+Ngrok in ra URL HTTPS của tài khoản (dev domain cố định); thêm `/api/v1/payments/webhook` làm URL trên SePay.
+Policy trên chỉ cho phép `POST` tới đúng webhook, chặn mọi route API khác qua tunnel. Tunnel chỉ hoạt động khi
+máy, server và tiến trình ngrok còn chạy; dùng API HTTPS triển khai ổn định trước khi nhận đơn production.
+
+**Chuyển sang SePay thật:** thay số và tên tài khoản giả bằng tài khoản ngân hàng đã liên kết với SePay,
+đặt API key webhook riêng, rồi mới đổi `SEPAY_SIMULATED=false` và khởi động lại server. Server từ chối
+số tài khoản toàn `0` khi tắt giả lập. Không đưa API key vào `EXPO_PUBLIC_*` hoặc mã app.
+Trong cấu hình webhook, chọn đúng tài khoản nhận tiền, sự kiện **Có tiền vào**, body **JSON**, xác thực
+**API Key**, và bật gửi lại khi endpoint trả lỗi. Dùng chức năng **Gửi thử** trên SePay để xác nhận webhook
+trả `200` với `{ "success": true }`; sau đó kiểm tra một giao dịch thật giá trị nhỏ và nhật ký webhook.
+Xem [hướng dẫn webhook chính thức](https://docs.sepay.vn/tich-hop-webhooks.html).
+
+SePay có [Test Mode riêng](https://docs.sepay.vn/test-mode.html) với tài khoản, webhook và giao dịch giả
+trên hệ thống SePay; chế độ này khác script `sepay:simulate` chạy hoàn toàn ở máy local. Nếu tài khoản SePay
+được bật Test Mode, nên thử webhook tại đó trước khi dùng tài khoản ngân hàng thật. URL ngrok chỉ phù hợp
+cho lần thử có giám sát; khi phát hành cần API HTTPS ổn định và database/ảnh lưu bền vững.
+
+### Giả lập SePay ở máy dev (không cần tài khoản SePay)
+
+Đặt `SEPAY_SIMULATED=true` cùng 4 biến `SEPAY_*` với giá trị giả (vd. STK `0000000000`, chủ TK
+`"TAI KHOAN GIA LAP"`, API key là chuỗi ngẫu nhiên). App hiện cảnh báo đỏ **"Chế độ giả lập — đừng chuyển
+tiền thật"** trên màn chuyển khoản (QR vẫn do `qr.sepay.vn` tạo nên tuyệt đối không quét để trả tiền).
+Server từ chối khởi động nếu bật giả lập khi `NODE_ENV=production`.
+
+```bash
+npm run sepay:simulate                         # liệt kê đơn đang chờ chuyển khoản
+npm run sepay:simulate -- MM7K2M9QXA           # trả đủ tiền theo mã CK (hoặc mã đơn, vd. 8D7A79E1)
+npm run sepay:simulate -- MM7K2M9QXA --amount 10000   # trả thiếu → result: underpaid
+```
+
+Script gửi webhook đúng định dạng và header như SePay tới server đang chạy, nên đi qua toàn bộ logic thật;
+app đang mở màn QR tự chuyển sang "Thanh toán thành công" sau vài giây.
+
+## Quản trị giao hàng (production)
+
+Cửa hàng cập nhật tiến độ giao hàng của đơn đã thanh toán qua màn **Tài khoản → Quản lý giao hàng** trong app
+(`/admin/orders`, chỉ hiện với tài khoản `role = admin`). Khác nút demo `POST /orders/:id/advance` (chỉ dev/test,
+khách tự bấm cho đơn của mình), luồng này chạy được ở production và áp dụng cho đơn của mọi khách.
+
+Cấp/thu quyền (dùng `DATABASE_URL` của môi trường cần cấp, tài khoản phải đăng ký trong app trước):
+
+```bash
+npm run admin:grant -- admin@example.com            # cấp quyền; người dùng mở lại app/đăng nhập lại để thấy menu
+npm run admin:grant -- admin@example.com --revoke   # thu quyền, có hiệu lực ngay
+```
+
+| Method và path | Hành vi |
+| --- | --- |
+| `GET /admin/orders?fulfillment&status&limit&cursor` | Đơn của mọi khách, mới nhất trước. `fulfillment` (`processing`/`shipping`/`delivered`) chỉ lấy đơn đã thanh toán. Mỗi đơn kèm `customer { id, fullName, email }`, `nextFulfillment`, `fulfillmentUpdatedBy` |
+| `GET /admin/orders/:id` | Chi tiết một đơn |
+| `POST /admin/orders/:id/fulfillment` | `{ to: 'shipping' \| 'delivered' }` — phải đúng bước kế tiếp (không nhảy cóc/lùi). Sai bước hoặc đơn vừa được người khác cập nhật → `409 ORDER_CHANGED`; chưa thanh toán/đã huỷ/đã giao → `409 ORDER_NOT_ADVANCEABLE`. Ghi `shippedAt`/`deliveredAt`, `fulfillment_updated_by`, gửi thông báo hộp thư cho khách |
+
+- Quyền admin kiểm tra lại trong DB ở **mỗi request** (không chỉ tin `role` trong access token) → không phải admin
+  hoặc vừa bị thu quyền → `403 FORBIDDEN`.
+- Cập nhật đồng thời an toàn: điều kiện trạng thái nằm trong câu `UPDATE … WHERE`, hai admin bấm cùng lúc thì một bên nhận `409`.
+- Migration `0017` thêm cột `orders.fulfillment_updated_by` (FK `users`, `ON DELETE SET NULL`).
+- Chưa có: huỷ/hoàn tiền đơn đã thanh toán từ trang quản trị, nhật ký đầy đủ từng bước (hiện chỉ lưu người cập nhật gần nhất).
+
+**Gửi khuyến mãi** (màn Tài khoản → Gửi khuyến mãi, `/admin/promotions`): `GET /admin/promotions/audience` → `{ recipients }`;
+`POST /admin/promotions { title, body, productId? }` → `{ sent }`, ghi tin `kind: system` vào Hộp thư của mọi khách có
+`promoNotifications = true` (một câu `INSERT … SELECT`); `productId` không tồn tại → `400 PRODUCT_NOT_FOUND`. Chưa có thông báo đẩy.
+
+**Giới hạn request** (đăng nhập/đăng ký, gửi tin AI, upload, góp ý) dùng chung qua bảng `rate_limits` (migration `0019`) khi chạy
+server thật; test dùng bộ đếm trong bộ nhớ. Nút dừng câu trả lời AI vẫn theo từng instance.
 
 ## Đánh giá sản phẩm
 
@@ -259,7 +377,7 @@ Các route sau dùng tiền tố `/api/v1`.
 
 Checkout demo không thu tiền và chỉ tạo đơn khi `NODE_ENV` là `development` hoặc `test`. Ở production chỉ đơn
 đã thanh toán qua SePay (`paymentMode: verified`) mới đủ điều kiện đánh giá. Đánh giá dựa trên đơn demo mang nhãn
-**Demo order**. Điểm đánh giá đã nhập từ các nguồn catalog vẫn được lưu riêng.
+**Đơn demo**. Điểm đánh giá đã nhập từ các nguồn catalog vẫn được lưu riêng.
 
 Chạy test tích hợp review trên một database dành riêng cho test:
 
@@ -270,9 +388,21 @@ REVIEWS_TEST_DATABASE_URL=postgres://market:market@localhost:5435/market_reviews
 
 ## Trợ lý mua sắm AI
 
-Model gọi qua API tương thích **OpenAI Chat Completions** (stream + tool calling) — OpenAI, OpenRouter, Groq,
-Ollama, … Đặt `AI_BASE_URL` (vd. `https://api.openai.com/v1`), `AI_API_KEY`, `AI_MODEL`. Khoá chỉ nằm trên server.
-Thiếu cấu hình thì CRUD hội thoại vẫn chạy, gửi tin trả `503 AI_UNAVAILABLE`, `GET /ai/conversations` trả `available: false`.
+Với Claude API key, đặt các dòng sau trong `server/.env` (file đã git ignore), rồi khởi động lại server:
+
+```dotenv
+AI_PROVIDER=anthropic
+AI_BASE_URL=
+AI_API_KEY=<dán khóa vào file local, không gửi qua chat>
+AI_MODEL=claude-haiku-5-5
+```
+
+Backend gọi **Anthropic Messages API** trực tiếp; khóa không được đưa vào Expo app. Có thể thay model bằng ID mà tài khoản
+Claude của bạn được phép dùng. Adapter hỗ trợ stream text, gọi tool và trả kết quả tool qua nhiều lượt.
+Các nhà cung cấp Chat Completions vẫn dùng được với `AI_PROVIDER=openai-compatible` và bộ ba
+`AI_BASE_URL`/`AI_API_KEY`/`AI_MODEL`. Thiếu key/model thì CRUD hội thoại vẫn chạy, gửi tin trả
+`503 AI_UNAVAILABLE`, `GET /ai/conversations` trả `available: false`. Nếu điền key/model thiếu cấu hình
+cần thiết, server dừng lúc khởi động và báo tên biến còn thiếu.
 
 | Method và path | Mô tả |
 | --- | --- |
