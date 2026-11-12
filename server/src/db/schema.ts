@@ -150,6 +150,8 @@ export const orders = pgTable('orders', {
   paymentCode: text('payment_code'),
   /** Số tiền phải chuyển (VND) — chốt lúc tạo đơn theo tỉ giá cấu hình. */
   amountVnd: integer('amount_vnd'),
+  /** Tổng tiền đã nhận qua SePay cho đơn đang chờ — khách có thể chuyển nhiều lần, đủ `amountVnd` thì xác nhận. */
+  receivedVnd: integer('received_vnd').notNull().default(0),
   paymentExpiresAt: timestamp('payment_expires_at', { withTimezone: true }),
   paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true, precision: 3 }).notNull().defaultNow(),

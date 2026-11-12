@@ -23,9 +23,11 @@ export async function applySepayTransaction(db: Db, config: SepayConfig, txn: Se
       ? await tx.select().from(orders).where(eq(orders.paymentCode, code)).for('update')
       : []
     let result: Exclude<Result, 'duplicate' | 'ignored'> = 'unmatched'
+    // Cộng dồn các lần chuyển cho cùng một đơn: chuyển thiếu rồi chuyển bù vẫn được xác nhận.
+    const received = (order?.receivedVnd ?? 0) + txn.transferAmount
     if (order) {
       if (order.status !== 'pending_payment') result = 'late'
-      else if (txn.transferAmount < (order.amountVnd ?? Infinity)) result = 'underpaid'
+      else if (received < (order.amountVnd ?? Infinity)) result = 'underpaid'
       else result = 'matched'
     }
 
@@ -37,7 +39,7 @@ export async function applySepayTransaction(db: Db, config: SepayConfig, txn: Se
     if (!order) return result
 
     if (result === 'matched') {
-      await tx.update(orders).set({ status: 'completed', paidAt: new Date() })
+      await tx.update(orders).set({ status: 'completed', paidAt: new Date(), receivedVnd: received })
         .where(and(eq(orders.id, order.id), eq(orders.status, 'pending_payment')))
       await notify(tx, order.userId, {
         kind: 'payment',
@@ -46,10 +48,14 @@ export async function applySepayTransaction(db: Db, config: SepayConfig, txn: Se
         data: { orderId: order.id },
       })
     } else if (result === 'underpaid') {
+      await tx.update(orders).set({ receivedVnd: received })
+        .where(and(eq(orders.id, order.id), eq(orders.status, 'pending_payment')))
+      const missing = (order.amountVnd ?? 0) - received
       await notify(tx, order.userId, {
         kind: 'payment',
         title: `Thanh toán chưa đủ cho đơn #${shortId(order.id)}`,
-        body: `Đã nhận ${txn.transferAmount.toLocaleString('vi-VN')}₫, còn thiếu so với ${order.amountVnd?.toLocaleString('vi-VN')}₫. Vui lòng liên hệ hỗ trợ.`,
+        body: `Đã nhận ${received.toLocaleString('vi-VN')}₫ / ${order.amountVnd?.toLocaleString('vi-VN')}₫. `
+          + `Chuyển thêm ${missing.toLocaleString('vi-VN')}₫ với nội dung ${order.paymentCode} để hoàn tất đơn hàng.`,
         data: { orderId: order.id },
       })
     } else {

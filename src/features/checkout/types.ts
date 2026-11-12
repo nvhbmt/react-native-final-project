@@ -16,7 +16,12 @@ export type PaymentInstructions = {
   bank: string
   accountNumber: string
   accountName: string
+  /** Số tiền cần chuyển lúc này — đã trừ phần đã nhận nếu khách chuyển thiếu trước đó. */
   amountVnd: number
+  /** Tổng tiền đơn (VND). Server cũ không gửi. */
+  totalVnd?: number
+  /** Đã nhận qua các lần chuyển trước. Server cũ không gửi. */
+  receivedVnd?: number
   /** Nội dung chuyển khoản bắt buộc (mã đơn). */
   content: string
   qrUrl: string

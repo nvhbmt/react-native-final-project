@@ -81,6 +81,38 @@ describe.skipIf(!commerceTestUrl)('thanh toán SePay', () => {
     expect((await t.call('GET', `/orders/${created.id}`, { token })).body.data.status).toBe('cancelled')
   })
 
+  it('chuyển thiếu rồi chuyển bù: cộng dồn, QR hiện phần còn thiếu, đủ tiền thì xác nhận', async () => {
+    const user = await t.register()
+    const created = await order(user)
+    const content = created.payment.content
+    const first = Math.floor(created.amountVnd / 3)
+    expect(await (await webhook({ content, transferAmount: first })).json()).toMatchObject({ result: 'underpaid' })
+
+    const partial = (await t.call('GET', `/orders/${created.id}`, { token: user.token })).body.data
+    expect(partial.status).toBe('pending_payment')
+    expect(partial.payment).toMatchObject({ totalVnd: created.amountVnd, receivedVnd: first, amountVnd: created.amountVnd - first })
+    expect(new URL(partial.payment.qrUrl).searchParams.get('amount')).toBe(String(created.amountVnd - first))
+    const notice = (await t.call('GET', '/inbox', { token: user.token })).body.data.items[0]
+    expect(notice.body).toContain(`Chuyển thêm ${(created.amountVnd - first).toLocaleString('vi-VN')}₫`)
+
+    // Lần 2 vẫn thiếu 1đ → vẫn chờ; lần 3 bù 1đ → xác nhận
+    expect(await (await webhook({ content, transferAmount: created.amountVnd - first - 1 })).json()).toMatchObject({ result: 'underpaid' })
+    expect(await (await webhook({ content, transferAmount: 1 })).json()).toMatchObject({ result: 'matched' })
+    const paid = (await t.call('GET', `/orders/${created.id}`, { token: user.token })).body.data
+    expect(paid).toMatchObject({ status: 'completed', payment: null })
+
+    // Giao dịch thiếu bị gửi lại (duplicate) không được cộng thêm lần nữa
+    const other = await order(user)
+    const id = ++txnId
+    const send = async () => (await t.app.request('/api/v1/payments/webhook', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Apikey ${sepay.webhookApiKey}` },
+      body: JSON.stringify({ id, accountNumber: sepay.accountNumber, transferType: 'in', content: other.payment.content, transferAmount: Math.ceil(other.amountVnd / 2) }),
+    })).json()
+    expect(await send()).toMatchObject({ result: 'underpaid' })
+    expect(await send()).toMatchObject({ result: 'duplicate' })
+    expect((await t.call('GET', `/orders/${other.id}`, { token: user.token })).body.data.status).toBe('pending_payment')
+  })
+
   it('POST /orders/:id/pay trả lại hướng dẫn chuyển khoản cho đơn đang chờ', async () => {
     const user = await t.register()
     const { token } = user

@@ -2,8 +2,8 @@
 
 Ứng dụng mua sắm **MobiMart** dựng trên **Expo SDK 58 + Expo Router**, UI bằng **Tamagui v3** với cú pháp
 Tailwind (`@tamagui/tailwind`). Home và Product Listing được dựng theo prototype E-Commercial
-Market Place. Dự án có thêm chi tiết sản phẩm, Đánh giá, Bảng size, Giỏ hàng, Thanh toán (thẻ demo hoặc
-VietQR qua SePay), Góp ý, Yêu thích, Hộp thư, Tài khoản (hồ sơ, địa chỉ, đơn hàng, tuỳ chọn khuyến mãi) và
+Market Place. Dự án có thêm chi tiết sản phẩm, Đánh giá, Bảng size, Giỏ hàng, Thanh toán (VietQR
+qua SePay), Góp ý, Yêu thích, Hộp thư, Tài khoản (hồ sơ, địa chỉ, đơn hàng, tuỳ chọn khuyến mãi) và
 trợ lý mua sắm AI; mọi màn đều lấy dữ liệu từ backend trong `server/`.
 
 Giao diện thống nhất **tiếng Việt** (tên sản phẩm, mô tả và đánh giá mẫu trong catalog giữ nguyên ngôn ngữ nguồn).
@@ -37,7 +37,8 @@ logo hiển thị trên màn Đăng nhập, Đăng ký, Quên mật khẩu (`src
     trong giỏ đều hỗ trợ (`GET /shipping-methods`). Tổng cập nhật ngay; FREESHIP hiện phí gạch ngang "Miễn phí".
   - **Giao đến**: chọn từ sổ địa chỉ (mặc định = địa chỉ mặc định), "Thêm hoặc sửa địa chỉ" mở `/addresses`,
     quay lại tự tải lại. Chưa có địa chỉ thì không đặt hàng được. Đơn lưu bản chụp địa chỉ.
-  - **Phương thức thanh toán**: **VietQR qua SePay** khi server cấu hình `SEPAY_*`, thẻ demo khi chạy dev.
+  - **Phương thức thanh toán**: chỉ **VietQR qua SePay** (server cấu hình `SEPAY_*`; dev dùng `SEPAY_SIMULATED=true`).
+    Không còn thẻ demo: chúng không thu tiền thật.
 - Chọn VietQR → đơn chờ thanh toán → màn Chuyển khoản hiện QR, số tài khoản, nội dung CK, tự kiểm tra mỗi
   4 giây và chuyển sang Thành công khi webhook SePay báo đã nhận tiền. Server bật `SEPAY_SIMULATED=true` thì màn
   này có cảnh báo "Chế độ giả lập — đừng chuyển tiền thật"; xác nhận bằng `npm run sepay:simulate` (xem `server/README.md`).
@@ -92,7 +93,7 @@ npm run dev            # API tại http://localhost:4000/api/v1
 Đã có code mới thì chạy lại `npm run migrate` trong `server/` trước khi `npm run dev`.
 
 Thanh toán SePay, email đặt lại mật khẩu và trợ lý AI cần thêm biến môi trường — xem `server/README.md`.
-Thiếu cấu hình thì: chỉ có thẻ demo, mã đặt lại mật khẩu in ra console server, chat báo trợ lý chưa bật.
+Thiếu cấu hình SePay thì **không đặt hàng được** (dev: bật `SEPAY_SIMULATED=true`); mã đặt lại mật khẩu in ra console server, chat báo trợ lý chưa bật.
 Ở máy dev có thể thử trọn luồng không cần tài khoản ngoài: **Mailpit** (`npm run mail:up`, xem thư tại
 http://localhost:8025) và **SePay giả lập** (`SEPAY_SIMULATED=true` + `npm run sepay:simulate`).
 

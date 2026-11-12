@@ -44,7 +44,7 @@ try {
     const pending = await db.select().from(orders).where(eq(orders.status, 'pending_payment')).orderBy(desc(orders.createdAt)).limit(10)
     if (!pending.length) console.log('Không có đơn nào đang chờ chuyển khoản. Đặt đơn bằng "Chuyển khoản ngân hàng (VietQR)" trong app trước.')
     for (const order of pending) {
-      console.log(`#${order.id.slice(0, 8).toUpperCase()}  mã CK ${order.paymentCode}  ${vnd(order.amountVnd ?? 0)}  ${order.createdAt.toLocaleString('vi-VN')}`)
+      console.log(`#${order.id.slice(0, 8).toUpperCase()}  mã CK ${order.paymentCode}  ${vnd(order.amountVnd ?? 0)}${order.receivedVnd ? ` (đã nhận ${vnd(order.receivedVnd)})` : ''}  ${order.createdAt.toLocaleString('vi-VN')}`)
     }
     if (pending.length) console.log('\nChạy: npm run sepay:simulate -- <mã CK>')
   } else {
@@ -56,7 +56,8 @@ try {
       console.error(`Không tìm thấy đơn chuyển khoản với mã "${code}".`)
       process.exitCode = 1
     } else {
-      const transferAmount = amountArg ?? order.amountVnd ?? 0
+      // Mặc định chuyển đúng phần còn thiếu (đơn có thể đã nhận một phần).
+      const transferAmount = amountArg ?? Math.max((order.amountVnd ?? 0) - order.receivedVnd, 0)
       const transactionId = Date.now()
       const response = await fetch(`http://localhost:${env.PORT}/api/v1/payments/webhook`, {
         method: 'POST',
@@ -82,12 +83,12 @@ try {
       } else {
         const meaning: Record<string, string> = {
           matched: 'đã xác nhận thanh toán, app sẽ tự chuyển sang "Thanh toán thành công"',
-          underpaid: 'chuyển thiếu tiền, đơn vẫn chờ thanh toán',
+          underpaid: 'chuyển thiếu tiền, đơn vẫn chờ thanh toán — chạy lại không kèm --amount để chuyển bù phần còn thiếu',
           late: 'đơn đã thanh toán hoặc đã huỷ trước đó',
           unmatched: 'không khớp đơn nào',
           duplicate: 'giao dịch đã được xử lý',
         }
-        console.log(`Đơn #${order.id.slice(0, 8).toUpperCase()} · chuyển ${vnd(transferAmount)} / cần ${vnd(order.amountVnd ?? 0)}`)
+        console.log(`Đơn #${order.id.slice(0, 8).toUpperCase()} · chuyển ${vnd(transferAmount)} · đã nhận trước đó ${vnd(order.receivedVnd)} / cần ${vnd(order.amountVnd ?? 0)}`)
         console.log(`Kết quả: ${body?.result} — ${meaning[body?.result ?? ''] ?? ''}`)
       }
     }

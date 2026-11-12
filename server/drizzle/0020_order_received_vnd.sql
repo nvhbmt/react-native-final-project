@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "received_vnd" integer DEFAULT 0 NOT NULL;

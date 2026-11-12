@@ -26,9 +26,9 @@ Repo `nvhbmt/react-native-final-project` là **private** của tài khoản `nvh
 | `SUPABASE_SECRET_KEY` | `server/.env` (Supabase → API Keys → **Secret key** `sb_secret_…`) | Có (ảnh) |
 | `SMTP_USER`, `SMTP_PASS` | `server/.env` (Gmail + App Password) | Có (quên mật khẩu) |
 | `AI_MODEL`, `AI_API_KEY` | `server/.env` (Anthropic) | Có (chatbot) |
-| `SEPAY_WEBHOOK_API_KEY`, `SEPAY_BANK`, `SEPAY_ACCOUNT_NUMBER`, `SEPAY_ACCOUNT_NAME` | SePay / tài khoản nhận tiền | Để trống tới bước 4 |
+| `SEPAY_WEBHOOK_API_KEY`, `SEPAY_BANK`, `SEPAY_ACCOUNT_NUMBER`, `SEPAY_ACCOUNT_NAME` | SePay / tài khoản nhận tiền | Có — thiếu thì không đặt hàng được (đã bỏ thẻ demo) |
 
-Giá trị cố định đã có trong `render.yaml`: `NODE_ENV=production`, `ALLOW_DEMO_CHECKOUT=true` (giữ thẻ demo cho buổi demo),
+Giá trị cố định đã có trong `render.yaml`: `NODE_ENV=production`, `ALLOW_DEMO_CHECKOUT=true` (nút "(Demo) Chuyển sang" bước giao hàng; thẻ demo đã bỏ),
 `AI_PROVIDER=anthropic`, `SEPAY_CODE_PREFIX=MM`, `SEPAY_SIMULATED=false`, `USD_TO_VND_RATE=25000`.
 
 ## 2. Sau khi API chạy
@@ -42,7 +42,7 @@ npx tsx --env-file=.env.supabase.local src/db/seedReviews.ts
 ```
 
 Kiểm tra nhanh trên app: catalog, đăng ký/đăng nhập, quên mật khẩu (thư tới Gmail), đổi avatar (ảnh lên Supabase),
-đặt đơn bằng thẻ demo, chatbot, Tài khoản → Quản lý giao hàng / Gửi khuyến mãi (tài khoản admin).
+đặt đơn chuyển khoản VietQR (cần SePay ở bước 4), chatbot, Tài khoản → Quản lý giao hàng / Gửi khuyến mãi (tài khoản admin).
 
 ## 3. Build APK (EAS)
 

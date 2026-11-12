@@ -243,13 +243,13 @@ Migration `0018` thêm cột `uploads.url` (null với ảnh cũ → vẫn dùng
 
 | Method và path | Hành vi |
 | --- | --- |
-| `GET /payment-methods` | `sepay` (khi đã cấu hình) + thẻ demo (khi `NODE_ENV` ≠ production) |
+| `GET /payment-methods` | Chỉ `sepay` (khi đã cấu hình). Thẻ demo `pm_*` không thu tiền nên đã bỏ khỏi app; chỉ test tự động bật lại qua `commerce.demoCards` |
 | `GET /shipping-methods?products=a,b` | Công khai. Hình thức giao mà **mọi** sản phẩm đều hỗ trợ: `[{ id, label, eta, fee }]` (phí gốc USD) |
 | `POST /orders` | `{ requestId, paymentMethod, addressId, shippingMethod?, items, voucher? }`. `addressId` bắt buộc, phải thuộc sổ địa chỉ của chính user (sai → `400 ADDRESS_NOT_FOUND`); server chụp lại địa chỉ vào đơn. `shippingMethod` mặc định `standard`; không áp dụng cho mọi sản phẩm → `400 SHIPPING_UNAVAILABLE`. Server tính giá từ catalog; gửi lại cùng `requestId` + cùng nội dung trả đơn cũ. Thẻ demo → `completed` ngay. `sepay` → `pending_payment` kèm `payment` (ngân hàng, STK, chủ TK, `amountVnd`, nội dung CK, `qrUrl`, hạn, `simulated`). Giỏ server được xoá. |
 | `GET /orders` · `GET /orders/:id` | Lịch sử (phân trang cursor) · chi tiết của chính user |
 | `POST /orders/:id/pay` | Lấy lại / gia hạn hướng dẫn chuyển khoản cho đơn đang chờ (mã CK giữ nguyên) |
 | `POST /orders/:id/cancel` | Huỷ đơn chờ thanh toán hoặc đơn demo **còn đang xử lý**. Đơn đã trả tiền thật hoặc đã gửi đi → `409 ORDER_NOT_CANCELLABLE` |
-| `POST /orders/:id/advance` | **Chỉ dev/test** (cùng điều kiện thẻ demo, production → `403 DEMO_ONLY`): chuyển bước giao hàng `processing → shipping → delivered`, gửi thông báo hộp thư. Hết bước → `409 ORDER_NOT_ADVANCEABLE` |
+| `POST /orders/:id/advance` | **Chỉ khi bật chế độ demo** (`ALLOW_DEMO_CHECKOUT`, mặc định ngoài production; tắt → `403 DEMO_ONLY`): chuyển bước giao hàng `processing → shipping → delivered`, gửi thông báo hộp thư. Hết bước → `409 ORDER_NOT_ADVANCEABLE` |
 | `POST /payments/webhook` | Webhook SePay, xác thực `Authorization: Apikey <SEPAY_WEBHOOK_API_KEY>` |
 
 Đơn hàng trả thêm: `shippingAddress` (bản chụp `{ recipientName, phone, line1, city }`), `shippingMethod`
@@ -271,7 +271,9 @@ tài khoản và gọi webhook → server tìm mã trong `code`/`content`, ghi g
 (unique theo id giao dịch SePay nên gửi lại không bị xử lý hai lần), rồi:
 
 - đủ tiền và đơn đang chờ → `completed`, `paidAt`, gửi thông báo vào hộp thư;
-- thiếu tiền → giữ chờ thanh toán, `result: underpaid`, báo cho khách;
+- thiếu tiền → giữ chờ thanh toán, `result: underpaid`, cộng vào `received_vnd` và báo khách số còn thiếu.
+  Các lần chuyển cho cùng mã được **cộng dồn**: chuyển bù đủ thì đơn được xác nhận. QR / `payment.amountVnd`
+  luôn là phần còn thiếu (`payment.totalVnd`, `payment.receivedVnd` cho tổng và số đã nhận);
 - đơn đã huỷ/đã trả → `result: late` (cần hoàn tiền thủ công), báo cho khách;
 - không có mã hoặc tiền ra → `unmatched` / `ignored`.
 
@@ -328,6 +330,7 @@ Server từ chối khởi động nếu bật giả lập khi `NODE_ENV=producti
 npm run sepay:simulate                         # liệt kê đơn đang chờ chuyển khoản
 npm run sepay:simulate -- MM7K2M9QXA           # trả đủ tiền theo mã CK (hoặc mã đơn, vd. 8D7A79E1)
 npm run sepay:simulate -- MM7K2M9QXA --amount 10000   # trả thiếu → result: underpaid
+npm run sepay:simulate -- MM7K2M9QXA                  # chạy lại không --amount: chuyển bù phần còn thiếu → matched
 ```
 
 Script gửi webhook đúng định dạng và header như SePay tới server đang chạy, nên đi qua toàn bộ logic thật;
