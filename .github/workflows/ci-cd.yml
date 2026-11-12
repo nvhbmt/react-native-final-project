@@ -130,8 +130,13 @@ jobs:
         run: |
           scp deploy/vps/docker-compose.yml deploy/vps/Caddyfile vps:$APP_DIR/
           gunzip -c api-image.tar.gz | ssh vps docker load
-          ssh vps "rm -rf $APP_DIR/web.new && mkdir -p $APP_DIR/web.new"
-          tar -C dist-web -czf - . | ssh vps "tar -C $APP_DIR/web.new -xzf - && rm -rf $APP_DIR/web.old && (mv $APP_DIR/web $APP_DIR/web.old 2>/dev/null || true) && mv $APP_DIR/web.new $APP_DIR/web"
+          # Mỗi bản web một thư mục site/<commit>; đổi symlink site/current (mv -T là thao tác nguyên tử).
+          # Không mv thư mục đang được mount: container sẽ vẫn giữ thư mục cũ.
+          RELEASE=$APP_DIR/site/${{ github.sha }}
+          ssh vps "rm -rf $RELEASE && mkdir -p $RELEASE"
+          tar -C dist-web -czf - . | ssh vps "tar -C $RELEASE -xzf - && ln -sfn ${{ github.sha }} $APP_DIR/site/current.tmp && mv -T $APP_DIR/site/current.tmp $APP_DIR/site/current"
+          # Giữ 3 bản web gần nhất để quay về nhanh
+          ssh vps "cd $APP_DIR/site && ls -1dt */ | grep -v '^current' | tail -n +4 | xargs -r rm -rf"
 
       # Container API chạy migration rồi mới nhận request (CMD trong server/Dockerfile).
       - name: Khởi động lại stack
@@ -160,6 +165,9 @@ jobs:
           done
           curl -fsS "https://$SITE_ADDRESS/api/v1/home" -o /dev/null
           curl -fsS "https://$SITE_ADDRESS/" | grep -qi '<div id="root"'
+          # Trang web phải là bản vừa build (không phải bản cũ còn mount)
+          EXPECTED=$(grep -oE '__common-[a-f0-9]+\.js' dist-web/index.html | head -1)
+          curl -fsS "https://$SITE_ADDRESS/" | grep -q "$EXPECTED" || { echo "::error::Trang web vẫn là bản cũ"; exit 1; }
           echo "Đã deploy ${{ github.sha }} lên https://$SITE_ADDRESS"
 
       - name: Dọn image cũ trên VPS

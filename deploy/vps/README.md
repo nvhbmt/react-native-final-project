@@ -17,7 +17,7 @@ trên máy GitHub → gửi sang VPS qua SSH (`docker load`) → `setup.sh` (ide
 ```
 Caddy :80/:443 (HTTPS tự động, Let's Encrypt)
 ├── /api/*, /uploads/*, /healthz → api:4000 (Node/Hono, image mobimart-api:<commit>)
-└── còn lại → web/ (bản web của app, SPA)
+└── còn lại → site/current/ (bản web của app, SPA)
 api → db (Postgres 17, không mở cổng ra ngoài)
 ```
 
@@ -28,7 +28,7 @@ Volume: `db-data` (database), `uploads` (ảnh upload), `caddy-data` (chứng ch
 | `docker-compose.yml`, `Caddyfile` | Copy từ `deploy/vps/` mỗi lần deploy | Có |
 | `.env` | `SITE_ADDRESS`, `POSTGRES_PASSWORD`, `API_TAG` (image đang chạy) | **Không** — `setup.sh` sinh lần đầu |
 | `api.env` | Biến của API: JWT secret, SePay, SMTP, AI… | **Không** — `setup.sh` sinh lần đầu, sửa tay |
-| `web/` | Bản web của app | Không — build mỗi lần deploy |
+| `site/<commit>/`, `site/current` | Bản web của app; `current` là symlink tới bản đang chạy (giữ 3 bản) | Không — build mỗi lần deploy |
 
 ## Cài đặt một lần trên GitHub
 
@@ -79,6 +79,6 @@ docker compose exec -T db pg_dump -U mobimart mobimart | gzip > backup-$(date +%
 ```
 
 Quay về bản trước: `docker image ls mobimart-api` → sửa `API_TAG` trong `.env` → `docker compose up -d api`
-(image cũ được giữ 72 giờ). Migration chỉ thêm cột/bảng nên chạy image cũ trên DB mới vẫn an toàn.
+(image cũ được giữ 72 giờ). Bản web: `ln -sfn <commit> site/current.tmp && mv -T site/current.tmp site/current`. Migration chỉ thêm cột/bảng nên chạy image cũ trên DB mới vẫn an toàn.
 
 App Android/iOS: build với `EXPO_PUBLIC_API_URL=https://mobimart.cunpoi.tech` (xem `HANDOFF.md`, mục Build APK).

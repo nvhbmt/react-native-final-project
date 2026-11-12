@@ -29,7 +29,7 @@ fi
 CORS_ORIGINS=$(echo "$SITE_ADDRESS" | tr -d ' ' | sed 's#^#https://#; s#,#,https://#g')
 
 # 4. Thư mục ứng dụng + bí mật sinh ngay trên VPS (không bao giờ nằm trong git)
-mkdir -p "$APP_DIR/web"
+mkdir -p "$APP_DIR/site"
 cd "$APP_DIR"
 if [ ! -f .env ]; then
   cat > .env <<ENV

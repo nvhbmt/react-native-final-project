@@ -52,7 +52,8 @@ services:
       SITE_ADDRESS: ${SITE_ADDRESS:?thiếu SITE_ADDRESS trong .env}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./web:/srv/web:ro
+      # Bản web: site/<commit>/, symlink site/current trỏ bản đang chạy (đổi symlink = đổi bản, không cần restart)
+      - ./site:/srv/site:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on:

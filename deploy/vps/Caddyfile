@@ -15,7 +15,7 @@
 
 	# Bản web của app (Expo export): SPA, đường dẫn lạ trả index.html
 	handle {
-		root * /srv/web
+		root * /srv/site/current
 		try_files {path} {path}.html /index.html
 		file_server
 	}
