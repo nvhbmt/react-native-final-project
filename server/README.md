@@ -271,7 +271,9 @@ tài khoản và gọi webhook → server tìm mã trong `code`/`content`, ghi g
 (unique theo id giao dịch SePay nên gửi lại không bị xử lý hai lần), rồi:
 
 - đủ tiền và đơn đang chờ → `completed`, `paidAt`, gửi thông báo vào hộp thư;
-- thiếu tiền → giữ chờ thanh toán, `result: underpaid`, báo cho khách;
+- thiếu tiền → giữ chờ thanh toán, `result: underpaid`, cộng vào `received_vnd` và báo khách số còn thiếu.
+  Các lần chuyển cho cùng mã được **cộng dồn**: chuyển bù đủ thì đơn được xác nhận. QR / `payment.amountVnd`
+  luôn là phần còn thiếu (`payment.totalVnd`, `payment.receivedVnd` cho tổng và số đã nhận);
 - đơn đã huỷ/đã trả → `result: late` (cần hoàn tiền thủ công), báo cho khách;
 - không có mã hoặc tiền ra → `unmatched` / `ignored`.
 
@@ -328,6 +330,7 @@ Server từ chối khởi động nếu bật giả lập khi `NODE_ENV=producti
 npm run sepay:simulate                         # liệt kê đơn đang chờ chuyển khoản
 npm run sepay:simulate -- MM7K2M9QXA           # trả đủ tiền theo mã CK (hoặc mã đơn, vd. 8D7A79E1)
 npm run sepay:simulate -- MM7K2M9QXA --amount 10000   # trả thiếu → result: underpaid
+npm run sepay:simulate -- MM7K2M9QXA                  # chạy lại không --amount: chuyển bù phần còn thiếu → matched
 ```
 
 Script gửi webhook đúng định dạng và header như SePay tới server đang chạy, nên đi qua toàn bộ logic thật;

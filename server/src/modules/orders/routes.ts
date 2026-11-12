@@ -57,14 +57,19 @@ export const shortId = (id: string) => id.slice(0, 8).toUpperCase()
 /** Hướng dẫn chuyển khoản cho đơn đang chờ thanh toán SePay. */
 function paymentInstructions(order: OrderRow, sepay?: SepayConfig) {
   if (order.status !== 'pending_payment' || !order.paymentCode || !order.amountVnd || !sepay) return null
+  // Đã chuyển một phần → QR và số tiền hiển thị là phần còn thiếu.
+  const remaining = Math.max(order.amountVnd - order.receivedVnd, 0)
   return {
     provider: 'sepay' as const,
     bank: sepay.bank,
     accountNumber: sepay.accountNumber,
     accountName: sepay.accountName,
-    amountVnd: order.amountVnd,
+    /** Số tiền cần chuyển lúc này (đã trừ phần đã nhận). */
+    amountVnd: remaining,
+    totalVnd: order.amountVnd,
+    receivedVnd: order.receivedVnd,
     content: order.paymentCode,
-    qrUrl: qrImageUrl(sepay, order.amountVnd, order.paymentCode),
+    qrUrl: qrImageUrl(sepay, remaining, order.paymentCode),
     expiresAt: order.paymentExpiresAt?.getTime() ?? null,
     expired: Boolean(order.paymentExpiresAt && order.paymentExpiresAt.getTime() <= Date.now()),
     /** SePay giả lập: app cảnh báo không chuyển tiền thật vào tài khoản trong QR. */
