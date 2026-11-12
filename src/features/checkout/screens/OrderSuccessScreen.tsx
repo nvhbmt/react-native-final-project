@@ -50,7 +50,9 @@ export function OrderSuccessScreen() {
         <Text className="max-w-[260px] text-center text-[14px] leading-[22px] text-neutral-500">
           {order.status === 'pending_payment'
             ? 'Chuyển khoản theo mã QR để hoàn tất đơn hàng.'
-            : order.paymentMode === 'demo' ? 'Đây là đơn demo, bạn không bị trừ tiền.' : `Đơn #${order.code} đã được xác nhận.`}
+            : order.status === 'cancelled'
+              ? `Đơn #${order.code} đã được huỷ.${order.paymentMode === 'verified' && order.paidAt ? ' Khoản đã thanh toán sẽ được hoàn lại.' : ''}`
+              : order.paymentMode === 'demo' ? 'Đây là đơn demo, bạn không bị trừ tiền.' : `Đơn #${order.code} đã được xác nhận.`}
         </Text>
         {order.status === 'pending_payment' ? (
           <Button title="Mở mã thanh toán" className="mt-3" onPress={() => router.replace({ pathname: '/checkout/transfer', params: { id: order.id } })} />
