@@ -1,0 +1,167 @@
+# CI cho mọi PR / push; CD lên VPS khi push vào main và CI xanh.
+# Cài đặt một lần: deploy/vps/README.md (secret VPS_SSH_KEY, VPS_HOST; biến SITE_ADDRESS).
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  app:
+    name: App (typecheck, lint, test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+  server:
+    name: Server (typecheck, test + Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: market
+          POSTGRES_PASSWORD: market
+          POSTGRES_DB: market_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U market -d market_test"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    defaults:
+      run:
+        working-directory: server
+    env:
+      INTEGRATION: '1'
+      DATABASE_URL: postgres://market:market@localhost:5432/market_test
+      CATALOG_TEST_DATABASE_URL: postgres://market:market@localhost:5432/market_catalog_test
+      REVIEWS_TEST_DATABASE_URL: postgres://market:market@localhost:5432/market_reviews_test
+      COMMERCE_TEST_DATABASE_URL: postgres://market:market@localhost:5432/market_commerce_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Tạo database cho integration test
+        env:
+          PGPASSWORD: market
+        run: |
+          for db in market_catalog_test market_reviews_test market_commerce_test; do
+            psql -h localhost -U market -d market_test -c "CREATE DATABASE $db"
+          done
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  deploy:
+    name: Deploy lên VPS
+    needs: [app, server]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ vars.SITE_ADDRESS }}
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      SITE_ADDRESS: ${{ vars.SITE_ADDRESS }}
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      APP_DIR: /opt/mobimart
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Kiểm tra cấu hình deploy
+        run: |
+          test -n "$SITE_ADDRESS" || { echo "::error::Thiếu biến SITE_ADDRESS (Settings → Variables)"; exit 1; }
+          test -n "$VPS_HOST" || { echo "::error::Thiếu secret VPS_HOST"; exit 1; }
+
+      # Bản web của app gọi API cùng tên miền.
+      - name: Build bản web của app
+        env:
+          EXPO_PUBLIC_API_URL: https://${{ vars.SITE_ADDRESS }}
+        run: |
+          npm ci
+          npx expo export --platform web --output-dir dist-web
+
+      # Build image trên máy GitHub (VPS chỉ 1 CPU / 1GB RAM), gửi sang bằng docker save | ssh docker load.
+      - name: Build image API
+        run: |
+          docker build -t mobimart-api:${{ github.sha }} server
+          docker save mobimart-api:${{ github.sha }} | gzip > api-image.tar.gz
+          ls -lh api-image.tar.gz
+
+      - name: Cấu hình SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          if [ -n "$VPS_KNOWN_HOSTS" ]; then printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else ssh-keyscan -H "$VPS_HOST" > ~/.ssh/known_hosts; fi
+          printf 'Host vps\n  HostName %s\n  User root\n  IdentityFile ~/.ssh/deploy\n  IdentitiesOnly yes\n  ServerAliveInterval 30\n' "$VPS_HOST" > ~/.ssh/config
+
+      - name: Chuẩn bị VPS (idempotent)
+        run: |
+          scp deploy/vps/setup.sh vps:/tmp/mobimart-setup.sh
+          ssh vps "bash /tmp/mobimart-setup.sh '$SITE_ADDRESS'"
+
+      - name: Gửi image, cấu hình và bản web
+        run: |
+          scp deploy/vps/docker-compose.yml deploy/vps/Caddyfile vps:$APP_DIR/
+          gunzip -c api-image.tar.gz | ssh vps docker load
+          ssh vps "rm -rf $APP_DIR/web.new && mkdir -p $APP_DIR/web.new"
+          tar -C dist-web -czf - . | ssh vps "tar -C $APP_DIR/web.new -xzf - && rm -rf $APP_DIR/web.old && (mv $APP_DIR/web $APP_DIR/web.old 2>/dev/null || true) && mv $APP_DIR/web.new $APP_DIR/web"
+
+      # Container API chạy migration rồi mới nhận request (CMD trong server/Dockerfile).
+      - name: Khởi động lại stack
+        run: |
+          # Ghi tag vào .env để `docker compose up` chạy tay trên VPS vẫn dùng đúng image đang deploy.
+          ssh vps "cd $APP_DIR && sed -i '/^API_TAG=/d' .env && echo API_TAG=${{ github.sha }} >> .env"
+          ssh vps "cd $APP_DIR && docker compose up -d --remove-orphans"
+          # Caddyfile là file mount: đổi nội dung thì phải reload (container không tự khởi động lại).
+          ssh vps "cd $APP_DIR && (docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile || docker compose restart caddy)"
+
+      # Seed catalog chỉ thêm sản phẩm chưa có — chạy lại mỗi lần deploy là an toàn.
+      - name: Seed catalog
+        run: |
+          for i in $(seq 1 24); do
+            ssh vps "cd $APP_DIR && docker compose ps api --format '{{.Status}}'" | grep -q healthy && break
+            sleep 5
+          done
+          ssh vps "cd $APP_DIR && docker compose exec -T api npm run -s db:seed:catalog"
+
+      - name: Kiểm tra sau deploy
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "https://$SITE_ADDRESS/healthz"; then echo; break; fi
+            sleep 5
+            [ "$i" = 30 ] && { ssh vps "cd $APP_DIR && docker compose ps && docker compose logs --tail 80 api caddy"; exit 1; }
+          done
+          curl -fsS "https://$SITE_ADDRESS/api/v1/home" -o /dev/null
+          curl -fsS "https://$SITE_ADDRESS/" | grep -qi '<div id="root"'
+          echo "Đã deploy ${{ github.sha }} lên https://$SITE_ADDRESS"
+
+      - name: Dọn image cũ trên VPS
+        if: success()
+        run: ssh vps "docker image prune -af --filter 'until=72h' >/dev/null || true"

@@ -1,0 +1,26 @@
+# Caddy tự xin chứng chỉ HTTPS (Let's Encrypt) cho SITE_ADDRESS, vd. 103-82-193-74.sslip.io
+# (sslip.io trỏ tên miền về đúng IP nên không cần mua domain). Có domain riêng thì đổi SITE_ADDRESS trong .env.
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	# API, ảnh upload và health check → server Node
+	@api path /api/* /uploads/* /healthz
+	handle @api {
+		reverse_proxy api:4000 {
+			# Câu trả lời AI stream SSE: không gom bộ đệm
+			flush_interval -1
+		}
+	}
+
+	# Bản web của app (Expo export): SPA, đường dẫn lạ trả index.html
+	handle {
+		root * /srv/web
+		try_files {path} {path}.html /index.html
+		file_server
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
