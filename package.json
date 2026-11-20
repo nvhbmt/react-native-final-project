@@ -43,7 +43,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
-    "test": "node --experimental-strip-types --test tests/cart-checkout.test.cjs tests/product-filters.test.cjs tests/api-client.test.cjs"
+    "test": "node --experimental-strip-types --test tests/cart-checkout.test.cjs tests/product-filters.test.cjs tests/api-client.test.cjs tests/assistant-markdown.test.cjs"
   },
   "private": true,
   "overrides": {

@@ -78,7 +78,7 @@ test('other 401 codes do not trigger refresh', async () => {
   assert.equal(refreshes, 0)
 })
 
-const { parseSseChunk, splitProductLinks } = require('../src/features/assistant/lib/sse.ts')
+const { parseSseChunk } = require('../src/features/assistant/lib/sse.ts')
 
 test('parses server-sent events split across network chunks', () => {
   const first = parseSseChunk('event: start\ndata: {"a":1}\n\nevent: delta\ndata: {"text":"Xin')
@@ -87,13 +87,4 @@ test('parses server-sent events split across network chunks', () => {
   assert.deepEqual(second.events.map((e) => e.event), ['delta', 'done'])
   assert.equal(JSON.parse(second.events[0].data).text, 'Xin chào')
   assert.equal(second.rest, '')
-})
-
-test('splits assistant answers into text and product links', () => {
-  assert.deepEqual(splitProductLinks('Thử [product:banana] nhé'), [
-    { type: 'text', text: 'Thử ' },
-    { type: 'product', id: 'banana' },
-    { type: 'text', text: ' nhé' },
-  ])
-  assert.deepEqual(splitProductLinks('[product:Bad Id]'), [{ type: 'text', text: '[product:Bad Id]' }])
 })

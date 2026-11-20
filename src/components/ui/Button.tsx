@@ -73,7 +73,15 @@ export function Button({
     >
       {leftIcon ? <Ionicons name={leftIcon} size={20} color={iconColor[variant]} /> : null}
       {title ? (
-        <Text className={cn('text-[16px] leading-[26px] font-medium', labelClass[variant])}>{title}</Text>
+        // Nút chỉ có chữ: cho nhãn chiếm hết bề ngang rồi căn giữa. Để nhãn tự co theo nội dung thì
+        // Android có lúc đo hụt bề rộng → từ cuối rớt xuống dòng 2 và bị cắt ("Đăng ký" còn "Đăng").
+        <Text
+          className={cn('text-[16px] leading-[26px] font-medium', labelClass[variant])}
+          // flexGrow (không dùng flex-1): nút tự co theo nội dung thì nhãn vẫn giữ bề rộng tối thiểu.
+          style={leftIcon || rightIcon || children ? undefined : { flexGrow: 1, textAlign: 'center' }}
+        >
+          {title}
+        </Text>
       ) : null}
       {children}
       {rightIcon ? <Ionicons name={rightIcon} size={20} color={iconColor[variant]} /> : null}

@@ -7,12 +7,19 @@ type Props = {
   size?: number
 }
 
+/**
+ * Chữ trong logo: cỡ chữ làm tròn và Text trải hết bề ngang khung (căn giữa bằng textAlign).
+ * Để Text tự co theo nội dung với cỡ chữ lẻ (vd. 8.4px) thì Android có lúc đo hụt và không vẽ chữ.
+ */
+const logoText = (fontSize: number, lineHeight: number) =>
+  ({ alignSelf: 'stretch', textAlign: 'center', fontSize: Math.round(fontSize), lineHeight: Math.round(lineHeight) }) as const
+
 /** Logo phương thức thanh toán vẽ bằng View/Text (không phụ thuộc file ảnh thương hiệu). */
 export function PaymentLogo({ brand, size = 36 }: Props) {
   if (brand === 'vietqr') {
     return (
       <View className="items-center justify-center rounded-[6px] bg-[#e8f1ff]" style={{ width: size * 1.45, height: size }}>
-        <Text className="font-bold text-[#0a5bd3]" style={{ fontSize: size * 0.3, lineHeight: size * 0.42 }}>VietQR</Text>
+        <Text numberOfLines={1} className="font-bold text-[#0a5bd3]" style={logoText(size * 0.3, size * 0.42)}>VietQR</Text>
       </View>
     )
   }
@@ -49,7 +56,7 @@ export function PaymentLogo({ brand, size = 36 }: Props) {
     >
       <View className="bg-[#1a1f71]" style={{ height: size * 0.28 }} />
       <View className="flex-1 items-center justify-center">
-        <Text className="font-bold italic text-[#1a1f71]" style={{ fontSize: size * 0.27, lineHeight: size * 0.36 }}>
+        <Text numberOfLines={1} className="font-bold italic text-[#1a1f71]" style={logoText(size * 0.27, size * 0.36)}>
           VISA
         </Text>
       </View>

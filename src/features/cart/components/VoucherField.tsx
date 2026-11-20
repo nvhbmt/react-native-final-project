@@ -44,6 +44,9 @@ export function VoucherField() {
             flex: 1,
             height: 36,
             paddingHorizontal: 12,
+            // Android có padding dọc mặc định ~10dp → ô cao 36 không đủ chỗ, chữ bị lẹm phần trên.
+            paddingVertical: 0,
+            textAlignVertical: 'center',
             borderWidth: 1,
             borderRadius: 4,
             borderColor: error ? appColors.danger : appColors['neutral-400'],
