@@ -1,6 +1,6 @@
 import { Text, View } from '@tamagui/tailwind'
 import type { PropsWithChildren, ReactNode } from 'react'
-import { ScrollView } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { cn } from '@/lib/cn'
@@ -47,9 +47,22 @@ export function Screen({
       <SafeAreaView edges={footer || safeBottom ? ['top', 'bottom'] : ['top']} style={{ flex: 1 }}>
         {header}
         {scroll ? (
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-            {content}
-          </ScrollView>
+          // Tránh bàn phím che ô nhập:
+          // - iOS: ScrollView tự chừa inset bằng bàn phím và cuộn tới ô đang nhập.
+          // - Android edge-to-edge: cửa sổ không tự co (adjustResize vô hiệu) nên chèn padding thủ công;
+          //   ScrollView co lại thì Android tự cuộn ô đang focus vào vùng nhìn thấy.
+          // Không bật padding trên iOS — sẽ bị đẩy 2 lần cùng automaticallyAdjustKeyboardInsets.
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'padding' : undefined}>
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={false}
+              automaticallyAdjustKeyboardInsets
+              // Chạm nút khi bàn phím đang mở vẫn ăn ngay, không cần chạm 2 lần.
+              keyboardShouldPersistTaps="handled"
+            >
+              {content}
+            </ScrollView>
+          </KeyboardAvoidingView>
         ) : (
           content
         )}

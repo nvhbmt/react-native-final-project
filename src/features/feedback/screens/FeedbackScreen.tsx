@@ -79,7 +79,8 @@ export function FeedbackScreen() {
 
   return (
     <View className="flex-1 bg-[rgba(23,26,31,0.45)]">
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      {/* iOS do ScrollView bên dưới lo (automaticallyAdjustKeyboardInsets); Android edge-to-edge cần padding thủ công. */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : undefined} style={{ flex: 1 }}>
         {/* Vùng trống phía trên sheet: chạm để đóng */}
         <View onPress={close} aria-label="Đóng" style={{ height: Math.max(SHEET_TOP, insets.top + 40) }} />
         <Animated.View style={{ flex: 1, transform: [{ translateY }] }}>
@@ -100,6 +101,7 @@ export function FeedbackScreen() {
             <ScrollView
               contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: insets.bottom + 16 }}
               keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets
               showsVerticalScrollIndicator={false}
             >
               <MoodPicker value={form.mood} onChange={(mood) => update({ mood })} />
