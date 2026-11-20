@@ -32,7 +32,8 @@ export function AssistantChatScreen() {
     <View className="flex-1 bg-background">
       <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
         <AppHeader title={title || 'Trợ lý mua sắm'} />
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {/* Android edge-to-edge cũng cần padding — nếu không, bàn phím che ô nhập dính đáy. */}
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
           <ScrollView
             ref={scroll}
             contentContainerStyle={{ flexGrow: 1, gap: 12, padding: 16 }}
