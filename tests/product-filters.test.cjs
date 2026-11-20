@@ -18,15 +18,32 @@ require.extensions['.ts'] = previousLoader
 
 test('listing sends catalog query fields and repeated policy parameters accepted by the API', () => {
   const path = listingPath({
-    category: 'electronics', subcategory: 'phone', query: ' White & Blue ', sort: 'popular',
-    relatedTo: 'iphone-15', limit: 10,
-    filters: { minimumPrice: '0', maximumPrice: '899.99', minimumRating: 4.5, shippingOptions: ['instant', 'express'], others: ['free-return', 'best-deal'] },
+    category: 'electronics',
+    subcategory: 'phone',
+    query: ' White & Blue ',
+    sort: 'popular',
+    relatedTo: 'iphone-15',
+    limit: 10,
+    filters: {
+      minimumPrice: '0',
+      maximumPrice: '899.99',
+      minimumRating: 4.5,
+      shippingOptions: ['instant', 'express'],
+      others: ['free-return', 'best-deal'],
+    },
   })
   const url = new URL(path, 'http://localhost')
   assert.equal(url.pathname, '/products')
   assert.deepEqual(Object.fromEntries([...url.searchParams].filter(([key]) => !key.endsWith('[]'))), {
-    q: 'White & Blue', category: 'electronics', subcategory: 'phone', sort: 'popular', relatedTo: 'iphone-15',
-    limit: '10', minPrice: '0', maxPrice: '899.99', minRating: '4.5',
+    q: 'White & Blue',
+    category: 'electronics',
+    subcategory: 'phone',
+    sort: 'popular',
+    relatedTo: 'iphone-15',
+    limit: '10',
+    minPrice: '0',
+    maxPrice: '899.99',
+    minRating: '4.5',
   })
   assert.deepEqual(url.searchParams.getAll('shipping[]'), ['instant', 'express'])
   assert.deepEqual(url.searchParams.getAll('benefits[]'), ['free-return', 'best-deal'])

@@ -37,7 +37,11 @@ export function AdminOrdersScreen() {
     invalidateOrders()
   }, [])
   // Quay lại màn này thì tải lại (đơn mới, đơn vừa thanh toán).
-  useFocusEffect(useCallback(() => { setRevision((value) => value + 1) }, []))
+  useFocusEffect(
+    useCallback(() => {
+      setRevision((value) => value + 1)
+    }, []),
+  )
 
   const page = useProductPages<AdminOrderPage>(isAdmin ? adminOrdersPath(filter) : undefined, `${user?.id}:${revision}`, true)
   const current = FILTERS.find((item) => item.value === filter)!
@@ -47,20 +51,36 @@ export function AdminOrdersScreen() {
       {!user ? (
         <CatalogStatus loading />
       ) : !isAdmin ? (
-        <EmptyState icon="lock-closed-outline" title="Không có quyền truy cập" description="Trang này chỉ dành cho tài khoản quản trị của cửa hàng." />
+        <EmptyState
+          icon="lock-closed-outline"
+          title="Không có quyền truy cập"
+          description="Trang này chỉ dành cho tài khoản quản trị của cửa hàng."
+        />
       ) : (
         <>
           <View className="flex-row flex-wrap gap-2" role="radiogroup" aria-label="Lọc theo tiến độ giao hàng">
             {FILTERS.map((item) => (
-              <Chip key={item.value} role="radio" label={item.label} selected={filter === item.value} onPress={() => setFilter(item.value)} />
+              <Chip
+                key={item.value}
+                role="radio"
+                label={item.label}
+                selected={filter === item.value}
+                onPress={() => setFilter(item.value)}
+              />
             ))}
           </View>
 
           {page.loading || page.error ? (
-            <CatalogStatus loading={page.loading} message={page.error ? 'Không tải được danh sách đơn.' : undefined} onRetry={page.error ? page.retry : undefined} />
+            <CatalogStatus
+              loading={page.loading}
+              message={page.error ? 'Không tải được danh sách đơn.' : undefined}
+              onRetry={page.error ? page.retry : undefined}
+            />
           ) : page.items.length ? (
             <View className="gap-3">
-              {page.items.map((order) => <AdminOrderCard key={order.id} order={order} onChanged={reload} />)}
+              {page.items.map((order) => (
+                <AdminOrderCard key={order.id} order={order} onChanged={reload} />
+              ))}
             </View>
           ) : (
             <Text className="py-12 text-center text-[14px] leading-[22px] text-neutral-500">{current.empty}</Text>
@@ -68,7 +88,11 @@ export function AdminOrdersScreen() {
 
           {page.hasMore ? <Button title="Xem thêm" variant="text" onPress={page.loadMore} /> : null}
           {page.loadingMore || page.moreError ? (
-            <CatalogStatus loading={page.loadingMore} message={page.moreError ? 'Không tải thêm được.' : undefined} onRetry={page.moreError ? page.retryMore : undefined} />
+            <CatalogStatus
+              loading={page.loadingMore}
+              message={page.moreError ? 'Không tải thêm được.' : undefined}
+              onRetry={page.moreError ? page.retryMore : undefined}
+            />
           ) : null}
         </>
       )}

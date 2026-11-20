@@ -43,7 +43,7 @@ describe.skipIf(!commerceTestUrl)('upload ảnh', () => {
     expect((await send(undefined, new Blob([PNG]))).status).toBe(401)
     const res = await send(token, new Blob([PNG]))
     expect(res.status).toBe(201)
-    const { data } = await res.json() as { data: { url: string; mimeType: string } }
+    const { data } = (await res.json()) as { data: { url: string; mimeType: string } }
     expect(data.mimeType).toBe('image/png')
     const file = await t.app.request(data.url)
     expect(file.status).toBe(200)
@@ -57,7 +57,9 @@ describe.skipIf(!commerceTestUrl)('upload ảnh', () => {
     const res = await t.call('POST', '/uploads', { token, body: { purpose: 'feedback', data: `data:image/png;base64,${base64}` } })
     expect(res.status).toBe(201)
     expect(res.body.data.mimeType).toBe('image/png')
-    expect((await t.call('POST', '/uploads', { token, body: { purpose: 'feedback', data: Buffer.from('hello').toString('base64') } })).status).toBe(415)
+    expect(
+      (await t.call('POST', '/uploads', { token, body: { purpose: 'feedback', data: Buffer.from('hello').toString('base64') } })).status,
+    ).toBe(415)
     expect((await t.call('POST', '/uploads', { token, body: { purpose: 'feedback' } })).status).toBe(400)
   })
 
@@ -77,11 +79,17 @@ describe.skipIf(!commerceTestUrl)('upload ảnh lên storage ngoài (Supabase)',
   // Storage giả thay cho Supabase: ghi nhận file và trả URL tuyệt đối như bucket public.
   const storage: ObjectStorage = {
     kind: 'supabase',
-    async put(name, bytes, mime) { stored.set(name, { bytes, mime }) },
+    async put(name, bytes, mime) {
+      stored.set(name, { bytes, mime })
+    },
     publicUrl: (name) => `https://ref.supabase.co/storage/v1/object/public/uploads/${name}`,
   }
-  beforeAll(async () => { t = await startCommerceTest((db) => ({ commerce: { db, allowDemoCheckout: true, storage } })) })
-  afterAll(async () => { await t?.stop() })
+  beforeAll(async () => {
+    t = await startCommerceTest((db) => ({ commerce: { db, allowDemoCheckout: true, storage } }))
+  })
+  afterAll(async () => {
+    await t?.stop()
+  })
 
   it('lưu URL tuyệt đối của storage và dùng cho avatar', async () => {
     const { token } = await t.register()

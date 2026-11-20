@@ -22,12 +22,26 @@ export function MarketplaceHeader({ title, onBack }: { title: string; onBack?: (
           <Ionicons name="chevron-back" size={22} color={m.muted} />
         </YStack>
       )}
-      <MarketHeading flex={1} fontSize={18} color={m.ink} numberOfLines={1}>{title}</MarketHeading>
-      <YStack {...keyboardAction} position="relative" w={44} h={44} items="center" justify="center" role="button" aria-label={`Giỏ hàng, ${count} sản phẩm`} onPress={() => router.push('/checkout')}>
+      <MarketHeading flex={1} fontSize={18} color={m.ink} numberOfLines={1}>
+        {title}
+      </MarketHeading>
+      <YStack
+        {...keyboardAction}
+        position="relative"
+        w={44}
+        h={44}
+        items="center"
+        justify="center"
+        role="button"
+        aria-label={`Giỏ hàng, ${count} sản phẩm`}
+        onPress={() => router.push('/checkout')}
+      >
         <Ionicons name="cart-outline" size={22} color={m.muted} />
         {count > 0 && (
           <YStack position="absolute" r={0} t={0} minW={16} h={16} px={3} rounded={9} items="center" bg={m.primary}>
-            <MarketText color="white" fontSize={10} lineHeight="16px">{count > 99 ? '99+' : count}</MarketText>
+            <MarketText color="white" fontSize={10} lineHeight="16px">
+              {count > 99 ? '99+' : count}
+            </MarketText>
           </YStack>
         )}
       </YStack>

@@ -4,12 +4,18 @@ import { commerceTestUrl, startCommerceTest } from '@/test/integration.ts'
 
 describe.skipIf(!commerceTestUrl)('lịch sử và huỷ đơn', () => {
   let t: Awaited<ReturnType<typeof startCommerceTest>>
-  beforeAll(async () => { t = await startCommerceTest() })
-  afterAll(async () => { await t?.stop() })
-
-  const place = ({ token, addressId }: { token: string; addressId: string }, productId: string) => t.call('POST', '/orders', {
-    token, body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId, items: [{ productId, quantity: 1 }] },
+  beforeAll(async () => {
+    t = await startCommerceTest()
   })
+  afterAll(async () => {
+    await t?.stop()
+  })
+
+  const place = ({ token, addressId }: { token: string; addressId: string }, productId: string) =>
+    t.call('POST', '/orders', {
+      token,
+      body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId, items: [{ productId, quantity: 1 }] },
+    })
 
   it('liệt kê đơn mới nhất trước, phân trang, chỉ đơn của mình', async () => {
     const me = await t.register()
@@ -70,18 +76,42 @@ describe.skipIf(!commerceTestUrl)('lịch sử và huỷ đơn', () => {
   it('phí ship theo hình thức giao, FREESHIP miễn phí ship, chặn hình thức không hỗ trợ', async () => {
     const phone = 'plug-samsung-galaxy-s24-ultra-5g-512gb-titanium-black-unlocked'
     const methods = (await t.call('GET', '/shipping-methods?products=pear,banana')).body.data
-    expect(methods.map((m: { id: string; fee: number }) => [m.id, m.fee])).toEqual([['standard', 2.99], ['express', 5.99], ['instant', 9.99]])
+    expect(methods.map((m: { id: string; fee: number }) => [m.id, m.fee])).toEqual([
+      ['standard', 2.99],
+      ['express', 5.99],
+      ['instant', 9.99],
+    ])
     // Có một sản phẩm không hỗ trợ Hoả tốc thì cả đơn không chọn được Hoả tốc.
-    expect((await t.call('GET', `/shipping-methods?products=pear,${phone}`)).body.data.map((m: { id: string }) => m.id)).toEqual(['standard', 'express'])
+    expect((await t.call('GET', `/shipping-methods?products=pear,${phone}`)).body.data.map((m: { id: string }) => m.id)).toEqual([
+      'standard',
+      'express',
+    ])
     expect((await t.call('GET', '/shipping-methods?products=pear,khong-ton-tai')).body.data).toEqual([])
 
     const me = await t.register()
-    const order = (body: Record<string, unknown>) => t.call('POST', '/orders', {
-      token: me.token, body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId: me.addressId, items: [{ productId: 'pear', quantity: 1 }], ...body },
-    })
+    const order = (body: Record<string, unknown>) =>
+      t.call('POST', '/orders', {
+        token: me.token,
+        body: {
+          requestId: crypto.randomUUID(),
+          paymentMethod: 'pm_visa',
+          addressId: me.addressId,
+          items: [{ productId: 'pear', quantity: 1 }],
+          ...body,
+        },
+      })
     // pear $1.92: thuế 0.19; phí ship cộng sau thuế, không chịu thuế.
-    expect((await order({})).body.data).toMatchObject({ fees: 2.99, tax: 0.19, total: 5.1, shippingMethod: { id: 'standard', label: 'Tiêu chuẩn' } })
-    expect((await order({ shippingMethod: 'instant' })).body.data).toMatchObject({ fees: 9.99, total: 12.1, shippingMethod: { id: 'instant' } })
+    expect((await order({})).body.data).toMatchObject({
+      fees: 2.99,
+      tax: 0.19,
+      total: 5.1,
+      shippingMethod: { id: 'standard', label: 'Tiêu chuẩn' },
+    })
+    expect((await order({ shippingMethod: 'instant' })).body.data).toMatchObject({
+      fees: 9.99,
+      total: 12.1,
+      shippingMethod: { id: 'instant' },
+    })
     expect((await order({ shippingMethod: 'express', voucher: 'FREESHIP' })).body.data).toMatchObject({ fees: 0, discount: 0, total: 2.11 })
     const blocked = await order({ shippingMethod: 'instant', items: [{ productId: phone, quantity: 1 }] })
     expect(blocked.body.error.code).toBe('SHIPPING_UNAVAILABLE')
@@ -94,7 +124,10 @@ describe.skipIf(!commerceTestUrl)('lịch sử và huỷ đơn', () => {
 
     const missing = await t.call('POST', '/orders', { token: me.token, body: { ...body, requestId: crypto.randomUUID() } })
     expect(missing.status).toBe(400)
-    const foreign = await t.call('POST', '/orders', { token: me.token, body: { ...body, requestId: crypto.randomUUID(), addressId: other.addressId } })
+    const foreign = await t.call('POST', '/orders', {
+      token: me.token,
+      body: { ...body, requestId: crypto.randomUUID(), addressId: other.addressId },
+    })
     expect(foreign.body.error.code).toBe('ADDRESS_NOT_FOUND')
 
     const order = (await place(me, 'pear')).body.data

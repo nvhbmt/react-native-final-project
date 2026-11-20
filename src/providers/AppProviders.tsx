@@ -31,9 +31,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   return (
     <SafeAreaProvider>
       <TamaguiProvider config={config} defaultTheme="light">
-        <ThemeProvider value={navTheme}>
-          {children}
-        </ThemeProvider>
+        <ThemeProvider value={navTheme}>{children}</ThemeProvider>
       </TamaguiProvider>
     </SafeAreaProvider>
   )

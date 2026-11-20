@@ -33,23 +33,27 @@ export function ForgotPasswordScreen() {
     form.clearError(field)
   }
 
-  const sendCode = () => form.submit(async () => {
-    await authApi.forgotPassword(values.email.trim())
-    setStep('reset')
-  })
-  const reset = () => form.submit(async () => {
-    await resetPassword({ email: values.email.trim(), code: values.code.trim(), newPassword: values.newPassword })
-    leaveAuthFlow()
-  })
+  const sendCode = () =>
+    form.submit(async () => {
+      await authApi.forgotPassword(values.email.trim())
+      setStep('reset')
+    })
+  const reset = () =>
+    form.submit(async () => {
+      await resetPassword({ email: values.email.trim(), code: values.code.trim(), newPassword: values.newPassword })
+      leaveAuthFlow()
+    })
 
   return (
     <AuthScreenFrame
       brand
       header="Quên mật khẩu"
       title={step === 'email' ? 'Quên mật khẩu' : 'Nhập mã xác nhận'}
-      subtitle={step === 'email'
-        ? 'Nhập email đã đăng ký, chúng tôi sẽ gửi mã 6 số để đặt lại mật khẩu.'
-        : `Nếu ${values.email.trim()} đã đăng ký, mã đã được gửi tới hộp thư. Mã có hiệu lực 15 phút.`}
+      subtitle={
+        step === 'email'
+          ? 'Nhập email đã đăng ký, chúng tôi sẽ gửi mã 6 số để đặt lại mật khẩu.'
+          : `Nếu ${values.email.trim()} đã đăng ký, mã đã được gửi tới hộp thư. Mã có hiệu lực 15 phút.`
+      }
     >
       <FormBanner message={form.formError} />
       {step === 'email' ? (
@@ -99,7 +103,13 @@ export function ForgotPasswordScreen() {
             />
           </View>
           <SubmitButton title="Đặt lại mật khẩu" loading={form.submitting} onPress={reset} />
-          <Text role="button" onPress={() => { if (!form.submitting) void sendCode() }} className="text-center text-[14px] font-bold text-primary">
+          <Text
+            role="button"
+            onPress={() => {
+              if (!form.submitting) void sendCode()
+            }}
+            className="text-center text-[14px] font-bold text-primary"
+          >
             Gửi lại mã
           </Text>
         </>

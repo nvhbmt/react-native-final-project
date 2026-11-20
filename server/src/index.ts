@@ -28,11 +28,12 @@ const app = buildApp({
   authRepository: createDrizzleAuthRepository(db),
   mailer: smtp ? createSmtpMailer(smtp.transport, smtp.from) : consoleMailer,
   catalog: createCatalogService(createCatalogRepository(db)),
-  ai: env.AI_API_KEY && env.AI_MODEL
-    ? env.AI_PROVIDER === 'anthropic'
-      ? createAnthropicProvider({ apiKey: env.AI_API_KEY, model: env.AI_MODEL })
-      : createOpenAiCompatibleProvider({ baseUrl: env.AI_BASE_URL!, apiKey: env.AI_API_KEY, model: env.AI_MODEL })
-    : undefined,
+  ai:
+    env.AI_API_KEY && env.AI_MODEL
+      ? env.AI_PROVIDER === 'anthropic'
+        ? createAnthropicProvider({ apiKey: env.AI_API_KEY, model: env.AI_MODEL })
+        : createOpenAiCompatibleProvider({ baseUrl: env.AI_BASE_URL!, apiKey: env.AI_API_KEY, model: env.AI_MODEL })
+      : undefined,
   commerce: { db, allowDemoCheckout: allowDemoCheckout(env), uploadDir: env.UPLOAD_DIR, storage, sepay: sepayConfig(env) },
   accessSecret: env.JWT_ACCESS_SECRET,
   accessTtlSeconds: env.ACCESS_TOKEN_TTL,

@@ -18,7 +18,9 @@ export function MessageBubble({ message, activity, onRate }: Props) {
         {message.content ? (
           mine ? (
             // Tin của người dùng giữ nguyên văn (gõ `*` không bị hiểu thành in nghiêng).
-            <Text {...selectableText} className="text-[14px] leading-[22px] text-white">{message.content}</Text>
+            <Text {...selectableText} className="text-[14px] leading-[22px] text-white">
+              {message.content}
+            </Text>
           ) : (
             <MarkdownMessage content={message.content} />
           )
@@ -32,9 +34,24 @@ export function MessageBubble({ message, activity, onRate }: Props) {
       {!mine && onRate && message.status !== 'streaming' && message.content ? (
         <View className="flex-row gap-3 pl-1">
           {([1, -1] as const).map((value) => (
-            <View key={value} onPress={() => onRate(value)} role="button" aria-label={value === 1 ? 'Hữu ích' : 'Không hữu ích'} aria-pressed={message.rating === value} hitSlop={6}>
+            <View
+              key={value}
+              onPress={() => onRate(value)}
+              role="button"
+              aria-label={value === 1 ? 'Hữu ích' : 'Không hữu ích'}
+              aria-pressed={message.rating === value}
+              hitSlop={6}
+            >
               <Ionicons
-                name={value === 1 ? (message.rating === 1 ? 'thumbs-up' : 'thumbs-up-outline') : (message.rating === -1 ? 'thumbs-down' : 'thumbs-down-outline')}
+                name={
+                  value === 1
+                    ? message.rating === 1
+                      ? 'thumbs-up'
+                      : 'thumbs-up-outline'
+                    : message.rating === -1
+                      ? 'thumbs-down'
+                      : 'thumbs-down-outline'
+                }
                 size={14}
                 color={message.rating === value ? appColors.primary : appColors['neutral-400']}
               />

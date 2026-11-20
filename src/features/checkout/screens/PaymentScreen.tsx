@@ -43,11 +43,16 @@ export function PaymentScreen() {
   // Tải lại sổ địa chỉ mỗi khi quay về từ màn Địa chỉ giao hàng (lần focus đầu đã tải sẵn).
   const [addressVersion, setAddressVersion] = useState(0)
   const focusedOnce = useRef(false)
-  useFocusEffect(useCallback(() => {
-    if (focusedOnce.current) setAddressVersion((v) => v + 1)
-    focusedOnce.current = true
-  }, []))
-  const addresses = useCatalogRequest<Address[]>(user ? '/users/me/addresses' : undefined, { auth: true, version: `${user?.id}:${addressVersion}` })
+  useFocusEffect(
+    useCallback(() => {
+      if (focusedOnce.current) setAddressVersion((v) => v + 1)
+      focusedOnce.current = true
+    }, []),
+  )
+  const addresses = useCatalogRequest<Address[]>(user ? '/users/me/addresses' : undefined, {
+    auth: true,
+    version: `${user?.id}:${addressVersion}`,
+  })
   const [chosenAddressId, setChosenAddressId] = useState<string | null>(null)
   const addressList = addresses.data ?? []
   const selectedAddress = addressList.find((a) => a.id === chosenAddressId) ?? addressList.find((a) => a.isDefault) ?? addressList[0]
@@ -62,12 +67,21 @@ export function PaymentScreen() {
   if (items.length === 0 && !paidTotals) return <Redirect href="/checkout" />
 
   const placeOrder = async () => {
-    if (auth === 'guest') { router.push('/login'); return }
+    if (auth === 'guest') {
+      router.push('/login')
+      return
+    }
     if (!user || !selected || !selectedAddress || !selectedShipping || submitting.current || cartTotals.total <= 0) return
     submitting.current = true
     setPending(true)
     setError('')
-    const body = { paymentMethod: selected.id, addressId: selectedAddress.id, shippingMethod: selectedShipping.id, voucher, items: items.map(({ productId, quantity, options }) => ({ productId, quantity, options })) }
+    const body = {
+      paymentMethod: selected.id,
+      addressId: selectedAddress.id,
+      shippingMethod: selectedShipping.id,
+      voucher,
+      items: items.map(({ productId, quantity, options }) => ({ productId, quantity, options })),
+    }
     // Cùng nội dung → cùng requestId: bấm lại sau khi mất mạng không tạo đơn trùng.
     const signature = JSON.stringify([user.id, body])
     if (request.current?.signature !== signature) {
@@ -107,7 +121,13 @@ export function PaymentScreen() {
         {shipping.loading || shipping.error || (shipping.data && !shippingOptions.length) ? (
           <CatalogStatus
             loading={shipping.loading}
-            message={shipping.error ? 'Không tải được hình thức giao hàng.' : shipping.data ? 'Giỏ hàng có sản phẩm không còn giao được.' : undefined}
+            message={
+              shipping.error
+                ? 'Không tải được hình thức giao hàng.'
+                : shipping.data
+                  ? 'Giỏ hàng có sản phẩm không còn giao được.'
+                  : undefined
+            }
             onRetry={shipping.error ? shipping.retry : undefined}
           />
         ) : (
@@ -115,7 +135,9 @@ export function PaymentScreen() {
             options={shippingOptions}
             selectedId={selectedShipping?.id ?? null}
             freeShipping={freeShipping}
-            onSelect={(id) => { if (!submitting.current) setChosenShipping(id) }}
+            onSelect={(id) => {
+              if (!submitting.current) setChosenShipping(id)
+            }}
           />
         )}
       </View>
@@ -130,14 +152,22 @@ export function PaymentScreen() {
               onRetry={addresses.error ? addresses.retry : undefined}
             />
           ) : (
-            <AddressPicker addresses={addressList} selectedId={selectedAddress?.id ?? null} onSelect={(id) => { if (!submitting.current) setChosenAddressId(id) }} />
+            <AddressPicker
+              addresses={addressList}
+              selectedId={selectedAddress?.id ?? null}
+              onSelect={(id) => {
+                if (!submitting.current) setChosenAddressId(id)
+              }}
+            />
           )}
           <Text className="pt-3 font-heading text-[16px] leading-[24px] font-bold text-neutral-900">Phương thức thanh toán</Text>
         </View>
       ) : null}
 
       {auth === 'guest' ? (
-        <Text className="pt-6 text-center text-[14px] leading-[22px] text-neutral-600">Đăng nhập để chọn địa chỉ giao hàng và phương thức thanh toán.</Text>
+        <Text className="pt-6 text-center text-[14px] leading-[22px] text-neutral-600">
+          Đăng nhập để chọn địa chỉ giao hàng và phương thức thanh toán.
+        </Text>
       ) : methods.loading || methods.error || auth === 'unknown' ? (
         <CatalogStatus
           loading={methods.loading || auth === 'unknown'}
@@ -147,7 +177,14 @@ export function PaymentScreen() {
       ) : methods.data?.length ? (
         <View className="gap-5 pt-3" role="radiogroup">
           {methods.data.map((m) => (
-            <PaymentMethodOption key={m.id} method={m} selected={m.id === selectedId} onSelect={() => { if (!submitting.current) setChosenId(m.id) }} />
+            <PaymentMethodOption
+              key={m.id}
+              method={m}
+              selected={m.id === selectedId}
+              onSelect={() => {
+                if (!submitting.current) setChosenId(m.id)
+              }}
+            />
           ))}
         </View>
       ) : (
@@ -161,13 +198,32 @@ export function PaymentScreen() {
             : 'Thanh toán demo — không thu tiền thật.'}
         </Text>
       ) : null}
-      {error ? <Text role="alert" className="pt-2 text-[14px] text-red-700">{error}</Text> : null}
+      {error ? (
+        <Text role="alert" className="pt-2 text-[14px] text-red-700">
+          {error}
+        </Text>
+      ) : null}
       <Button
-        title={pending ? 'Đang đặt hàng…' : auth === 'guest' ? 'Đăng nhập để đặt hàng' : isTransfer ? 'Đặt hàng & chuyển khoản' : 'Đặt hàng (demo)'}
+        title={
+          pending
+            ? 'Đang đặt hàng…'
+            : auth === 'guest'
+              ? 'Đăng nhập để đặt hàng'
+              : isTransfer
+                ? 'Đặt hàng & chuyển khoản'
+                : 'Đặt hàng (demo)'
+        }
         leftIcon={isTransfer ? 'qr-code-outline' : 'card-outline'}
         className="mt-5"
         onPress={placeOrder}
-        disabled={pending || auth === 'unknown' || !!paidTotals || totals.total <= 0 || !selectedShipping || (auth === 'authenticated' && (!selected || !selectedAddress))}
+        disabled={
+          pending ||
+          auth === 'unknown' ||
+          !!paidTotals ||
+          totals.total <= 0 ||
+          !selectedShipping ||
+          (auth === 'authenticated' && (!selected || !selectedAddress))
+        }
       />
     </Screen>
   )

@@ -15,12 +15,18 @@ function scriptedProvider(seen: ChatMessage[][]): ChatProvider {
         yield { type: 'text', text: 'Đang ' }
         await new Promise((resolve, reject) => {
           const timer = setTimeout(resolve, 5000)
-          signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')) })
+          signal.addEventListener('abort', () => {
+            clearTimeout(timer)
+            reject(new Error('aborted'))
+          })
         })
         return
       }
       if (last.role === 'user') {
-        yield { type: 'tool_calls', calls: [{ id: 't1', type: 'function', function: { name: 'search_products', arguments: '{"query":"banana"}' } }] }
+        yield {
+          type: 'tool_calls',
+          calls: [{ id: 't1', type: 'function', function: { name: 'search_products', arguments: '{"query":"banana"}' } }],
+        }
         return
       }
       const products = JSON.parse((last as { content: string }).content) as { id: string }[]
@@ -31,11 +37,14 @@ function scriptedProvider(seen: ChatMessage[][]): ChatProvider {
 }
 
 function parseSse(text: string) {
-  return text.split('\n\n').filter(Boolean).map((block) => {
-    const event = block.match(/^event: (.*)$/m)?.[1]
-    const data = block.match(/^data: (.*)$/m)?.[1]
-    return { event, data: data ? JSON.parse(data) : null }
-  })
+  return text
+    .split('\n\n')
+    .filter(Boolean)
+    .map((block) => {
+      const event = block.match(/^event: (.*)$/m)?.[1]
+      const data = block.match(/^data: (.*)$/m)?.[1]
+      return { event, data: data ? JSON.parse(data) : null }
+    })
 }
 
 describe.skipIf(!commerceTestUrl)('trợ lý AI', () => {
@@ -44,11 +53,16 @@ describe.skipIf(!commerceTestUrl)('trợ lý AI', () => {
   beforeAll(async () => {
     t = await startCommerceTest((db) => ({ ai: scriptedProvider(seen), catalog: createCatalogService(createCatalogRepository(db)) }))
   })
-  afterAll(async () => { await t?.stop() })
-
-  const send = (token: string, id: string, content: string) => t.app.request(`/api/v1/ai/conversations/${id}/messages`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ content }),
+  afterAll(async () => {
+    await t?.stop()
   })
+
+  const send = (token: string, id: string, content: string) =>
+    t.app.request(`/api/v1/ai/conversations/${id}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ content }),
+    })
 
   it('stream câu trả lời có gọi tool, lưu lịch sử, đặt tiêu đề và đánh giá', async () => {
     const { token } = await t.register()
@@ -59,7 +73,11 @@ describe.skipIf(!commerceTestUrl)('trợ lý AI', () => {
     expect(res.headers.get('content-type')).toContain('text/event-stream')
     const events = parseSse(await res.text())
     expect(events.map((e) => e.event)).toEqual(['start', 'tool', 'delta', 'delta', 'done'])
-    expect(events.at(-1)!.data.message).toMatchObject({ role: 'assistant', status: 'complete', content: expect.stringContaining('[product:') })
+    expect(events.at(-1)!.data.message).toMatchObject({
+      role: 'assistant',
+      status: 'complete',
+      content: expect.stringContaining('[product:'),
+    })
     expect(seen[0]![0]!.content).toContain('[product:banana]') // ngữ cảnh sản phẩm trong system prompt
 
     const history = (await t.call('GET', `/ai/conversations/${conversation.id}/messages`, { token })).body.data
@@ -77,7 +95,9 @@ describe.skipIf(!commerceTestUrl)('trợ lý AI', () => {
     const reader = res.body!.getReader()
     const first = new TextDecoder().decode((await reader.read()).value)
     const { assistantMessageId } = parseSse(first)[0]!.data
-    expect((await t.call('POST', `/ai/conversations/${conversation.id}/messages/${assistantMessageId}/stop`, { token })).body.data.stopped).toBe(true)
+    expect(
+      (await t.call('POST', `/ai/conversations/${conversation.id}/messages/${assistantMessageId}/stop`, { token })).body.data.stopped,
+    ).toBe(true)
     let rest = ''
     for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) rest += new TextDecoder().decode(chunk.value)
     const done = parseSse(first + rest).find((e) => e.event === 'done')

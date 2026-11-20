@@ -9,10 +9,6 @@ const config = getDefaultConfig(__dirname)
 // ("TreeFS: Failed to make parent directory entry"). Chỉ chặn tmp/ ở gốc, không chặn thư mục cùng tên trong node_modules.
 const escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const tmpDir = escape(path.join(__dirname, 'tmp')).replace(/\\\\|\//g, '[\\\\/]')
-config.resolver.blockList = [
-  ...[].concat(config.resolver.blockList ?? []),
-  /^tmp[\\/].*/,
-  new RegExp(`^${tmpDir}[\\\\/].*`),
-]
+config.resolver.blockList = [...[].concat(config.resolver.blockList ?? []), /^tmp[\\/].*/, new RegExp(`^${tmpDir}[\\\\/].*`)]
 
 module.exports = config

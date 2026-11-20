@@ -30,11 +30,7 @@ export function MoodPicker({ value, onChange }: Props) {
             aria-label={m.label}
             className="active:opacity-70"
           >
-            <MaterialCommunityIcons
-              name={m.icon}
-              size={48}
-              color={selected ? appColors.primary : appColors['neutral-500']}
-            />
+            <MaterialCommunityIcons name={m.icon} size={48} color={selected ? appColors.primary : appColors['neutral-500']} />
           </View>
         )
       })}

@@ -40,7 +40,9 @@ export function serializeUpload(row: UploadRow) {
 /** Lấy các upload thuộc user, đúng mục đích; ném 400 nếu có id lạ (của người khác / sai mục đích). */
 export async function requireOwnUploads(db: Db, userId: string, ids: string[], purpose: UploadRow['purpose']) {
   if (!ids.length) return []
-  const rows = await db.select().from(uploads)
+  const rows = await db
+    .select()
+    .from(uploads)
     .where(and(eq(uploads.userId, userId), eq(uploads.purpose, purpose), inArray(uploads.id, ids)))
   if (rows.length !== new Set(ids).size) throw new AppError(400, 'INVALID_UPLOAD', 'Ảnh đính kèm không hợp lệ')
   const byId = new Map(rows.map((row) => [row.id, row]))
@@ -49,48 +51,64 @@ export async function requireOwnUploads(db: Db, userId: string, ids: string[], p
 
 export function uploadRoutes(db: Db, accessSecret: string, storage: ObjectStorage) {
   const app = new Hono<{ Variables: AuthVariables }>()
-  const perUser = rateLimit({ windowMs: 60 * 60 * 1000, max: 60, key: (c) => `upload:${(c.get('auth' as never) as { sub?: string } | undefined)?.sub ?? 'anon'}` })
+  const perUser = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 60,
+    key: (c) => `upload:${(c.get('auth' as never) as { sub?: string } | undefined)?.sub ?? 'anon'}`,
+  })
 
-  return app
-    .post(
-      '/uploads',
-      bodyLimit({ maxSize: Math.ceil(MAX_UPLOAD_BYTES * 4 / 3) + 64 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB') } }),
-      requireAuth(accessSecret),
-      perUser,
-      async (c) => {
-        // Hai dạng: multipart (field `file`) hoặc JSON `{ purpose, data: <base64> }` — app mobile dùng base64
-        // từ image picker vì gửi file qua FormData không ổn định giữa các nền tảng.
-        const isJson = c.req.header('Content-Type')?.includes('application/json')
-        const form: Record<string, unknown> = isJson
-          ? await c.req.json().catch(() => ({}))
-          : await c.req.parseBody().catch(() => {
-              throw new AppError(400, 'BAD_REQUEST', 'Gửi ảnh dạng multipart/form-data (field "file") hoặc JSON { purpose, data }')
-            })
-        const purpose = z.enum(PURPOSES).safeParse(form.purpose)
-        if (!purpose.success) throw new AppError(400, 'VALIDATION_ERROR', 'purpose phải là avatar, feedback hoặc review')
-        let bytes: Uint8Array
-        if (isJson) {
-          const data = typeof form.data === 'string' ? form.data.replace(/^data:[^,]*,/, '') : ''
-          if (!data || !/^[A-Za-z0-9+/=\s]+$/.test(data)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu dữ liệu ảnh base64')
-          bytes = new Uint8Array(Buffer.from(data, 'base64'))
-        } else {
-          const file = form.file
-          if (!(file instanceof File)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu file ảnh')
-          bytes = new Uint8Array(await file.arrayBuffer())
-        }
-        if (bytes.length === 0 || bytes.length > MAX_UPLOAD_BYTES) throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB')
-
-        const kind = sniffImage(bytes)
-        if (!kind) throw new AppError(415, 'UNSUPPORTED_IMAGE', 'Chỉ nhận ảnh JPEG, PNG hoặc WebP')
-
-        const fileName = `${randomUUID()}.${kind.ext}`
-        await storage.put(fileName, bytes, kind.mime)
-        const [row] = await db.insert(uploads).values({
-          userId: c.var.auth.sub, purpose: purpose.data, fileName, url: storage.publicUrl(fileName), mimeType: kind.mime, sizeBytes: bytes.length,
-        }).returning()
-        return ok(c, serializeUpload(row!), 201)
+  return app.post(
+    '/uploads',
+    bodyLimit({
+      maxSize: Math.ceil((MAX_UPLOAD_BYTES * 4) / 3) + 64 * 1024,
+      onError: () => {
+        throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB')
       },
-    )
+    }),
+    requireAuth(accessSecret),
+    perUser,
+    async (c) => {
+      // Hai dạng: multipart (field `file`) hoặc JSON `{ purpose, data: <base64> }` — app mobile dùng base64
+      // từ image picker vì gửi file qua FormData không ổn định giữa các nền tảng.
+      const isJson = c.req.header('Content-Type')?.includes('application/json')
+      const form: Record<string, unknown> = isJson
+        ? await c.req.json().catch(() => ({}))
+        : await c.req.parseBody().catch(() => {
+            throw new AppError(400, 'BAD_REQUEST', 'Gửi ảnh dạng multipart/form-data (field "file") hoặc JSON { purpose, data }')
+          })
+      const purpose = z.enum(PURPOSES).safeParse(form.purpose)
+      if (!purpose.success) throw new AppError(400, 'VALIDATION_ERROR', 'purpose phải là avatar, feedback hoặc review')
+      let bytes: Uint8Array
+      if (isJson) {
+        const data = typeof form.data === 'string' ? form.data.replace(/^data:[^,]*,/, '') : ''
+        if (!data || !/^[A-Za-z0-9+/=\s]+$/.test(data)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu dữ liệu ảnh base64')
+        bytes = new Uint8Array(Buffer.from(data, 'base64'))
+      } else {
+        const file = form.file
+        if (!(file instanceof File)) throw new AppError(400, 'VALIDATION_ERROR', 'Thiếu file ảnh')
+        bytes = new Uint8Array(await file.arrayBuffer())
+      }
+      if (bytes.length === 0 || bytes.length > MAX_UPLOAD_BYTES) throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Ảnh tối đa 5MB')
+
+      const kind = sniffImage(bytes)
+      if (!kind) throw new AppError(415, 'UNSUPPORTED_IMAGE', 'Chỉ nhận ảnh JPEG, PNG hoặc WebP')
+
+      const fileName = `${randomUUID()}.${kind.ext}`
+      await storage.put(fileName, bytes, kind.mime)
+      const [row] = await db
+        .insert(uploads)
+        .values({
+          userId: c.var.auth.sub,
+          purpose: purpose.data,
+          fileName,
+          url: storage.publicUrl(fileName),
+          mimeType: kind.mime,
+          sizeBytes: bytes.length,
+        })
+        .returning()
+      return ok(c, serializeUpload(row!), 201)
+    },
+  )
 }
 
 /** Phục vụ file đã upload (công khai, tên file là UUID ngẫu nhiên nên không đoán được). */

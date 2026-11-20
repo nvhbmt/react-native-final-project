@@ -9,7 +9,8 @@ type FilterState = {
 
 export const useFilterStore = create<FilterState>((set) => ({
   filters: emptyFilters,
-  setFilters: (filters) => set({ filters: { ...filters, shippingOptions: [...(filters.shippingOptions ?? [])], others: [...(filters.others ?? [])] } }),
+  setFilters: (filters) =>
+    set({ filters: { ...filters, shippingOptions: [...(filters.shippingOptions ?? [])], others: [...(filters.others ?? [])] } }),
 }))
 
 export function useProductFilters() {
@@ -17,5 +18,7 @@ export function useProductFilters() {
 }
 
 export function hasActiveFilters(filters: ProductFilters) {
-  return Boolean(filters.minimumPrice || filters.maximumPrice || filters.minimumRating || filters.shippingOptions?.length || filters.others?.length)
+  return Boolean(
+    filters.minimumPrice || filters.maximumPrice || filters.minimumRating || filters.shippingOptions?.length || filters.others?.length,
+  )
 }

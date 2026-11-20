@@ -4,12 +4,15 @@ import { createOpenAiCompatibleProvider, type StreamEvent } from './provider.ts'
 
 function sseResponse(chunks: string[]) {
   const encoder = new TextEncoder()
-  return new Response(new ReadableStream({
-    start(controller) {
-      for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
-      controller.close()
-    },
-  }), { status: 200 })
+  return new Response(
+    new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+        controller.close()
+      },
+    }),
+    { status: 200 },
+  )
 }
 
 describe('provider tương thích OpenAI', () => {
@@ -34,7 +37,10 @@ describe('provider tương thích OpenAI', () => {
   })
 
   it('ném lỗi khi nhà cung cấp trả mã lỗi', async () => {
-    const provider = createOpenAiCompatibleProvider({ baseUrl: 'https://ai.example', apiKey: 'k', model: 'm' }, async () => new Response('quota', { status: 429 }))
+    const provider = createOpenAiCompatibleProvider(
+      { baseUrl: 'https://ai.example', apiKey: 'k', model: 'm' },
+      async () => new Response('quota', { status: 429 }),
+    )
     await expect(async () => {
       for await (const _ of provider.stream([], [], new AbortController().signal)) void _
     }).rejects.toThrow('429')

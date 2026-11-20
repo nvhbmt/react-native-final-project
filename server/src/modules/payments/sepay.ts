@@ -54,17 +54,19 @@ export function verifyApiKey(header: string | undefined, key: string) {
 }
 
 /** Payload webhook SePay (https://docs.sepay.vn/tich-hop-webhooks.html). */
-export const sepayWebhookSchema = z.object({
-  id: z.union([z.number(), z.string()]).transform(String),
-  gateway: z.string().optional(),
-  transactionDate: z.string().optional(),
-  accountNumber: z.string().nullish(),
-  code: z.string().nullish(),
-  content: z.string().default(''),
-  transferType: z.enum(['in', 'out']),
-  transferAmount: z.number().int().nonnegative(),
-  referenceCode: z.string().nullish(),
-  description: z.string().nullish(),
-}).loose()
+export const sepayWebhookSchema = z
+  .object({
+    id: z.union([z.number(), z.string()]).transform(String),
+    gateway: z.string().optional(),
+    transactionDate: z.string().optional(),
+    accountNumber: z.string().nullish(),
+    code: z.string().nullish(),
+    content: z.string().default(''),
+    transferType: z.enum(['in', 'out']),
+    transferAmount: z.number().int().nonnegative(),
+    referenceCode: z.string().nullish(),
+    description: z.string().nullish(),
+  })
+  .loose()
 
 export type SepayWebhook = z.infer<typeof sepayWebhookSchema>

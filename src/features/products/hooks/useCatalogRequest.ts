@@ -14,10 +14,17 @@ export function useCatalogRequest<T>(path?: string, { auth = false, version = ''
       request.abort()
       setResult({ key, error: new Error('Hết thời gian chờ phản hồi.') })
     }, 12_000)
-    api.get<T>(path, { auth, signal: request.signal }).then(
-      (data) => { if (!request.signal.aborted) setResult({ key, data }) },
-      (error: unknown) => { if (!request.signal.aborted) setResult({ key, error }) },
-    ).finally(() => clearTimeout(timeout))
+    api
+      .get<T>(path, { auth, signal: request.signal })
+      .then(
+        (data) => {
+          if (!request.signal.aborted) setResult({ key, data })
+        },
+        (error: unknown) => {
+          if (!request.signal.aborted) setResult({ key, error })
+        },
+      )
+      .finally(() => clearTimeout(timeout))
 
     return () => {
       clearTimeout(timeout)

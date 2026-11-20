@@ -22,7 +22,11 @@ export function CheckoutScreen() {
   if (items.length === 0) {
     return (
       <Screen header={<AppHeader title="Giỏ hàng" />} contentClassName="pb-6" safeBottom>
-        {syncError ? <Text role="alert" className="px-6 pt-3 text-[13px] leading-[20px] text-danger">{syncError}</Text> : null}
+        {syncError ? (
+          <Text role="alert" className="px-6 pt-3 text-[13px] leading-[20px] text-danger">
+            {syncError}
+          </Text>
+        ) : null}
         <EmptyState icon="cart-outline" title="Giỏ hàng đang trống" description="Thêm sản phẩm vào giỏ để đặt hàng.">
           <Button title="Tiếp tục mua sắm" onPress={() => router.dismissTo('/')} />
         </EmptyState>
@@ -41,7 +45,11 @@ export function CheckoutScreen() {
         ))}
       </View>
 
-      {syncError ? <Text role="alert" className="pt-3 text-[13px] leading-[20px] text-danger">{syncError}</Text> : null}
+      {syncError ? (
+        <Text role="alert" className="pt-3 text-[13px] leading-[20px] text-danger">
+          {syncError}
+        </Text>
+      ) : null}
       <View className="pt-[18px]">
         <VoucherField />
       </View>
@@ -52,17 +60,10 @@ export function CheckoutScreen() {
           <Text className="font-heading text-[14px] leading-[22px] font-bold uppercase text-neutral-700">Tạm tính</Text>
           <Text className="text-[12px] leading-[18px] text-neutral-500">Chưa gồm thuế và phí</Text>
         </View>
-        <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">
-          {formatPrice(subtotal - discount)}
-        </Text>
+        <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">{formatPrice(subtotal - discount)}</Text>
       </View>
 
-      <Button
-        title="Tiếp tục"
-        rightIcon="arrow-forward"
-        className="mt-6"
-        onPress={() => router.push('/checkout/payment')}
-      />
+      <Button title="Tiếp tục" rightIcon="arrow-forward" className="mt-6" onPress={() => router.push('/checkout/payment')} />
     </Screen>
   )
 }

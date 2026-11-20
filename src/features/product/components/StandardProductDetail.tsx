@@ -58,7 +58,18 @@ export function StandardProductDetail({ product }: { product: Product }) {
 
   return (
     <Screen
-      header={<AppHeader title={product.categoryName} align="left" right={<><FavoriteButton product={{ id: product.id }} /><HeaderActions /></>} />}
+      header={
+        <AppHeader
+          title={product.categoryName}
+          align="left"
+          right={
+            <>
+              <FavoriteButton product={{ id: product.id }} />
+              <HeaderActions />
+            </>
+          }
+        />
+      }
       contentClassName="pb-6"
       footer={
         <View className="flex-row gap-3 border-t border-neutral-200 px-6 pt-3 pb-3">
@@ -85,18 +96,24 @@ export function StandardProductDetail({ product }: { product: Product }) {
     >
       <View className="gap-4 px-6 pt-1 pb-6">
         <ImageCarousel images={product.images} width={contentWidth} height={Math.round(contentWidth * 0.545)} contentFit="contain" />
-        {product.imageAttribution && <Link href={product.imageAttribution} asChild>
-          <Text className="self-end text-[11px] leading-[16px] text-neutral-500 underline">Nguồn ảnh</Text>
-        </Link>}
+        {product.imageAttribution && (
+          <Link href={product.imageAttribution} asChild>
+            <Text className="self-end text-[11px] leading-[16px] text-neutral-500 underline">Nguồn ảnh</Text>
+          </Link>
+        )}
         <Text className="font-heading text-[18px] leading-[26px] font-bold text-neutral-900">{product.name}</Text>
         <View className="flex-row items-center justify-between">
-          <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">
-            {formatProductPrice(product)}
-          </Text>
+          <Text className="font-heading text-[20px] leading-[30px] font-bold text-neutral-900">{formatProductPrice(product)}</Text>
           <View className="flex-row items-center gap-1">
-            {product.rating !== null && <><Ionicons name="star" size={20} color={appColors.warning} />
-              <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text></>}
-            {product.reviewCount > 0 && <Text className="text-[14px] leading-[22px] text-neutral-500">({product.reviewCount} lượt đánh giá gốc)</Text>}
+            {product.rating !== null && (
+              <>
+                <Ionicons name="star" size={20} color={appColors.warning} />
+                <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text>
+              </>
+            )}
+            {product.reviewCount > 0 && (
+              <Text className="text-[14px] leading-[22px] text-neutral-500">({product.reviewCount} lượt đánh giá gốc)</Text>
+            )}
           </View>
         </View>
       </View>
@@ -128,7 +145,13 @@ export function StandardProductDetail({ product }: { product: Product }) {
       <View className="gap-4 px-6 pt-6 pb-6">
         <SectionHeader title="Đánh giá" onSeeAll={() => router.push(`/product/${product.id}/reviews`)} />
         {reviews.data && <RatingSummary {...reviews.data.summary} />}
-        {(reviews.loading || Boolean(reviews.error)) && <CatalogStatus loading={reviews.loading} message={reviews.error ? 'Không tải được đánh giá.' : undefined} onRetry={reviews.error ? reviews.retry : undefined} />}
+        {(reviews.loading || Boolean(reviews.error)) && (
+          <CatalogStatus
+            loading={reviews.loading}
+            message={reviews.error ? 'Không tải được đánh giá.' : undefined}
+            onRetry={reviews.error ? reviews.retry : undefined}
+          />
+        )}
         <View className="gap-5 pt-2">
           {reviews.data?.items.map((r) => (
             <ReviewItem key={r.id} review={r} />
@@ -141,7 +164,10 @@ export function StandardProductDetail({ product }: { product: Product }) {
       {related.data?.length ? (
         <View className="gap-4 pt-6 pb-4">
           <View className="px-6">
-            <SectionHeader title="Sản phẩm liên quan" onSeeAll={() => router.push({ pathname: '/product-listing', params: { relatedTo: product.id } })} />
+            <SectionHeader
+              title="Sản phẩm liên quan"
+              onSeeAll={() => router.push({ pathname: '/product-listing', params: { relatedTo: product.id } })}
+            />
           </View>
           <ScrollView
             horizontal
@@ -154,11 +180,21 @@ export function StandardProductDetail({ product }: { product: Product }) {
             ))}
           </ScrollView>
         </View>
-      ) : (related.loading || related.error) ? <CatalogStatus loading={related.loading} message={related.error ? 'Không tải được sản phẩm liên quan.' : undefined} onRetry={related.error ? related.retry : undefined} /> : null}
+      ) : related.loading || related.error ? (
+        <CatalogStatus
+          loading={related.loading}
+          message={related.error ? 'Không tải được sản phẩm liên quan.' : undefined}
+          onRetry={related.error ? related.retry : undefined}
+        />
+      ) : null}
 
       <View className="px-6 pt-2">
         <NotifyCard value={promo.enabled} onChange={(value) => void promo.setEnabled(value)} />
-        {promo.error ? <Text role="alert" className="pt-2 text-[12px] leading-[20px] text-danger">{promo.error}</Text> : null}
+        {promo.error ? (
+          <Text role="alert" className="pt-2 text-[12px] leading-[20px] text-danger">
+            {promo.error}
+          </Text>
+        ) : null}
       </View>
     </Screen>
   )

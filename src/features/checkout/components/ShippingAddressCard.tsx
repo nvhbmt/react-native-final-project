@@ -15,7 +15,9 @@ export function ShippingAddressCard({ address }: { address: ShippingAddress }) {
         <Text className="text-[14px] leading-[22px] font-bold text-neutral-900">
           {address.recipientName} · {address.phone}
         </Text>
-        <Text className="text-[14px] leading-[22px] text-neutral-600">{address.line1}, {address.city}</Text>
+        <Text className="text-[14px] leading-[22px] text-neutral-600">
+          {address.line1}, {address.city}
+        </Text>
       </View>
     </View>
   )

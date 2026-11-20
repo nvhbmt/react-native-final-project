@@ -19,17 +19,20 @@ export function useOrder(id: string | undefined, pollMs = 0) {
   useEffect(() => {
     if (!id || !user) return
     let alive = true
-    const load = () => ordersApi.get(id).then(
-      (next) => {
-        if (!alive) return
-        setOrder((previous) => {
-          if (previous && previous.status !== next.status) invalidateOrders()
-          return next
-        })
-        setError(null)
-      },
-      (e: unknown) => { if (alive) setError(e instanceof ApiError ? e.message : 'Không tải được đơn hàng') },
-    )
+    const load = () =>
+      ordersApi.get(id).then(
+        (next) => {
+          if (!alive) return
+          setOrder((previous) => {
+            if (previous && previous.status !== next.status) invalidateOrders()
+            return next
+          })
+          setError(null)
+        },
+        (e: unknown) => {
+          if (alive) setError(e instanceof ApiError ? e.message : 'Không tải được đơn hàng')
+        },
+      )
     void load()
     const timer = pollMs > 0 ? setInterval(() => void load(), pollMs) : undefined
     return () => {

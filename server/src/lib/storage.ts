@@ -72,8 +72,11 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): ObjectStor
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: config.bucket, name: config.bucket, public: true,
-          file_size_limit: 5 * 1024 * 1024, allowed_mime_types: ['image/jpeg', 'image/png', 'image/webp'],
+          id: config.bucket,
+          name: config.bucket,
+          public: true,
+          file_size_limit: 5 * 1024 * 1024,
+          allowed_mime_types: ['image/jpeg', 'image/png', 'image/webp'],
         }),
       })
       if (!created.ok) throw await failure(created, 'tạo bucket')

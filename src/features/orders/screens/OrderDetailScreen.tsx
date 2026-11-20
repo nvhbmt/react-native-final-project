@@ -37,18 +37,19 @@ export function OrderDetailScreen() {
     )
   }
 
-  const cancel = () => confirmAction('Huỷ đơn hàng?', `Đơn #${order.code} sẽ bị huỷ.`, 'Huỷ đơn', async () => {
-    setBusy(true)
-    setActionError(null)
-    try {
-      update(await ordersApi.cancel(order.id))
-      invalidateReviews()
-    } catch (e) {
-      setActionError(e instanceof ApiError ? e.message : 'Không huỷ được đơn, vui lòng thử lại')
-    } finally {
-      setBusy(false)
-    }
-  })
+  const cancel = () =>
+    confirmAction('Huỷ đơn hàng?', `Đơn #${order.code} sẽ bị huỷ.`, 'Huỷ đơn', async () => {
+      setBusy(true)
+      setActionError(null)
+      try {
+        update(await ordersApi.cancel(order.id))
+        invalidateReviews()
+      } catch (e) {
+        setActionError(e instanceof ApiError ? e.message : 'Không huỷ được đơn, vui lòng thử lại')
+      } finally {
+        setBusy(false)
+      }
+    })
   // Chỉ có ở môi trường demo: giả lập kho/shipper chuyển đơn sang bước kế tiếp.
   const advance = async () => {
     setAdvancing(true)
@@ -93,10 +94,14 @@ export function OrderDetailScreen() {
             <View className="flex-row items-center gap-3 py-3">
               <Image source={item.image} style={{ width: 56, height: 56, borderRadius: 4 }} contentFit="contain" />
               <View className="flex-1 gap-[2px]">
-                <Text numberOfLines={2} className="text-[14px] leading-[22px] text-neutral-800">{item.name}</Text>
+                <Text numberOfLines={2} className="text-[14px] leading-[22px] text-neutral-800">
+                  {item.name}
+                </Text>
                 <Text className="text-[12px] leading-[18px] text-neutral-500">{item.subtitle}</Text>
               </View>
-              <Text className="text-[14px] text-neutral-700">{item.quantity} × {formatPrice(item.price)}</Text>
+              <Text className="text-[14px] text-neutral-700">
+                {item.quantity} × {formatPrice(item.price)}
+              </Text>
             </View>
           </Fragment>
         ))}
@@ -106,19 +111,34 @@ export function OrderDetailScreen() {
 
       <OrderSummaryCard order={order} />
 
-      {actionError ? <Text role="alert" className="text-[13px] text-danger">{actionError}</Text> : null}
-      {order.status === 'pending_payment' ? (
-        <Button title="Thanh toán ngay" leftIcon="qr-code-outline" onPress={() => router.push({ pathname: '/checkout/transfer', params: { id: order.id } })} />
+      {actionError ? (
+        <Text role="alert" className="text-[13px] text-danger">
+          {actionError}
+        </Text>
       ) : null}
-      {order.status === 'completed' ? products.map((item) => (
+      {order.status === 'pending_payment' ? (
         <Button
-          key={item.productId}
-          title={`Đánh giá: ${item.name.length > 28 ? `${item.name.slice(0, 28)}…` : item.name}`}
-          variant="outline"
-          onPress={() => router.push({ pathname: '/product/[id]/write-review', params: { id: item.productId, orderId: order.id } })}
+          title="Thanh toán ngay"
+          leftIcon="qr-code-outline"
+          onPress={() => router.push({ pathname: '/checkout/transfer', params: { id: order.id } })}
         />
-      )) : null}
-      <Button title="Hỏi trợ lý về đơn này" variant="text" leftIcon="chatbubbles-outline" onPress={() => router.push({ pathname: '/assistant', params: { orderId: order.id } })} />
+      ) : null}
+      {order.status === 'completed'
+        ? products.map((item) => (
+            <Button
+              key={item.productId}
+              title={`Đánh giá: ${item.name.length > 28 ? `${item.name.slice(0, 28)}…` : item.name}`}
+              variant="outline"
+              onPress={() => router.push({ pathname: '/product/[id]/write-review', params: { id: item.productId, orderId: order.id } })}
+            />
+          ))
+        : null}
+      <Button
+        title="Hỏi trợ lý về đơn này"
+        variant="text"
+        leftIcon="chatbubbles-outline"
+        onPress={() => router.push({ pathname: '/assistant', params: { orderId: order.id } })}
+      />
       {order.cancellable ? <Button title={busy ? 'Đang huỷ…' : 'Huỷ đơn'} variant="text" disabled={busy} onPress={cancel} /> : null}
     </Screen>
   )

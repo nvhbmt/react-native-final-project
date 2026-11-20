@@ -12,8 +12,20 @@ export function FilterSection({ title, children, first, last, top, bottom }: Pro
   const [expanded, setExpanded] = useState(true)
   return (
     <YStack pt={top ?? (first ? 16 : 20)} pb={bottom ?? (last ? 0 : 16)} borderBottomWidth={last ? 0 : 1} borderColor={m.starEmpty}>
-      <XStack {...keyboardAction} role="button" aria-label={title} aria-expanded={expanded} onPress={() => setExpanded(!expanded)} items="center" justify="space-between" minH={26} hitSlop={5}>
-        <MarketHeading fontSize={16} lineHeight="26px" color={m.ink}>{title}</MarketHeading>
+      <XStack
+        {...keyboardAction}
+        role="button"
+        aria-label={title}
+        aria-expanded={expanded}
+        onPress={() => setExpanded(!expanded)}
+        items="center"
+        justify="space-between"
+        minH={26}
+        hitSlop={5}
+      >
+        <MarketHeading fontSize={16} lineHeight="26px" color={m.ink}>
+          {title}
+        </MarketHeading>
         <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={22} color={m.muted} />
       </XStack>
       {expanded && children}

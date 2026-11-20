@@ -47,8 +47,20 @@ export const TOOL_SPECS: ToolSpec[] = [
   },
 ]
 
-const compactProduct = (p: { id: string; name: string; price: number; rating: number | null; category: string; available: boolean | null }) => ({
-  id: p.id, name: p.name, priceUsd: p.price, rating: p.rating, category: p.category, available: p.available !== false,
+const compactProduct = (p: {
+  id: string
+  name: string
+  price: number
+  rating: number | null
+  category: string
+  available: boolean | null
+}) => ({
+  id: p.id,
+  name: p.name,
+  priceUsd: p.price,
+  rating: p.rating,
+  category: p.category,
+  available: p.available !== false,
 })
 
 export function createToolRunner(db: Db, catalog: CatalogService | undefined, userId: string) {
@@ -85,11 +97,20 @@ export function createToolRunner(db: Db, catalog: CatalogService | undefined, us
         }
         case 'list_my_orders': {
           const limit = Math.min(10, Math.max(1, Number(args.limit) || 5))
-          const rows = await db.select().from(orders).where(and(eq(orders.userId, userId))).orderBy(desc(orders.createdAt)).limit(limit)
+          const rows = await db
+            .select()
+            .from(orders)
+            .where(and(eq(orders.userId, userId)))
+            .orderBy(desc(orders.createdAt))
+            .limit(limit)
           return rows.map((row) => {
             const order = serializeOrder(row)
             return {
-              code: order.code, status: order.status, fulfillment: order.fulfillment, totalUsd: order.total, createdAt: new Date(order.createdAt).toISOString(),
+              code: order.code,
+              status: order.status,
+              fulfillment: order.fulfillment,
+              totalUsd: order.total,
+              createdAt: new Date(order.createdAt).toISOString(),
               items: order.items.map((item) => `${item.quantity} × ${item.name}`),
             }
           })

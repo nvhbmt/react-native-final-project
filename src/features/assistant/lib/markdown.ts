@@ -7,9 +7,7 @@
  * đến lượt chunk sau đóng lại thì tự hiện đúng.
  */
 
-export type Inline =
-  | { type: 'text'; text: string; bold?: boolean; italic?: boolean; code?: boolean }
-  | { type: 'product'; id: string }
+export type Inline = { type: 'text'; text: string; bold?: boolean; italic?: boolean; code?: boolean } | { type: 'product'; id: string }
 
 export type Block =
   | { type: 'paragraph'; inlines: Inline[] }
@@ -77,7 +75,8 @@ export function parseMarkdown(text: string): Block[] {
 }
 
 // Thứ tự quan trọng: `**` phải thử trước `*`. `(?!\*)`: với `***` cuối câu, `**` đóng là 2 dấu sau cùng.
-const INLINE = /\[product:([a-z0-9-]{1,160})\]|`([^`\n]+)`|\*\*(.+?)\*\*(?!\*)|__(.+?)__|\[([^\]\n]+)\]\((?:[^)\s]+)\)|\*([^*\s](?:[^*\n]*[^*\s])?)\*|\b_([^_\n]+)_\b/g
+const INLINE =
+  /\[product:([a-z0-9-]{1,160})\]|`([^`\n]+)`|\*\*(.+?)\*\*(?!\*)|__(.+?)__|\[([^\]\n]+)\]\((?:[^)\s]+)\)|\*([^*\s](?:[^*\n]*[^*\s])?)\*|\b_([^_\n]+)_\b/g
 
 export function parseInline(text: string, style: { bold?: boolean; italic?: boolean } = {}): Inline[] {
   const out: Inline[] = []

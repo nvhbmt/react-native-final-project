@@ -64,10 +64,7 @@ function Inlines({ inlines }: { inlines: Inline[] }) {
     }
     if (!part.bold && !part.italic && !part.code) return part.text
     return (
-      <Text
-        key={i}
-        className={cn(part.bold && 'font-bold', part.italic && 'italic', part.code && 'rounded bg-neutral-200 text-[13px]')}
-      >
+      <Text key={i} className={cn(part.bold && 'font-bold', part.italic && 'italic', part.code && 'rounded bg-neutral-200 text-[13px]')}>
         {part.text}
       </Text>
     )

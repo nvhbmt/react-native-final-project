@@ -11,7 +11,13 @@ import { validate } from '@/lib/validate.ts'
 import { requireAuth, type AuthVariables } from '@/middleware/auth.ts'
 import { clearCart } from '@/modules/cart/routes.ts'
 import {
-  commonShippingMethods, computeTotalsCents, priceLines, SHIPPING_METHOD_IDS, SHIPPING_METHODS, shippingFeeCents, totalCents,
+  commonShippingMethods,
+  computeTotalsCents,
+  priceLines,
+  SHIPPING_METHOD_IDS,
+  SHIPPING_METHODS,
+  shippingFeeCents,
+  totalCents,
   type ShippingMethodId,
 } from '@/modules/commerce/pricing.ts'
 import { notify } from '@/modules/inbox/notify.ts'
@@ -33,11 +39,16 @@ const checkout = z.object({
   /** Mặc định giao tiêu chuẩn (mọi sản phẩm đều hỗ trợ). */
   shippingMethod: z.enum(SHIPPING_METHOD_IDS).default('standard'),
   voucher: z.enum(['SALE10', 'FREESHIP']).optional(),
-  items: z.array(z.object({
-    productId: z.string().regex(/^[a-z0-9-]{1,160}$/),
-    quantity: z.number().int().min(1).max(99),
-    options: z.object({ color: z.string().min(1).max(100).optional(), size: z.string().min(1).max(40).optional() }).optional(),
-  })).min(1).max(50),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().regex(/^[a-z0-9-]{1,160}$/),
+        quantity: z.number().int().min(1).max(99),
+        options: z.object({ color: z.string().min(1).max(100).optional(), size: z.string().min(1).max(40).optional() }).optional(),
+      }),
+    )
+    .min(1)
+    .max(50),
 })
 
 const shippingQuery = z.object({
@@ -47,7 +58,12 @@ const shippingQuery = z.object({
 const shippingMethod = (id: ShippingMethodId) => ({ id, label: SHIPPING_METHODS[id].label, eta: SHIPPING_METHODS[id].eta })
 
 const listQuery = z.object({
-  limit: z.string().regex(/^\d{1,2}$/).transform(Number).pipe(z.number().int().min(1).max(50)).default(20),
+  limit: z
+    .string()
+    .regex(/^\d{1,2}$/)
+    .transform(Number)
+    .pipe(z.number().int().min(1).max(50))
+    .default(20),
   cursor: z.uuid().optional(),
 })
 const idParam = z.object({ id: z.uuid() })
@@ -94,8 +110,9 @@ export function serializeOrder(order: OrderRow, sepay?: SepayConfig, allowDemo =
     deliveredAt: order.deliveredAt?.getTime() ?? null,
     advanceable: allowDemo && order.status === 'completed' && order.fulfillment !== 'delivered',
     // Đơn đã trả tiền thật cần hoàn tiền thủ công nên người dùng không tự huỷ được; hàng đã gửi đi thì không huỷ nữa.
-    cancellable: order.status === 'pending_payment'
-      || (order.status === 'completed' && order.paymentMode === 'demo' && order.fulfillment === 'processing'),
+    cancellable:
+      order.status === 'pending_payment' ||
+      (order.status === 'completed' && order.paymentMode === 'demo' && order.fulfillment === 'processing'),
     items: order.items.map(({ priceCents, ...item }) => ({ ...item, price: priceCents / 100 })),
     shippingAddress: order.shippingAddress ?? null,
     subtotal: order.subtotalCents / 100,
@@ -128,154 +145,219 @@ export function orderRoutes(db: Db, accessSecret: string, options: OrderOptions)
   /** Hình thức giao mà mọi sản phẩm đều hỗ trợ; rỗng nếu có sản phẩm không tồn tại. */
   async function shippingMethodsFor(productIds: string[]) {
     const ids = [...new Set(productIds)]
-    const rows = await db.select({ shippingOptions: catalogProducts.shippingOptions }).from(catalogProducts).where(inArray(catalogProducts.id, ids))
+    const rows = await db
+      .select({ shippingOptions: catalogProducts.shippingOptions })
+      .from(catalogProducts)
+      .where(inArray(catalogProducts.id, ids))
     return rows.length === ids.length ? commonShippingMethods(rows.map((row) => row.shippingOptions)) : []
   }
 
   async function findOwn(id: string, userId: string) {
-    const [order] = await db.select().from(orders).where(and(eq(orders.id, id), eq(orders.userId, userId)))
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, id), eq(orders.userId, userId)))
     if (!order) throw new AppError(404, 'ORDER_NOT_FOUND', 'Không tìm thấy đơn hàng')
     return order
   }
 
-  return app
-    /** Phương thức thanh toán khả dụng: chỉ phương thức thu tiền thật (SePay khi đã cấu hình). */
-    .get('/payment-methods', (c) => ok(c, [
-      ...(sepay ? [SEPAY_METHOD] : []),
-      ...(demoCards ? Object.values(DEMO_METHODS) : []),
-    ]))
-    /** Hình thức giao khả dụng cho một nhóm sản phẩm, kèm phí gốc (chưa áp FREESHIP). */
-    .get('/shipping-methods', validate('query', shippingQuery), async (c) => {
-      const methods = await shippingMethodsFor(c.req.valid('query').products.split(','))
-      return ok(c, methods.map((id) => ({ ...shippingMethod(id), fee: SHIPPING_METHODS[id].feeCents / 100 })))
-    })
-    .post('/orders', validate('json', checkout), async (c) => {
-      const userId = c.var.auth.sub
-      const input = c.req.valid('json')
-      const viaSepay = input.paymentMethod === 'sepay'
-      if (viaSepay ? !sepay : !demoCards) throw new AppError(503, 'CHECKOUT_UNAVAILABLE', 'Phương thức thanh toán này hiện không khả dụng')
-
-      const requestHash = createHash('sha256').update(JSON.stringify(input)).digest('hex')
-      const lookup = and(eq(orders.userId, userId), eq(orders.requestId, input.requestId))
-      const [existing] = await db.select().from(orders).where(lookup)
-      if (existing) {
-        if (existing.requestHash !== requestHash) throw new AppError(409, 'ORDER_REQUEST_CONFLICT', 'Yêu cầu đặt hàng này đã được dùng')
-        return ok(c, serialize(existing))
-      }
-
-      // Kiểm tra sau bước replay: gửi lại cùng yêu cầu vẫn trả đơn cũ dù địa chỉ đã bị xoá sau đó.
-      const [address] = await db.select().from(addresses).where(and(eq(addresses.id, input.addressId), eq(addresses.userId, userId)))
-      if (!address) throw new AppError(400, 'ADDRESS_NOT_FOUND', 'Địa chỉ giao hàng không tồn tại, vui lòng chọn lại')
-      const shippingAddress = { recipientName: address.recipientName, phone: address.phone, line1: address.line1, city: address.city }
-
-      const items = await priceLines(db, input.items)
-      if (new Set(items.map(({ key }) => key)).size !== items.length) {
-        throw new AppError(400, 'DUPLICATE_ORDER_ITEM', 'Gộp các dòng giống nhau trước khi thanh toán')
-      }
-      if (!(await shippingMethodsFor(items.map((item) => item.productId))).includes(input.shippingMethod)) {
-        throw new AppError(400, 'SHIPPING_UNAVAILABLE', 'Hình thức giao hàng này không áp dụng cho mọi sản phẩm trong giỏ')
-      }
-      const totals = computeTotalsCents(items, input.voucher, shippingFeeCents(input.shippingMethod, input.voucher))
-      if (totals.subtotalCents > 2_000_000_000) throw new AppError(400, 'ORDER_LIMIT', 'Đơn hàng vượt quá giới hạn thanh toán')
-
-      const payment = viaSepay && sepay
-        ? {
-            status: 'pending_payment' as const,
-            paymentMode: 'verified' as const,
-            paymentCode: createPaymentCode(sepay.codePrefix),
-            amountVnd: toVnd(totalCents(totals), sepay),
-            paymentExpiresAt: new Date(Date.now() + sepay.ttlMinutes * 60_000),
-          }
-        : { status: 'completed' as const, paymentMode: 'demo' as const }
-      const [created] = await db.insert(orders).values({
-        userId, requestId: input.requestId, requestHash, paymentMethod: input.paymentMethod, items, shippingAddress, shippingMethod: input.shippingMethod, ...totals, ...payment,
-      }).onConflictDoNothing({ target: [orders.userId, orders.requestId] }).returning()
-
-      if (created) {
-        await clearCart(db, userId)
-        const count = items.reduce((n, item) => n + item.quantity, 0)
-        await notify(db, userId, viaSepay
-          ? {
-              kind: 'payment',
-              title: `Chờ thanh toán đơn #${shortId(created.id)}`,
-              body: `Chuyển ${created.amountVnd?.toLocaleString('vi-VN')}₫ với nội dung ${created.paymentCode} để hoàn tất đơn ${count} sản phẩm.`,
-              data: { orderId: created.id },
-            }
-          : {
-              kind: 'order',
-              title: `Đặt hàng thành công #${shortId(created.id)}`,
-              body: `Đơn gồm ${count} sản phẩm đã được ghi nhận.`,
-              data: { orderId: created.id },
-            })
-        return ok(c, serialize(created), 201)
-      }
-      const [replayed] = await db.select().from(orders).where(lookup)
-      if (!replayed || replayed.requestHash !== requestHash) throw new AppError(409, 'ORDER_REQUEST_CONFLICT', 'Yêu cầu đặt hàng này đã được dùng')
-      return ok(c, serialize(replayed))
-    })
-    .get('/orders', validate('query', listQuery), async (c) => {
-      const userId = c.var.auth.sub
-      const { limit, cursor } = c.req.valid('query')
-      const mine = eq(orders.userId, userId)
-      const [anchor] = cursor ? await db.select({ id: orders.id, createdAt: orders.createdAt }).from(orders).where(and(mine, eq(orders.id, cursor))) : []
-      if (cursor && !anchor) throw new AppError(400, 'INVALID_CURSOR', 'Cursor không hợp lệ')
-      const rows = await db.select().from(orders)
-        .where(and(mine, anchor ? or(lt(orders.createdAt, anchor.createdAt), and(eq(orders.createdAt, anchor.createdAt), lt(orders.id, anchor.id))) : undefined))
-        .orderBy(desc(orders.createdAt), desc(orders.id)).limit(limit + 1)
-      const page = rows.slice(0, limit)
-      return ok(c, { items: page.map(serialize), nextCursor: rows.length > limit ? page.at(-1)!.id : null })
-    })
-    .get('/orders/:id', validate('param', idParam), async (c) => ok(c, serialize(await findOwn(c.req.valid('param').id, c.var.auth.sub))))
-    /**
-     * Lấy (hoặc gia hạn khi đã hết hạn) hướng dẫn chuyển khoản cho đơn đang chờ thanh toán.
-     * Mã chuyển khoản giữ nguyên nên tiền chuyển theo QR cũ vẫn được ghi nhận.
-     */
-    .post('/orders/:id/pay', validate('param', idParam), async (c) => {
-      const order = await findOwn(c.req.valid('param').id, c.var.auth.sub)
-      if (order.status !== 'pending_payment' || !sepay) throw new AppError(409, 'ORDER_NOT_PAYABLE', 'Đơn hàng không ở trạng thái chờ thanh toán')
-      if (order.paymentExpiresAt && order.paymentExpiresAt.getTime() > Date.now()) return ok(c, serialize(order))
-      const [renewed] = await db.update(orders).set({ paymentExpiresAt: new Date(Date.now() + sepay.ttlMinutes * 60_000) })
-        .where(and(eq(orders.id, order.id), eq(orders.status, 'pending_payment'))).returning()
-      return ok(c, serialize(renewed ?? (await findOwn(order.id, order.userId))))
-    })
-    .post('/orders/:id/cancel', validate('param', idParam), async (c) => {
-      const userId = c.var.auth.sub
-      const order = await findOwn(c.req.valid('param').id, userId)
-      if (order.status === 'cancelled') return ok(c, serialize(order))
-      if (!serialize(order).cancellable) {
-        throw new AppError(409, 'ORDER_NOT_CANCELLABLE', order.fulfillment !== 'processing'
-          ? 'Đơn đã được gửi đi nên không thể huỷ'
-          : 'Đơn đã thanh toán không thể tự huỷ, vui lòng liên hệ hỗ trợ để hoàn tiền')
-      }
-      // Điều kiện status trong WHERE: nếu webhook vừa ghi nhận tiền thì không huỷ đè lên.
-      const [cancelled] = await db.update(orders).set({ status: 'cancelled', cancelledAt: new Date() })
-        .where(and(eq(orders.id, order.id), eq(orders.status, order.status), eq(orders.fulfillment, order.fulfillment))).returning()
-      if (!cancelled) throw new AppError(409, 'ORDER_CHANGED', 'Đơn hàng vừa thay đổi trạng thái, vui lòng tải lại')
-      await notify(db, userId, {
-        kind: 'order', title: `Đã huỷ đơn #${shortId(cancelled.id)}`, body: 'Đơn hàng của bạn đã được huỷ.', data: { orderId: cancelled.id },
+  return (
+    app
+      /** Phương thức thanh toán khả dụng: chỉ phương thức thu tiền thật (SePay khi đã cấu hình). */
+      .get('/payment-methods', (c) => ok(c, [...(sepay ? [SEPAY_METHOD] : []), ...(demoCards ? Object.values(DEMO_METHODS) : [])]))
+      /** Hình thức giao khả dụng cho một nhóm sản phẩm, kèm phí gốc (chưa áp FREESHIP). */
+      .get('/shipping-methods', validate('query', shippingQuery), async (c) => {
+        const methods = await shippingMethodsFor(c.req.valid('query').products.split(','))
+        return ok(
+          c,
+          methods.map((id) => ({ ...shippingMethod(id), fee: SHIPPING_METHODS[id].feeCents / 100 })),
+        )
       })
-      return ok(c, serialize(cancelled))
-    })
-    /**
-     * Chuyển đơn sang bước giao hàng tiếp theo (Đang xử lý → Đang giao → Đã giao).
-     * Chỉ bật ở dev/test (cùng điều kiện với thẻ demo) để trình diễn; production cần trang quản trị riêng.
-     */
-    .post('/orders/:id/advance', validate('param', idParam), async (c) => {
-      if (!allowDemo) throw new AppError(403, 'DEMO_ONLY', 'Chỉ dùng được ở môi trường demo')
-      const userId = c.var.auth.sub
-      const order = await findOwn(c.req.valid('param').id, userId)
-      return ok(c, serialize(await advanceFulfillment(db, order, userId)))
-    })
+      .post('/orders', validate('json', checkout), async (c) => {
+        const userId = c.var.auth.sub
+        const input = c.req.valid('json')
+        const viaSepay = input.paymentMethod === 'sepay'
+        if (viaSepay ? !sepay : !demoCards)
+          throw new AppError(503, 'CHECKOUT_UNAVAILABLE', 'Phương thức thanh toán này hiện không khả dụng')
+
+        const requestHash = createHash('sha256').update(JSON.stringify(input)).digest('hex')
+        const lookup = and(eq(orders.userId, userId), eq(orders.requestId, input.requestId))
+        const [existing] = await db.select().from(orders).where(lookup)
+        if (existing) {
+          if (existing.requestHash !== requestHash) throw new AppError(409, 'ORDER_REQUEST_CONFLICT', 'Yêu cầu đặt hàng này đã được dùng')
+          return ok(c, serialize(existing))
+        }
+
+        // Kiểm tra sau bước replay: gửi lại cùng yêu cầu vẫn trả đơn cũ dù địa chỉ đã bị xoá sau đó.
+        const [address] = await db
+          .select()
+          .from(addresses)
+          .where(and(eq(addresses.id, input.addressId), eq(addresses.userId, userId)))
+        if (!address) throw new AppError(400, 'ADDRESS_NOT_FOUND', 'Địa chỉ giao hàng không tồn tại, vui lòng chọn lại')
+        const shippingAddress = { recipientName: address.recipientName, phone: address.phone, line1: address.line1, city: address.city }
+
+        const items = await priceLines(db, input.items)
+        if (new Set(items.map(({ key }) => key)).size !== items.length) {
+          throw new AppError(400, 'DUPLICATE_ORDER_ITEM', 'Gộp các dòng giống nhau trước khi thanh toán')
+        }
+        if (!(await shippingMethodsFor(items.map((item) => item.productId))).includes(input.shippingMethod)) {
+          throw new AppError(400, 'SHIPPING_UNAVAILABLE', 'Hình thức giao hàng này không áp dụng cho mọi sản phẩm trong giỏ')
+        }
+        const totals = computeTotalsCents(items, input.voucher, shippingFeeCents(input.shippingMethod, input.voucher))
+        if (totals.subtotalCents > 2_000_000_000) throw new AppError(400, 'ORDER_LIMIT', 'Đơn hàng vượt quá giới hạn thanh toán')
+
+        const payment =
+          viaSepay && sepay
+            ? {
+                status: 'pending_payment' as const,
+                paymentMode: 'verified' as const,
+                paymentCode: createPaymentCode(sepay.codePrefix),
+                amountVnd: toVnd(totalCents(totals), sepay),
+                paymentExpiresAt: new Date(Date.now() + sepay.ttlMinutes * 60_000),
+              }
+            : { status: 'completed' as const, paymentMode: 'demo' as const }
+        const [created] = await db
+          .insert(orders)
+          .values({
+            userId,
+            requestId: input.requestId,
+            requestHash,
+            paymentMethod: input.paymentMethod,
+            items,
+            shippingAddress,
+            shippingMethod: input.shippingMethod,
+            ...totals,
+            ...payment,
+          })
+          .onConflictDoNothing({ target: [orders.userId, orders.requestId] })
+          .returning()
+
+        if (created) {
+          await clearCart(db, userId)
+          const count = items.reduce((n, item) => n + item.quantity, 0)
+          await notify(
+            db,
+            userId,
+            viaSepay
+              ? {
+                  kind: 'payment',
+                  title: `Chờ thanh toán đơn #${shortId(created.id)}`,
+                  body: `Chuyển ${created.amountVnd?.toLocaleString('vi-VN')}₫ với nội dung ${created.paymentCode} để hoàn tất đơn ${count} sản phẩm.`,
+                  data: { orderId: created.id },
+                }
+              : {
+                  kind: 'order',
+                  title: `Đặt hàng thành công #${shortId(created.id)}`,
+                  body: `Đơn gồm ${count} sản phẩm đã được ghi nhận.`,
+                  data: { orderId: created.id },
+                },
+          )
+          return ok(c, serialize(created), 201)
+        }
+        const [replayed] = await db.select().from(orders).where(lookup)
+        if (!replayed || replayed.requestHash !== requestHash)
+          throw new AppError(409, 'ORDER_REQUEST_CONFLICT', 'Yêu cầu đặt hàng này đã được dùng')
+        return ok(c, serialize(replayed))
+      })
+      .get('/orders', validate('query', listQuery), async (c) => {
+        const userId = c.var.auth.sub
+        const { limit, cursor } = c.req.valid('query')
+        const mine = eq(orders.userId, userId)
+        const [anchor] = cursor
+          ? await db
+              .select({ id: orders.id, createdAt: orders.createdAt })
+              .from(orders)
+              .where(and(mine, eq(orders.id, cursor)))
+          : []
+        if (cursor && !anchor) throw new AppError(400, 'INVALID_CURSOR', 'Cursor không hợp lệ')
+        const rows = await db
+          .select()
+          .from(orders)
+          .where(
+            and(
+              mine,
+              anchor
+                ? or(lt(orders.createdAt, anchor.createdAt), and(eq(orders.createdAt, anchor.createdAt), lt(orders.id, anchor.id)))
+                : undefined,
+            ),
+          )
+          .orderBy(desc(orders.createdAt), desc(orders.id))
+          .limit(limit + 1)
+        const page = rows.slice(0, limit)
+        return ok(c, { items: page.map(serialize), nextCursor: rows.length > limit ? page.at(-1)!.id : null })
+      })
+      .get('/orders/:id', validate('param', idParam), async (c) => ok(c, serialize(await findOwn(c.req.valid('param').id, c.var.auth.sub))))
+      /**
+       * Lấy (hoặc gia hạn khi đã hết hạn) hướng dẫn chuyển khoản cho đơn đang chờ thanh toán.
+       * Mã chuyển khoản giữ nguyên nên tiền chuyển theo QR cũ vẫn được ghi nhận.
+       */
+      .post('/orders/:id/pay', validate('param', idParam), async (c) => {
+        const order = await findOwn(c.req.valid('param').id, c.var.auth.sub)
+        if (order.status !== 'pending_payment' || !sepay)
+          throw new AppError(409, 'ORDER_NOT_PAYABLE', 'Đơn hàng không ở trạng thái chờ thanh toán')
+        if (order.paymentExpiresAt && order.paymentExpiresAt.getTime() > Date.now()) return ok(c, serialize(order))
+        const [renewed] = await db
+          .update(orders)
+          .set({ paymentExpiresAt: new Date(Date.now() + sepay.ttlMinutes * 60_000) })
+          .where(and(eq(orders.id, order.id), eq(orders.status, 'pending_payment')))
+          .returning()
+        return ok(c, serialize(renewed ?? (await findOwn(order.id, order.userId))))
+      })
+      .post('/orders/:id/cancel', validate('param', idParam), async (c) => {
+        const userId = c.var.auth.sub
+        const order = await findOwn(c.req.valid('param').id, userId)
+        if (order.status === 'cancelled') return ok(c, serialize(order))
+        if (!serialize(order).cancellable) {
+          throw new AppError(
+            409,
+            'ORDER_NOT_CANCELLABLE',
+            order.fulfillment !== 'processing'
+              ? 'Đơn đã được gửi đi nên không thể huỷ'
+              : 'Đơn đã thanh toán không thể tự huỷ, vui lòng liên hệ hỗ trợ để hoàn tiền',
+          )
+        }
+        // Điều kiện status trong WHERE: nếu webhook vừa ghi nhận tiền thì không huỷ đè lên.
+        const [cancelled] = await db
+          .update(orders)
+          .set({ status: 'cancelled', cancelledAt: new Date() })
+          .where(and(eq(orders.id, order.id), eq(orders.status, order.status), eq(orders.fulfillment, order.fulfillment)))
+          .returning()
+        if (!cancelled) throw new AppError(409, 'ORDER_CHANGED', 'Đơn hàng vừa thay đổi trạng thái, vui lòng tải lại')
+        await notify(db, userId, {
+          kind: 'order',
+          title: `Đã huỷ đơn #${shortId(cancelled.id)}`,
+          body: 'Đơn hàng của bạn đã được huỷ.',
+          data: { orderId: cancelled.id },
+        })
+        return ok(c, serialize(cancelled))
+      })
+      /**
+       * Chuyển đơn sang bước giao hàng tiếp theo (Đang xử lý → Đang giao → Đã giao).
+       * Chỉ bật ở dev/test (cùng điều kiện với thẻ demo) để trình diễn; production cần trang quản trị riêng.
+       */
+      .post('/orders/:id/advance', validate('param', idParam), async (c) => {
+        if (!allowDemo) throw new AppError(403, 'DEMO_ONLY', 'Chỉ dùng được ở môi trường demo')
+        const userId = c.var.auth.sub
+        const order = await findOwn(c.req.valid('param').id, userId)
+        return ok(c, serialize(await advanceFulfillment(db, order, userId)))
+      })
+  )
 }
 
-const NEXT_FULFILLMENT: Partial<Record<OrderRow['fulfillment'], { next: OrderRow['fulfillment']; title: (code: string) => string; body: string }>> = {
+const NEXT_FULFILLMENT: Partial<
+  Record<OrderRow['fulfillment'], { next: OrderRow['fulfillment']; title: (code: string) => string; body: string }>
+> = {
   processing: { next: 'shipping', title: (code) => `Đơn #${code} đang được giao`, body: 'Đơn hàng đã rời kho và đang trên đường tới bạn.' },
-  shipping: { next: 'delivered', title: (code) => `Đơn #${code} đã giao thành công`, body: 'Cảm ơn bạn đã mua sắm tại MobiMart. Hãy đánh giá sản phẩm nhé!' },
+  shipping: {
+    next: 'delivered',
+    title: (code) => `Đơn #${code} đã giao thành công`,
+    body: 'Cảm ơn bạn đã mua sắm tại MobiMart. Hãy đánh giá sản phẩm nhé!',
+  },
 }
 
 /** Bước giao hàng kế tiếp của đơn đã thanh toán; `null` khi chưa thanh toán, đã huỷ hoặc đã giao. */
 export const nextFulfillment = (order: Pick<OrderRow, 'status' | 'fulfillment'>) =>
-  order.status === 'completed' ? NEXT_FULFILLMENT[order.fulfillment]?.next ?? null : null
+  order.status === 'completed' ? (NEXT_FULFILLMENT[order.fulfillment]?.next ?? null) : null
 
 /**
  * Chuyển đơn sang bước giao hàng kế tiếp, ghi người thực hiện và báo cho khách qua hộp thư.
@@ -286,10 +368,21 @@ export async function advanceFulfillment(db: Db, order: OrderRow, actorId: strin
   const step = order.status === 'completed' ? NEXT_FULFILLMENT[order.fulfillment] : undefined
   if (!step) throw new AppError(409, 'ORDER_NOT_ADVANCEABLE', 'Đơn hàng không thể chuyển sang bước tiếp theo')
   const now = new Date()
-  const [advanced] = await db.update(orders)
-    .set({ fulfillment: step.next, fulfillmentUpdatedBy: actorId, ...(step.next === 'shipping' ? { shippedAt: now } : { deliveredAt: now }) })
-    .where(and(eq(orders.id, order.id), eq(orders.status, 'completed'), eq(orders.fulfillment, order.fulfillment))).returning()
+  const [advanced] = await db
+    .update(orders)
+    .set({
+      fulfillment: step.next,
+      fulfillmentUpdatedBy: actorId,
+      ...(step.next === 'shipping' ? { shippedAt: now } : { deliveredAt: now }),
+    })
+    .where(and(eq(orders.id, order.id), eq(orders.status, 'completed'), eq(orders.fulfillment, order.fulfillment)))
+    .returning()
   if (!advanced) throw new AppError(409, 'ORDER_CHANGED', 'Đơn hàng vừa thay đổi trạng thái, vui lòng tải lại')
-  await notify(db, advanced.userId, { kind: 'order', title: step.title(shortId(advanced.id)), body: step.body, data: { orderId: advanced.id } })
+  await notify(db, advanced.userId, {
+    kind: 'order',
+    title: step.title(shortId(advanced.id)),
+    body: step.body,
+    data: { orderId: advanced.id },
+  })
   return advanced
 }

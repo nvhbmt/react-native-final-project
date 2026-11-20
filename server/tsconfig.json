@@ -3,12 +3,8 @@
     "target": "ES2023",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": [
-      "ES2023"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["ES2023"],
+    "types": ["node"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,
@@ -17,14 +13,8 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "drizzle.config.ts",
-    "vitest.config.ts"
-  ]
+  "include": ["src/**/*.ts", "drizzle.config.ts", "vitest.config.ts"]
 }

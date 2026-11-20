@@ -37,10 +37,12 @@ test('public requests never send a token', async () => {
 })
 
 test('maps error envelope and validation details to ApiError', async () => {
-  useFetch(() => json(400, {
-    success: false,
-    error: { code: 'VALIDATION_ERROR', message: 'bad', details: [{ field: 'email', message: 'Email không hợp lệ' }] },
-  }))
+  useFetch(() =>
+    json(400, {
+      success: false,
+      error: { code: 'VALIDATION_ERROR', message: 'bad', details: [{ field: 'email', message: 'Email không hợp lệ' }] },
+    }),
+  )
   await assert.rejects(api.post('/auth/register', {}), (error) => {
     assert.ok(error instanceof ApiError)
     assert.equal(error.code, 'VALIDATION_ERROR')
@@ -50,14 +52,22 @@ test('maps error envelope and validation details to ApiError', async () => {
 })
 
 test('network failures become NETWORK_ERROR', async () => {
-  useFetch(() => { throw new TypeError('Network request failed') })
+  useFetch(() => {
+    throw new TypeError('Network request failed')
+  })
   await assert.rejects(api.get('/x'), { code: 'NETWORK_ERROR', status: 0 })
 })
 
 test('refreshes once on TOKEN_EXPIRED and retries with the new token', async () => {
   let refreshes = 0
   useFetch((_url, init) => (init.headers.Authorization === 'Bearer new' ? json(200, { success: true, data: 'ok' }) : expired()))
-  configureApiAuth({ getAccessToken: () => 'old', refresh: async () => { refreshes++; return 'new' } })
+  configureApiAuth({
+    getAccessToken: () => 'old',
+    refresh: async () => {
+      refreshes++
+      return 'new'
+    },
+  })
   assert.equal(await api.get('/auth/me'), 'ok')
   assert.equal(refreshes, 1)
   assert.equal(calls.length, 2)
@@ -73,7 +83,13 @@ test('rethrows the original error when refresh fails, without looping', async ()
 test('other 401 codes do not trigger refresh', async () => {
   let refreshes = 0
   useFetch(() => json(401, { success: false, error: { code: 'INVALID_CREDENTIALS', message: 'x' } }))
-  configureApiAuth({ getAccessToken: () => 'old', refresh: async () => { refreshes++; return 'new' } })
+  configureApiAuth({
+    getAccessToken: () => 'old',
+    refresh: async () => {
+      refreshes++
+      return 'new'
+    },
+  })
   await assert.rejects(api.get('/x'), { code: 'INVALID_CREDENTIALS' })
   assert.equal(refreshes, 0)
 })
@@ -84,7 +100,10 @@ test('parses server-sent events split across network chunks', () => {
   const first = parseSseChunk('event: start\ndata: {"a":1}\n\nevent: delta\ndata: {"text":"Xin')
   assert.deepEqual(first.events, [{ event: 'start', data: '{"a":1}' }])
   const second = parseSseChunk(`${first.rest} chào"}\r\n\r\nevent: done\ndata: {}\n\n`)
-  assert.deepEqual(second.events.map((e) => e.event), ['delta', 'done'])
+  assert.deepEqual(
+    second.events.map((e) => e.event),
+    ['delta', 'done'],
+  )
   assert.equal(JSON.parse(second.events[0].data).text, 'Xin chào')
   assert.equal(second.rest, '')
 })

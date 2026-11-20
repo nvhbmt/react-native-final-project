@@ -26,7 +26,8 @@ export function OrderListItem({ order }: { order: Order }) {
         {first ? <Image source={first.image} style={{ width: 48, height: 48, borderRadius: 4 }} contentFit="contain" /> : null}
         <View className="flex-1 gap-[2px]">
           <Text numberOfLines={1} className="text-[14px] leading-[22px] text-neutral-700">
-            {first?.name}{order.items.length > 1 ? ` và ${order.items.length - 1} sản phẩm khác` : ''}
+            {first?.name}
+            {order.items.length > 1 ? ` và ${order.items.length - 1} sản phẩm khác` : ''}
           </Text>
           <Text className="text-[12px] leading-[18px] text-neutral-500">
             {new Date(order.createdAt).toLocaleDateString('vi-VN')} · {count} sản phẩm

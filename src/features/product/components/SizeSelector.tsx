@@ -20,13 +20,13 @@ export function SizeSelector({ sizes, value, onChange }: Props) {
             onPress={() => onChange(size)}
             role="radio"
             aria-checked={selected}
-            className={cn('h-[36px] w-[40px] items-center justify-center', i > 0 && 'border-l border-neutral-500', selected ? 'bg-primary' : 'bg-white')}
+            className={cn(
+              'h-[36px] w-[40px] items-center justify-center',
+              i > 0 && 'border-l border-neutral-500',
+              selected ? 'bg-primary' : 'bg-white',
+            )}
           >
-            <Text
-              className={cn('text-[14px] leading-[22px]', selected ? 'font-bold text-white' : 'text-neutral-500')}
-            >
-              {size}
-            </Text>
+            <Text className={cn('text-[14px] leading-[22px]', selected ? 'font-bold text-white' : 'text-neutral-500')}>{size}</Text>
           </View>
         )
       })}

@@ -28,7 +28,11 @@ export function AccountMenuRow({ icon, label, onPress, danger, loading, right }:
     >
       <Ionicons name={icon} size={20} color={color} />
       <Text className={cn('flex-1 text-[14px] leading-[22px]', danger ? 'text-danger' : 'text-neutral-700')}>{label}</Text>
-      {loading ? <ActivityIndicator color={color} /> : right ?? <Ionicons name="chevron-forward" size={16} color={appColors['neutral-400']} />}
+      {loading ? (
+        <ActivityIndicator color={color} />
+      ) : (
+        (right ?? <Ionicons name="chevron-forward" size={16} color={appColors['neutral-400']} />)
+      )}
     </View>
   )
 }

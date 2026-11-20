@@ -21,19 +21,40 @@ export function BannerCarousel({ slides }: { slides: Slide[] }) {
     <YStack gap={8} onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
       <ScrollView
         ref={scroll}
-        horizontal pagingEnabled showsHorizontalScrollIndicator={false}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={(event) => {
           if (width) setActive(Math.max(0, Math.min(slides.length - 1, Math.round(event.nativeEvent.contentOffset.x / width))))
         }}
         style={styles.carousel}
       >
-        {width > 0 && slides.map((slide, index) => (
-          <Image key={index} source={slide.image} accessibilityLabel={slide.label} resizeMode={slide.resizeMode ?? 'cover'} style={{ width, height: 129, backgroundColor: m.surface }} />
-        ))}
+        {width > 0 &&
+          slides.map((slide, index) => (
+            <Image
+              key={index}
+              source={slide.image}
+              accessibilityLabel={slide.label}
+              resizeMode={slide.resizeMode ?? 'cover'}
+              style={{ width, height: 129, backgroundColor: m.surface }}
+            />
+          ))}
       </ScrollView>
       <XStack justify="center" gap={7} h={8} items="center" aria-label={`Banner ${active + 1}/${slides.length}`}>
         {slides.map((_, index) => (
-          <YStack {...keyboardAction} key={index} role="button" aria-label={`Xem banner ${index + 1}: ${slides[index].label}`} aria-pressed={index === active} onPress={() => setActive(index)} hitSlop={6} w={index === active ? 16 : 6} h={6} rounded={4} bg={index === active ? m.primary : m.starEmpty} />
+          <YStack
+            {...keyboardAction}
+            key={index}
+            role="button"
+            aria-label={`Xem banner ${index + 1}: ${slides[index].label}`}
+            aria-pressed={index === active}
+            onPress={() => setActive(index)}
+            hitSlop={6}
+            w={index === active ? 16 : 6}
+            h={6}
+            rounded={4}
+            bg={index === active ? m.primary : m.starEmpty}
+          />
         ))}
       </XStack>
     </YStack>

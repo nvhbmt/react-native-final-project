@@ -26,19 +26,24 @@ export function AdminOrderCard({ order, onChanged }: Props) {
   const address = order.shippingAddress
 
   const move = (to: NonNullable<AdminOrder['nextFulfillment']>) =>
-    confirmAction(ACTION_LABEL[to], `Đơn #${order.code} của ${order.customer?.fullName ?? 'khách'} sẽ được cập nhật và khách nhận thông báo.`, 'Xác nhận', async () => {
-      setBusy(true)
-      setError(null)
-      try {
-        await adminApi.moveFulfillment(order.id, to)
-        onChanged()
-      } catch (e) {
-        if (e instanceof ApiError && e.code === 'ORDER_CHANGED') onChanged()
-        setError(e instanceof ApiError ? e.message : 'Không cập nhật được, vui lòng thử lại')
-      } finally {
-        setBusy(false)
-      }
-    })
+    confirmAction(
+      ACTION_LABEL[to],
+      `Đơn #${order.code} của ${order.customer?.fullName ?? 'khách'} sẽ được cập nhật và khách nhận thông báo.`,
+      'Xác nhận',
+      async () => {
+        setBusy(true)
+        setError(null)
+        try {
+          await adminApi.moveFulfillment(order.id, to)
+          onChanged()
+        } catch (e) {
+          if (e instanceof ApiError && e.code === 'ORDER_CHANGED') onChanged()
+          setError(e instanceof ApiError ? e.message : 'Không cập nhật được, vui lòng thử lại')
+        } finally {
+          setBusy(false)
+        }
+      },
+    )
 
   return (
     <View className="gap-3 rounded-[8px] border border-neutral-200 p-4">
@@ -74,7 +79,11 @@ export function AdminOrderCard({ order, onChanged }: Props) {
         <Text className="text-[16px] leading-[24px] font-semibold text-neutral-900">{formatPrice(order.total)}</Text>
       </View>
 
-      {error ? <Text role="alert" className="text-[13px] leading-[20px] text-danger">{error}</Text> : null}
+      {error ? (
+        <Text role="alert" className="text-[13px] leading-[20px] text-danger">
+          {error}
+        </Text>
+      ) : null}
       {next ? (
         <Button
           title={busy ? 'Đang cập nhật…' : ACTION_LABEL[next]}

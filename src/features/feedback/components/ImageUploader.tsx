@@ -25,7 +25,8 @@ export function ImageUploader({ value, onChange }: Props) {
       horizontal
       style={{ flexGrow: 0, flexShrink: 0 }}
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ gap: 12, paddingTop: 6, paddingRight: 6 }}>
+      contentContainerStyle={{ gap: 12, paddingTop: 6, paddingRight: 6 }}
+    >
       {value.length < MAX_IMAGES ? (
         <View
           onPress={pick}

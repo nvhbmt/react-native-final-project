@@ -25,8 +25,10 @@ describe('AI environment', () => {
   }
 
   it('Claude dùng native API không cần AI_BASE_URL', () => {
-    expect(loadEnv({ ...base, AI_PROVIDER: 'anthropic', AI_API_KEY: 'test-key', AI_MODEL: 'claude-haiku-5-5' }))
-      .toMatchObject({ AI_PROVIDER: 'anthropic', AI_MODEL: 'claude-haiku-5-5' })
+    expect(loadEnv({ ...base, AI_PROVIDER: 'anthropic', AI_API_KEY: 'test-key', AI_MODEL: 'claude-haiku-5-5' })).toMatchObject({
+      AI_PROVIDER: 'anthropic',
+      AI_MODEL: 'claude-haiku-5-5',
+    })
   })
 
   it('chặn cấu hình AI thiếu key, model hoặc base URL của Chat Completions', () => {
@@ -51,10 +53,15 @@ describe('Email environment', () => {
   })
 
   it('SMTP_URL vẫn dùng được; thiếu một nửa hoặc đặt cả hai cách thì báo lỗi', () => {
-    expect(smtpConfig(loadEnv({ ...base, SMTP_URL: 'smtp://localhost:1025' }))).toEqual({ transport: 'smtp://localhost:1025', from: 'MobiMart <no-reply@mobimart.local>' })
+    expect(smtpConfig(loadEnv({ ...base, SMTP_URL: 'smtp://localhost:1025' }))).toEqual({
+      transport: 'smtp://localhost:1025',
+      from: 'MobiMart <no-reply@mobimart.local>',
+    })
     expect(smtpConfig(loadEnv(base))).toBeUndefined()
     expect(() => loadEnv({ ...base, SMTP_USER: 'shop@gmail.com' })).toThrow('SMTP_PASS')
-    expect(() => loadEnv({ ...base, SMTP_URL: 'smtp://localhost:1025', SMTP_USER: 'a@gmail.com', SMTP_PASS: 'x' })).toThrow('Chỉ chọn một cách')
+    expect(() => loadEnv({ ...base, SMTP_URL: 'smtp://localhost:1025', SMTP_USER: 'a@gmail.com', SMTP_PASS: 'x' })).toThrow(
+      'Chỉ chọn một cách',
+    )
   })
 })
 
@@ -65,10 +72,15 @@ describe('Storage environment', () => {
   }
   it('dòng trống = lưu ổ đĩa; đủ cặp = Supabase; thiếu một nửa thì báo lỗi', () => {
     expect(storageConfig(loadEnv({ ...base, SUPABASE_URL: '', SUPABASE_SECRET_KEY: '' }))).toBeUndefined()
-    expect(storageConfig(loadEnv({ ...base, SUPABASE_URL: 'https://ref.supabase.co', SUPABASE_SECRET_KEY: 'sb_secret_k' })))
-      .toEqual({ url: 'https://ref.supabase.co', serviceKey: 'sb_secret_k', bucket: 'uploads' })
+    expect(storageConfig(loadEnv({ ...base, SUPABASE_URL: 'https://ref.supabase.co', SUPABASE_SECRET_KEY: 'sb_secret_k' }))).toEqual({
+      url: 'https://ref.supabase.co',
+      serviceKey: 'sb_secret_k',
+      bucket: 'uploads',
+    })
     // Tên biến cũ (khoá service_role JWT) vẫn được nhận.
-    expect(storageConfig(loadEnv({ ...base, SUPABASE_URL: 'https://ref.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'eyJlegacy' }))?.serviceKey).toBe('eyJlegacy')
+    expect(
+      storageConfig(loadEnv({ ...base, SUPABASE_URL: 'https://ref.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'eyJlegacy' }))?.serviceKey,
+    ).toBe('eyJlegacy')
     expect(() => loadEnv({ ...base, SUPABASE_URL: 'https://ref.supabase.co' })).toThrow('SUPABASE_SECRET_KEY')
   })
 })

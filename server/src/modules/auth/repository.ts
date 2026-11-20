@@ -36,8 +36,7 @@ export interface AuthRepository {
 const UNIQUE_VIOLATION = '23505'
 
 function isUniqueViolation(error: unknown): boolean {
-  const code = (error as { code?: string; cause?: { code?: string } })?.code
-    ?? (error as { cause?: { code?: string } })?.cause?.code
+  const code = (error as { code?: string; cause?: { code?: string } })?.code ?? (error as { cause?: { code?: string } })?.cause?.code
   return code === UNIQUE_VIOLATION
 }
 
@@ -94,25 +93,36 @@ export function createDrizzleAuthRepository(db: Db): AuthRepository {
 
     async createPasswordReset(input) {
       await db.transaction(async (tx) => {
-        await tx.update(passwordResets).set({ usedAt: new Date() })
+        await tx
+          .update(passwordResets)
+          .set({ usedAt: new Date() })
           .where(and(eq(passwordResets.userId, input.userId), isNull(passwordResets.usedAt)))
         await tx.insert(passwordResets).values(input)
       })
     },
     async findActivePasswordReset(userId) {
-      const [row] = await db.select().from(passwordResets)
+      const [row] = await db
+        .select()
+        .from(passwordResets)
         .where(and(eq(passwordResets.userId, userId), isNull(passwordResets.usedAt), sql`${passwordResets.expiresAt} > now()`))
-        .orderBy(desc(passwordResets.createdAt)).limit(1)
+        .orderBy(desc(passwordResets.createdAt))
+        .limit(1)
       return row
     },
     async recordPasswordResetAttempt(id) {
-      const [row] = await db.update(passwordResets).set({ attempts: sql`${passwordResets.attempts} + 1` })
-        .where(eq(passwordResets.id, id)).returning({ attempts: passwordResets.attempts })
+      const [row] = await db
+        .update(passwordResets)
+        .set({ attempts: sql`${passwordResets.attempts} + 1` })
+        .where(eq(passwordResets.id, id))
+        .returning({ attempts: passwordResets.attempts })
       return row?.attempts ?? Number.MAX_SAFE_INTEGER
     },
     async consumePasswordReset(id) {
-      const rows = await db.update(passwordResets).set({ usedAt: new Date() })
-        .where(and(eq(passwordResets.id, id), isNull(passwordResets.usedAt))).returning({ id: passwordResets.id })
+      const rows = await db
+        .update(passwordResets)
+        .set({ usedAt: new Date() })
+        .where(and(eq(passwordResets.id, id), isNull(passwordResets.usedAt)))
+        .returning({ id: passwordResets.id })
       return rows.length > 0
     },
   }

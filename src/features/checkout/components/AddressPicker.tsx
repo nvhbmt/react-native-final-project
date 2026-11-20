@@ -33,17 +33,29 @@ export function AddressPicker({ addresses, selectedId, onSelect }: Props) {
             role="radio"
             aria-checked={selected}
             aria-label={`${address.recipientName}, ${address.line1}, ${address.city}`}
-            className={cn('flex-row items-center gap-3 rounded-[4px] border px-4 py-3 active:opacity-80', selected ? 'border-primary' : 'border-neutral-300')}
+            className={cn(
+              'flex-row items-center gap-3 rounded-[4px] border px-4 py-3 active:opacity-80',
+              selected ? 'border-primary' : 'border-neutral-300',
+            )}
           >
             <View className="flex-1 gap-[2px]">
               <View className="flex-row items-center gap-2">
                 <Text className="text-[14px] leading-[22px] font-bold text-neutral-900">{address.recipientName}</Text>
-                {address.isDefault ? <Text className="rounded-full bg-primary px-2 text-[11px] leading-[18px] text-white">Mặc định</Text> : null}
+                {address.isDefault ? (
+                  <Text className="rounded-full bg-primary px-2 text-[11px] leading-[18px] text-white">Mặc định</Text>
+                ) : null}
               </View>
               <Text className="text-[13px] leading-[20px] text-neutral-600">{address.phone}</Text>
-              <Text className="text-[13px] leading-[20px] text-neutral-600">{address.line1}, {address.city}</Text>
+              <Text className="text-[13px] leading-[20px] text-neutral-600">
+                {address.line1}, {address.city}
+              </Text>
             </View>
-            <View className={cn('size-[16px] items-center justify-center rounded-full border', selected ? 'border-primary' : 'border-neutral-600')}>
+            <View
+              className={cn(
+                'size-[16px] items-center justify-center rounded-full border',
+                selected ? 'border-primary' : 'border-neutral-600',
+              )}
+            >
               {selected ? <View className="size-[8px] rounded-full bg-primary" /> : null}
             </View>
           </View>

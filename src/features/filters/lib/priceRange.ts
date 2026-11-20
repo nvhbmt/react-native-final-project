@@ -1,7 +1,10 @@
 export const MAX_PRICE = 10000
 
 export function cleanPrice(text: string) {
-  const [whole, ...fraction] = text.replace(/,/g, '.').replace(/[^0-9.]/g, '').split('.')
+  const [whole, ...fraction] = text
+    .replace(/,/g, '.')
+    .replace(/[^0-9.]/g, '')
+    .split('.')
   return fraction.length ? `${whole}.${fraction.join('').slice(0, 2)}` : whole
 }
 

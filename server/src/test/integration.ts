@@ -54,7 +54,8 @@ export async function startCommerceTest(overrides: (db: ReturnType<typeof create
     if (!withAddress) return { token, id, email, addressId: '' }
     // Mỗi tài khoản test có sẵn một địa chỉ mặc định để đặt đơn.
     const address = await test.call('POST', '/users/me/addresses', {
-      token, body: { recipientName: fullName, phone: '0901234567', line1: '1 Lê Lợi, Quận 1', city: 'TP. Hồ Chí Minh', isDefault: true },
+      token,
+      body: { recipientName: fullName, phone: '0901234567', line1: '1 Lê Lợi, Quận 1', city: 'TP. Hồ Chí Minh', isDefault: true },
     })
     expect(address.status).toBe(201)
     return { token, id, email, addressId: address.body.data[0].id as string }

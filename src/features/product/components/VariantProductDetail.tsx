@@ -72,7 +72,18 @@ export function VariantProductDetail({ product }: { product: Product & { variant
 
   return (
     <Screen
-      header={<AppHeader title={product.categoryName} align="left" right={<><FavoriteButton product={{ id: product.id }} /><HeaderActions /></>} />}
+      header={
+        <AppHeader
+          title={product.categoryName}
+          align="left"
+          right={
+            <>
+              <FavoriteButton product={{ id: product.id }} />
+              <HeaderActions />
+            </>
+          }
+        />
+      }
       contentClassName="px-6 pt-1 pb-6"
       footer={
         <View className="border-t border-neutral-200 px-6 pt-6 pb-3">
@@ -96,21 +107,34 @@ export function VariantProductDetail({ product }: { product: Product & { variant
           <Text className="font-heading text-[24px] leading-[36px] font-bold text-neutral-900">{product.name}</Text>
           <Text className="text-[12px] leading-[20px] text-neutral-600">{product.subtitle}</Text>
         </View>
-        {product.rating !== null && <View className="flex-row items-center gap-2">
-          <Ionicons name="star" size={22} color={appColors.warning} />
-          <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text>
-        </View>}
+        {product.rating !== null && (
+          <View className="flex-row items-center gap-2">
+            <Ionicons name="star" size={22} color={appColors.warning} />
+            <Text className="text-[14px] leading-[22px] font-bold text-neutral-800">{product.rating}</Text>
+          </View>
+        )}
       </View>
 
-      {colors.length > 0 && <View className="gap-2 pt-7">
-        <Label>Màu sắc</Label>
-        <ColorSwatches colors={colors} value={selection.colorId} onChange={(colorId) => { update({ colorId }); setImageIndex(0) }} />
-      </View>}
+      {colors.length > 0 && (
+        <View className="gap-2 pt-7">
+          <Label>Màu sắc</Label>
+          <ColorSwatches
+            colors={colors}
+            value={selection.colorId}
+            onChange={(colorId) => {
+              update({ colorId })
+              setImageIndex(0)
+            }}
+          />
+        </View>
+      )}
 
-      {sizes.length > 0 && <View className="gap-2 pt-6">
-        <Label>Kích cỡ</Label>
-        <SizeSelector sizes={sizes} value={selection.size} onChange={(size) => update({ size })} />
-      </View>}
+      {sizes.length > 0 && (
+        <View className="gap-2 pt-6">
+          <Label>Kích cỡ</Label>
+          <SizeSelector sizes={sizes} value={selection.size} onChange={(size) => update({ size })} />
+        </View>
+      )}
 
       <View className="gap-2 pt-6">
         <Label>Số lượng</Label>
@@ -127,13 +151,20 @@ export function VariantProductDetail({ product }: { product: Product & { variant
 
       <View className="pt-6">
         <Divider />
-        {product.sizeChart && <><LinkRow
-          title="Bảng size"
-          onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
-        />
-        <Divider /></>}
+        {product.sizeChart && (
+          <>
+            <LinkRow
+              title="Bảng size"
+              onPress={() => router.push({ pathname: '/product/[id]/size-guide', params: { id: product.id, size: selection.size ?? '' } })}
+            />
+            <Divider />
+          </>
+        )}
         <AskAssistantLink productId={product.id} />
-        <LinkRow title={reviews.data ? `Đánh giá (${reviews.data.summary.reviewCount})` : 'Đánh giá'} onPress={() => router.push(`/product/${product.id}/reviews`)} />
+        <LinkRow
+          title={reviews.data ? `Đánh giá (${reviews.data.summary.reviewCount})` : 'Đánh giá'}
+          onPress={() => router.push(`/product/${product.id}/reviews`)}
+        />
       </View>
     </Screen>
   )

@@ -36,10 +36,17 @@ export function SearchField({ value, onChangeText, onFilter, onSubmit, placehold
       </XStack>
       <YStack
         {...keyboardAction}
-        role="button" aria-label="Lọc sản phẩm" onPress={onFilter}
-        w={36} h={36} items="center" justify="center"
-        rounded={4} bg={filtered ? '#e6fbfe' : m.input}
-        hitSlop={4} opacity="1 press:0.65"
+        role="button"
+        aria-label="Lọc sản phẩm"
+        onPress={onFilter}
+        w={36}
+        h={36}
+        items="center"
+        justify="center"
+        rounded={4}
+        bg={filtered ? '#e6fbfe' : m.input}
+        hitSlop={4}
+        opacity="1 press:0.65"
       >
         <Ionicons name="filter-outline" size={16} color={filtered ? m.primary : m.secondary} />
       </YStack>

@@ -36,8 +36,7 @@ describe.skipIf(!url)('catalog với Postgres', () => {
     const { status, body } = await get('/home')
     expect(status).toBe(200)
     const { categories, banners, deals, recommendedProducts } = body.data
-    expect(categories.map((category: { id: string }) => category.id))
-      .toEqual(['electronics', 'fashion', 'beauty', 'fruits'])
+    expect(categories.map((category: { id: string }) => category.id)).toEqual(['electronics', 'fashion', 'beauty', 'fruits'])
     expect(banners).toHaveLength(4)
     expect(deals.length).toBeGreaterThan(0)
     expect(recommendedProducts.length).toBeGreaterThan(0)
@@ -77,8 +76,10 @@ describe.skipIf(!url)('catalog với Postgres', () => {
     const tees = await get('/products?category=fashion&subcategory=t-shirt&benefits%5B%5D=ship-to-store')
     expect(tees.body.data.items).toEqual([expect.objectContaining({ id: 'vuori-strato-tech-tee-black' })])
 
-    const selected = await get('/products?category=electronics&minPrice=50&maxPrice=850&minRating=4.5'
-      + '&shipping%5B%5D=instant&shipping%5B%5D=express&benefits%5B%5D=free-return&benefits%5B%5D=best-deal')
+    const selected = await get(
+      '/products?category=electronics&minPrice=50&maxPrice=850&minRating=4.5' +
+        '&shipping%5B%5D=instant&shipping%5B%5D=express&benefits%5B%5D=free-return&benefits%5B%5D=best-deal',
+    )
     expect(selected.status).toBe(200)
     expect(selected.body.data.items.length).toBeGreaterThan(0)
     for (const item of selected.body.data.items) {

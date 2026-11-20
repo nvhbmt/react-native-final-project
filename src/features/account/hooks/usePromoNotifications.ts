@@ -19,7 +19,10 @@ export function usePromoNotifications() {
   const inFlight = useRef(false)
 
   const setEnabled = async (value: boolean) => {
-    if (!user) { router.push('/login'); return }
+    if (!user) {
+      router.push('/login')
+      return
+    }
     if (inFlight.current) return
     inFlight.current = true
     setSaving(true)

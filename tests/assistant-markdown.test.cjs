@@ -34,19 +34,24 @@ test('cú pháp chưa đóng khi đang stream thì giữ nguyên', () => {
 })
 
 test('đoạn văn, danh sách, tiêu đề', () => {
-  const blocks = parseMarkdown([
-    '## Gợi ý',
-    'Mình tìm thấy 2 máy:',
-    '',
-    '- **iPhone 14**: $296.99 [product:iphone-14]',
-    '- **iPhone 16e**: $384.99',
-    '  còn hàng',
-    '',
-    '1. Rẻ nhất',
-    '2. Mới nhất',
-    'Bạn chọn máy nào?',
-  ].join('\n'))
-  assert.deepEqual(blocks.map((b) => b.type), ['heading', 'paragraph', 'list', 'list', 'paragraph'])
+  const blocks = parseMarkdown(
+    [
+      '## Gợi ý',
+      'Mình tìm thấy 2 máy:',
+      '',
+      '- **iPhone 14**: $296.99 [product:iphone-14]',
+      '- **iPhone 16e**: $384.99',
+      '  còn hàng',
+      '',
+      '1. Rẻ nhất',
+      '2. Mới nhất',
+      'Bạn chọn máy nào?',
+    ].join('\n'),
+  )
+  assert.deepEqual(
+    blocks.map((b) => b.type),
+    ['heading', 'paragraph', 'list', 'list', 'paragraph'],
+  )
   const bullets = blocks[2]
   assert.equal(bullets.ordered, false)
   assert.deepEqual(bullets.items[0].inlines, [
@@ -55,5 +60,8 @@ test('đoạn văn, danh sách, tiêu đề', () => {
     { type: 'product', id: 'iphone-14' },
   ])
   assert.deepEqual(bullets.items[1].inlines.at(-1), { type: 'text', text: ': $384.99\ncòn hàng' })
-  assert.deepEqual(blocks[3].items.map((i) => i.marker), ['1.', '2.'])
+  assert.deepEqual(
+    blocks[3].items.map((i) => i.marker),
+    ['1.', '2.'],
+  )
 })

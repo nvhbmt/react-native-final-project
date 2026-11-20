@@ -81,7 +81,12 @@ export function SignedInAccount({ user }: { user: User }) {
           label="Đăng xuất khỏi mọi thiết bị"
           loading={busy === 'logout-all'}
           onPress={() =>
-            confirm('Đăng xuất mọi thiết bị?', 'Tất cả thiết bị đang đăng nhập tài khoản này sẽ phải đăng nhập lại.', 'Đăng xuất', run('logout-all', logoutAll))
+            confirm(
+              'Đăng xuất mọi thiết bị?',
+              'Tất cả thiết bị đang đăng nhập tài khoản này sẽ phải đăng nhập lại.',
+              'Đăng xuất',
+              run('logout-all', logoutAll),
+            )
           }
         />
         <Divider />

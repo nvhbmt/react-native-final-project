@@ -44,36 +44,57 @@ export function AssistantScreen() {
     }
   }, [])
 
-  useFocusEffect(useCallback(() => {
-    if ((params.productId || params.orderId) && !handledContext.current) {
-      handledContext.current = true
-      void create({ productId: params.productId, orderId: params.orderId }, true)
-      return
-    }
-    assistantApi.list().then(setData, (e: unknown) => setError(e instanceof ApiError ? e.message : 'Không tải được hội thoại'))
-  }, [create, params.orderId, params.productId]))
+  useFocusEffect(
+    useCallback(() => {
+      if ((params.productId || params.orderId) && !handledContext.current) {
+        handledContext.current = true
+        void create({ productId: params.productId, orderId: params.orderId }, true)
+        return
+      }
+      assistantApi.list().then(setData, (e: unknown) => setError(e instanceof ApiError ? e.message : 'Không tải được hội thoại'))
+    }, [create, params.orderId, params.productId]),
+  )
 
-  const remove = (conversation: Conversation) => confirmAction('Xoá cuộc trò chuyện?', conversation.title, 'Xoá', async () => {
-    await assistantApi.remove(conversation.id).catch(() => undefined)
-    setData((d) => d && { ...d, items: d.items.filter((c) => c.id !== conversation.id) })
-  })
+  const remove = (conversation: Conversation) =>
+    confirmAction('Xoá cuộc trò chuyện?', conversation.title, 'Xoá', async () => {
+      await assistantApi.remove(conversation.id).catch(() => undefined)
+      setData((d) => d && { ...d, items: d.items.filter((c) => c.id !== conversation.id) })
+    })
 
   return (
     <Screen header={<AppHeader title="Trợ lý mua sắm" />} contentClassName="gap-4 px-5 pt-3 pb-8" safeBottom>
       {data && !data.available ? (
-        <Text className="rounded-[6px] bg-[#fff6e5] p-3 text-[13px] leading-[20px] text-[#a15c00]">Trợ lý mua sắm đang tạm thời chưa khả dụng. Vui lòng thử lại sau.</Text>
+        <Text className="rounded-[6px] bg-[#fff6e5] p-3 text-[13px] leading-[20px] text-[#a15c00]">
+          Trợ lý mua sắm đang tạm thời chưa khả dụng. Vui lòng thử lại sau.
+        </Text>
       ) : null}
       <Button title={creating ? 'Đang tạo…' : 'Cuộc trò chuyện mới'} leftIcon="add" disabled={creating} onPress={() => void create()} />
-      {error ? <Text role="alert" className="text-[13px] text-danger">{error}</Text> : null}
-      {!data ? <CatalogStatus loading={!error} /> : data.items.length ? (
+      {error ? (
+        <Text role="alert" className="text-[13px] text-danger">
+          {error}
+        </Text>
+      ) : null}
+      {!data ? (
+        <CatalogStatus loading={!error} />
+      ) : data.items.length ? (
         <View className="overflow-hidden rounded-[8px] border border-neutral-200">
           {data.items.map((conversation, i) => (
             <Fragment key={conversation.id}>
               {i > 0 ? <Divider /> : null}
-              <View onPress={() => openChat(conversation)} role="link" className="flex-row items-center gap-3 px-4 py-3 active:bg-neutral-100">
-                <Ionicons name={conversation.orderId ? 'receipt-outline' : conversation.productId ? 'pricetag-outline' : 'chatbubbles-outline'} size={20} color={appColors.primary} />
+              <View
+                onPress={() => openChat(conversation)}
+                role="link"
+                className="flex-row items-center gap-3 px-4 py-3 active:bg-neutral-100"
+              >
+                <Ionicons
+                  name={conversation.orderId ? 'receipt-outline' : conversation.productId ? 'pricetag-outline' : 'chatbubbles-outline'}
+                  size={20}
+                  color={appColors.primary}
+                />
                 <View className="flex-1">
-                  <Text numberOfLines={1} className="text-[14px] leading-[22px] text-neutral-900">{conversation.title}</Text>
+                  <Text numberOfLines={1} className="text-[14px] leading-[22px] text-neutral-900">
+                    {conversation.title}
+                  </Text>
                   <Text className="text-[12px] text-neutral-500">{new Date(conversation.updatedAt).toLocaleString('vi-VN')}</Text>
                 </View>
                 <View onPress={() => remove(conversation)} role="button" aria-label="Xoá" hitSlop={8}>

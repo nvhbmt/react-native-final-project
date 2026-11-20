@@ -20,7 +20,10 @@ export function PaymentMethodOption({ method, selected, onSelect }: Props) {
       onPress={onSelect}
       role="radio"
       aria-checked={selected}
-      className={cn('h-[58px] flex-row items-center gap-3 rounded-[4px] border px-5 active:opacity-80', selected ? 'border-primary' : 'border-neutral-300')}
+      className={cn(
+        'h-[58px] flex-row items-center gap-3 rounded-[4px] border px-5 active:opacity-80',
+        selected ? 'border-primary' : 'border-neutral-300',
+      )}
     >
       <PaymentLogo brand={method.brand} />
       <Text className="flex-1 text-[14px] leading-[22px] text-neutral-700">{label}</Text>

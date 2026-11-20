@@ -73,7 +73,10 @@ export const useCartStore = create<CartState>((set, get) => {
       set((s) => {
         const existing = s.items.find((i) => i.key === key)
         if (existing) {
-          return { syncError: null, items: s.items.map((i) => (i.key === key ? { ...i, quantity: Math.min(99, i.quantity + quantity) } : i)) }
+          return {
+            syncError: null,
+            items: s.items.map((i) => (i.key === key ? { ...i, quantity: Math.min(99, i.quantity + quantity) } : i)),
+          }
         }
         return { syncError: null, items: [...s.items, { ...input, key, quantity: Math.min(99, quantity) }] }
       })
@@ -116,8 +119,7 @@ export const useCartStore = create<CartState>((set, get) => {
       sync(() => remote!.clear())
     },
 
-    replace: ({ items, voucher }) =>
-      set({ items: items.filter((item) => item.available !== false), voucher, syncError: null }),
+    replace: ({ items, voucher }) => set({ items: items.filter((item) => item.available !== false), voucher, syncError: null }),
   }
 })
 

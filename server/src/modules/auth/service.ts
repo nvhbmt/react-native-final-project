@@ -139,7 +139,11 @@ export function createAuthService(repo: AuthRepository, config: AuthConfig) {
       const user = await repo.findUserByEmail(email)
       if (!user) return
       const code = String(randomInt(0, 1_000_000)).padStart(6, '0')
-      await repo.createPasswordReset({ userId: user.id, codeHash: hashResetCode(user.id, code), expiresAt: new Date(Date.now() + RESET_TTL_MS) })
+      await repo.createPasswordReset({
+        userId: user.id,
+        codeHash: hashResetCode(user.id, code),
+        expiresAt: new Date(Date.now() + RESET_TTL_MS),
+      })
       await (config.mailer ?? consoleMailer).send({
         to: user.email,
         subject: `MobiMart – Mã đặt lại mật khẩu: ${code}`,

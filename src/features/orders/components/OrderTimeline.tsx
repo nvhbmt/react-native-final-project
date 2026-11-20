@@ -8,16 +8,26 @@ import { appColors } from '@/theme/tamagui.config'
 
 type Step = { key: string; label: string; icon: ComponentProps<typeof Ionicons>['name']; at: number | null; danger?: boolean }
 
-const formatTime = (at: number) => new Date(at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })
+const formatTime = (at: number) =>
+  new Date(at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })
 
 function stepsOf(order: Order): Step[] {
   // Đơn demo xác nhận ngay khi đặt; đơn SePay xác nhận lúc nhận được tiền.
   const confirmedAt = order.paidAt ?? (order.status === 'completed' ? order.createdAt : null)
   const steps: Step[] = [
     { key: 'placed', label: 'Đã đặt hàng', icon: 'receipt-outline', at: order.createdAt },
-    { key: 'confirmed', label: order.paymentMode === 'verified' ? 'Đã thanh toán' : 'Đã xác nhận', icon: 'checkmark-circle-outline', at: confirmedAt },
+    {
+      key: 'confirmed',
+      label: order.paymentMode === 'verified' ? 'Đã thanh toán' : 'Đã xác nhận',
+      icon: 'checkmark-circle-outline',
+      at: confirmedAt,
+    },
   ]
-  if (order.status === 'cancelled') return [...steps.filter((s) => s.at), { key: 'cancelled', label: 'Đã huỷ', icon: 'close-circle-outline', at: order.cancelledAt, danger: true }]
+  if (order.status === 'cancelled')
+    return [
+      ...steps.filter((s) => s.at),
+      { key: 'cancelled', label: 'Đã huỷ', icon: 'close-circle-outline', at: order.cancelledAt, danger: true },
+    ]
   return [
     ...steps,
     { key: 'shipping', label: 'Đang giao hàng', icon: 'car-outline', at: order.shippedAt },
@@ -44,7 +54,9 @@ export function OrderTimeline({ order }: { order: Order }) {
               ) : null}
             </View>
             <View className="flex-1 pb-3">
-              <Text className={cn('text-[14px] leading-[20px]', done ? 'font-semibold text-neutral-900' : 'text-neutral-500')}>{step.label}</Text>
+              <Text className={cn('text-[14px] leading-[20px]', done ? 'font-semibold text-neutral-900' : 'text-neutral-500')}>
+                {step.label}
+              </Text>
               {time ? <Text className="text-[12px] leading-[18px] text-neutral-500">{time}</Text> : null}
             </View>
           </View>

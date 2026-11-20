@@ -87,9 +87,13 @@ export async function priceLines(db: Pick<Db, 'select'>, lines: LineInput[]): Pr
 export type TotalsCents = { subtotalCents: number; discountCents: number; taxCents: number; shippingCents: number }
 
 /** `shippingCents`: phí ship đã tính (sau FREESHIP); giỏ hàng chưa chọn hình thức giao thì để 0. */
-export function computeTotalsCents(items: Pick<CheckoutItem, 'priceCents' | 'quantity'>[], voucher?: string | null, shippingCents = 0): TotalsCents {
+export function computeTotalsCents(
+  items: Pick<CheckoutItem, 'priceCents' | 'quantity'>[],
+  voucher?: string | null,
+  shippingCents = 0,
+): TotalsCents {
   const subtotalCents = items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0)
-  const rate = voucher ? VOUCHERS[voucher]?.rate ?? 0 : 0
+  const rate = voucher ? (VOUCHERS[voucher]?.rate ?? 0) : 0
   const discountCents = Math.round(subtotalCents * rate)
   const taxCents = Math.round((subtotalCents - discountCents) * TAX_RATE)
   return { subtotalCents, discountCents, taxCents, shippingCents }

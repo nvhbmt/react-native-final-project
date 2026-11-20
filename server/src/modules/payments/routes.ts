@@ -19,9 +19,7 @@ export async function applySepayTransaction(db: Db, config: SepayConfig, txn: Se
   const code = extractPaymentCode(config.codePrefix, txn.code, txn.content, txn.description)
 
   return db.transaction(async (tx) => {
-    const [order] = code
-      ? await tx.select().from(orders).where(eq(orders.paymentCode, code)).for('update')
-      : []
+    const [order] = code ? await tx.select().from(orders).where(eq(orders.paymentCode, code)).for('update') : []
     let result: Exclude<Result, 'duplicate' | 'ignored'> = 'unmatched'
     // Cộng dồn các lần chuyển cho cùng một đơn: chuyển thiếu rồi chuyển bù vẫn được xác nhận.
     const received = (order?.receivedVnd ?? 0) + txn.transferAmount
@@ -31,15 +29,27 @@ export async function applySepayTransaction(db: Db, config: SepayConfig, txn: Se
       else result = 'matched'
     }
 
-    const [recorded] = await tx.insert(paymentTransactions).values({
-      provider: 'sepay', providerTxnId: txn.id, orderId: order?.id ?? null, amountVnd: txn.transferAmount,
-      content: txn.content, referenceCode: txn.referenceCode ?? null, result, raw: txn,
-    }).onConflictDoNothing().returning({ id: paymentTransactions.id })
+    const [recorded] = await tx
+      .insert(paymentTransactions)
+      .values({
+        provider: 'sepay',
+        providerTxnId: txn.id,
+        orderId: order?.id ?? null,
+        amountVnd: txn.transferAmount,
+        content: txn.content,
+        referenceCode: txn.referenceCode ?? null,
+        result,
+        raw: txn,
+      })
+      .onConflictDoNothing()
+      .returning({ id: paymentTransactions.id })
     if (!recorded) return 'duplicate'
     if (!order) return result
 
     if (result === 'matched') {
-      await tx.update(orders).set({ status: 'completed', paidAt: new Date(), receivedVnd: received })
+      await tx
+        .update(orders)
+        .set({ status: 'completed', paidAt: new Date(), receivedVnd: received })
         .where(and(eq(orders.id, order.id), eq(orders.status, 'pending_payment')))
       await notify(tx, order.userId, {
         kind: 'payment',
@@ -48,14 +58,17 @@ export async function applySepayTransaction(db: Db, config: SepayConfig, txn: Se
         data: { orderId: order.id },
       })
     } else if (result === 'underpaid') {
-      await tx.update(orders).set({ receivedVnd: received })
+      await tx
+        .update(orders)
+        .set({ receivedVnd: received })
         .where(and(eq(orders.id, order.id), eq(orders.status, 'pending_payment')))
       const missing = (order.amountVnd ?? 0) - received
       await notify(tx, order.userId, {
         kind: 'payment',
         title: `Thanh toán chưa đủ cho đơn #${shortId(order.id)}`,
-        body: `Đã nhận ${received.toLocaleString('vi-VN')}₫ / ${order.amountVnd?.toLocaleString('vi-VN')}₫. `
-          + `Chuyển thêm ${missing.toLocaleString('vi-VN')}₫ với nội dung ${order.paymentCode} để hoàn tất đơn hàng.`,
+        body:
+          `Đã nhận ${received.toLocaleString('vi-VN')}₫ / ${order.amountVnd?.toLocaleString('vi-VN')}₫. ` +
+          `Chuyển thêm ${missing.toLocaleString('vi-VN')}₫ với nội dung ${order.paymentCode} để hoàn tất đơn hàng.`,
         data: { orderId: order.id },
       })
     } else {

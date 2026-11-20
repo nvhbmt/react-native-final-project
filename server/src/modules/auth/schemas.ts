@@ -7,10 +7,7 @@ const email = z
   .pipe(z.email({ message: 'Email không hợp lệ' }).max(254))
 
 // Giới hạn trên để tránh request băm mật khẩu dài bất thường làm nghẽn CPU.
-const password = z
-  .string()
-  .min(8, 'Mật khẩu tối thiểu 8 ký tự')
-  .max(128, 'Mật khẩu tối đa 128 ký tự')
+const password = z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự').max(128, 'Mật khẩu tối đa 128 ký tự')
 
 export const registerSchema = z.object({
   email,
@@ -36,7 +33,10 @@ export const forgotPasswordSchema = z.object({ email })
 
 export const resetPasswordSchema = z.object({
   email,
-  code: z.string().trim().regex(/^\d{6}$/, 'Mã gồm 6 chữ số'),
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, 'Mã gồm 6 chữ số'),
   newPassword: password,
 })
 

@@ -60,7 +60,10 @@ export function VoucherField() {
           role="button"
           aria-label="Áp dụng mã giảm giá"
           aria-disabled={!canApply || applying}
-          className={cn('h-[36px] w-[61px] items-center justify-center rounded-[4px]', canApply ? 'bg-secondary-50 active:opacity-70' : 'bg-secondary-25')}
+          className={cn(
+            'h-[36px] w-[61px] items-center justify-center rounded-[4px]',
+            canApply ? 'bg-secondary-50 active:opacity-70' : 'bg-secondary-25',
+          )}
         >
           <Text className={cn('text-[14px] leading-[22px]', canApply ? 'text-secondary' : 'text-secondary-300')}>Áp dụng</Text>
         </View>

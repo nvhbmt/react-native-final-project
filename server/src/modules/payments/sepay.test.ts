@@ -14,7 +14,13 @@ describe('SePay helpers', () => {
 
   it('quy đổi VND, dựng URL QR và so khớp API key', () => {
     expect(toVnd(1234, { usdToVnd: 25_000 })).toBe(308_500)
-    const url = new URL(qrImageUrl({ bank: 'MBBank', accountNumber: '0123', accountName: 'A', webhookApiKey: 'k', codePrefix: 'DH', ttlMinutes: 30, usdToVnd: 1 }, 50_000, 'DHABCDEFGH'))
+    const url = new URL(
+      qrImageUrl(
+        { bank: 'MBBank', accountNumber: '0123', accountName: 'A', webhookApiKey: 'k', codePrefix: 'DH', ttlMinutes: 30, usdToVnd: 1 },
+        50_000,
+        'DHABCDEFGH',
+      ),
+    )
     expect(url.host).toBe('qr.sepay.vn')
     expect(Object.fromEntries(url.searchParams)).toEqual({ acc: '0123', bank: 'MBBank', amount: '50000', des: 'DHABCDEFGH' })
     expect(verifyApiKey('Apikey secret', 'secret')).toBe(true)

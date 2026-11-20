@@ -23,7 +23,11 @@ export function OrdersScreen() {
   return (
     <Screen header={<AppHeader title="Đơn hàng của tôi" />} contentClassName="gap-3 px-5 pt-3 pb-8" safeBottom>
       {page.loading || page.error ? (
-        <CatalogStatus loading={page.loading} message={page.error ? 'Không tải được đơn hàng.' : undefined} onRetry={page.error ? page.retry : undefined} />
+        <CatalogStatus
+          loading={page.loading}
+          message={page.error ? 'Không tải được đơn hàng.' : undefined}
+          onRetry={page.error ? page.retry : undefined}
+        />
       ) : page.items.length ? (
         page.items.map((order) => <OrderListItem key={order.id} order={order} />)
       ) : (
@@ -35,7 +39,11 @@ export function OrdersScreen() {
       )}
       {page.hasMore ? <Button title="Xem thêm" variant="text" onPress={page.loadMore} /> : null}
       {page.loadingMore || page.moreError ? (
-        <CatalogStatus loading={page.loadingMore} message={page.moreError ? 'Không tải thêm được.' : undefined} onRetry={page.moreError ? page.retryMore : undefined} />
+        <CatalogStatus
+          loading={page.loadingMore}
+          message={page.moreError ? 'Không tải thêm được.' : undefined}
+          onRetry={page.moreError ? page.retryMore : undefined}
+        />
       ) : null}
     </Screen>
   )

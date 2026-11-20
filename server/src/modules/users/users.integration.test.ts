@@ -47,9 +47,13 @@ describe.skipIf(!commerceTestUrl)('tài khoản', () => {
     const form = new FormData()
     form.set('purpose', 'avatar')
     form.set('file', new Blob([PNG]), 'a.png')
-    const upload = await (await t.app.request('/api/v1/uploads', { method: 'POST', body: form, headers: { Authorization: `Bearer ${a.token}` } })).json() as { data: { id: string; url: string } }
+    const upload = (await (
+      await t.app.request('/api/v1/uploads', { method: 'POST', body: form, headers: { Authorization: `Bearer ${a.token}` } })
+    ).json()) as { data: { id: string; url: string } }
     expect((await t.call('PUT', '/users/me/avatar', { token: b.token, body: { uploadId: upload.data.id } })).status).toBe(400)
-    expect((await t.call('PUT', '/users/me/avatar', { token: a.token, body: { uploadId: upload.data.id } })).body.data.avatarUrl).toBe(upload.data.url)
+    expect((await t.call('PUT', '/users/me/avatar', { token: a.token, body: { uploadId: upload.data.id } })).body.data.avatarUrl).toBe(
+      upload.data.url,
+    )
     expect((await t.call('PUT', '/users/me/avatar', { token: a.token, body: { uploadId: null } })).body.data.avatarUrl).toBeNull()
   })
 
@@ -57,14 +61,20 @@ describe.skipIf(!commerceTestUrl)('tài khoản', () => {
     const { token } = await t.register('Test user', { withAddress: false })
     const first = (await t.call('POST', '/users/me/addresses', { token, body: address })).body.data
     expect(first[0].isDefault).toBe(true)
-    const two = (await t.call('POST', '/users/me/addresses', { token, body: { ...address, line1: '2 Hai Bà Trưng', isDefault: true } })).body.data
-    expect(two.map((a: { line1: string; isDefault: boolean }) => [a.line1, a.isDefault])).toEqual([['2 Hai Bà Trưng', true], ['1 Lê Lợi, Q1', false]])
+    const two = (await t.call('POST', '/users/me/addresses', { token, body: { ...address, line1: '2 Hai Bà Trưng', isDefault: true } }))
+      .body.data
+    expect(two.map((a: { line1: string; isDefault: boolean }) => [a.line1, a.isDefault])).toEqual([
+      ['2 Hai Bà Trưng', true],
+      ['1 Lê Lợi, Q1', false],
+    ])
     const other = await t.register('Other', { withAddress: false })
     expect((await t.call('DELETE', `/users/me/addresses/${two[0].id}`, { token: other.token })).body.data).toEqual([])
     const left = (await t.call('DELETE', `/users/me/addresses/${two[0].id}`, { token })).body.data
     expect(left).toHaveLength(1)
     expect(left[0].isDefault).toBe(true)
-    expect((await t.call('PATCH', `/users/me/addresses/${left[0].id}`, { token, body: { city: 'Hà Nội' } })).body.data[0].city).toBe('Hà Nội')
+    expect((await t.call('PATCH', `/users/me/addresses/${left[0].id}`, { token, body: { city: 'Hà Nội' } })).body.data[0].city).toBe(
+      'Hà Nội',
+    )
   })
 
   it('xoá tài khoản cần đúng mật khẩu', async () => {

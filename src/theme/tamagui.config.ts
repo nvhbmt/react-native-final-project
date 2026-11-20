@@ -40,8 +40,7 @@ const baseConfig = createV6Config({
 })
 
 // Native: family là tên file đã nạp (weight khác lấy qua `face`). Web: family thật + @font-face.
-const fontFamily = (web: string, native: string) =>
-  Platform.OS === 'web' ? `${web}, system-ui, sans-serif` : native
+const fontFamily = (web: string, native: string) => (Platform.OS === 'web' ? `${web}, system-ui, sans-serif` : native)
 
 /** Dùng cho component RN thuần (TextInput, nhãn tab) không đi qua Tamagui. */
 export const bodyFontFamily = fontFamily('Inter', 'Inter_400Regular')

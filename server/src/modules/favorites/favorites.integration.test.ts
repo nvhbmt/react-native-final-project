@@ -4,8 +4,12 @@ import { commerceTestUrl, startCommerceTest } from '@/test/integration.ts'
 
 describe.skipIf(!commerceTestUrl)('sản phẩm yêu thích', () => {
   let t: Awaited<ReturnType<typeof startCommerceTest>>
-  beforeAll(async () => { t = await startCommerceTest() })
-  afterAll(async () => { await t?.stop() })
+  beforeAll(async () => {
+    t = await startCommerceTest()
+  })
+  afterAll(async () => {
+    await t?.stop()
+  })
 
   it('thêm idempotent, liệt kê mới nhất trước, bỏ yêu thích', async () => {
     const { token } = await t.register()

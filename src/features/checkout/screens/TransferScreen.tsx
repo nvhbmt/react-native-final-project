@@ -72,7 +72,11 @@ export function TransferScreen() {
   const received = payment.receivedVnd ?? 0
 
   return (
-    <Screen header={<AppHeader title="Chuyển khoản" onBack={() => router.dismissTo('/')} />} contentClassName="gap-4 px-5 pt-3 pb-8" safeBottom>
+    <Screen
+      header={<AppHeader title="Chuyển khoản" onBack={() => router.dismissTo('/')} />}
+      contentClassName="gap-4 px-5 pt-3 pb-8"
+      safeBottom
+    >
       <View className="items-center gap-1">
         <Text className="text-[14px] leading-[22px] text-neutral-600">Đơn #{order.code}</Text>
         {received > 0 ? <Text className="text-[13px] leading-[20px] text-neutral-600">Còn thiếu</Text> : null}
@@ -99,8 +103,8 @@ export function TransferScreen() {
         <View role="alert" className="flex-row items-start gap-2 rounded-[6px] border border-danger bg-[#fdecec] p-3">
           <Ionicons name="warning" size={18} color={appColors.danger} />
           <Text className="flex-1 text-[13px] leading-[20px] text-danger">
-            <Text className="font-bold text-danger">Chế độ giả lập — đừng chuyển tiền thật.</Text> Tài khoản bên dưới không có thật.
-            Xác nhận thanh toán bằng lệnh <Text className="font-bold text-danger">npm run sepay:simulate</Text> trong thư mục server.
+            <Text className="font-bold text-danger">Chế độ giả lập — đừng chuyển tiền thật.</Text> Tài khoản bên dưới không có thật. Xác
+            nhận thanh toán bằng lệnh <Text className="font-bold text-danger">npm run sepay:simulate</Text> trong thư mục server.
           </Text>
         </View>
       ) : null}
@@ -110,7 +114,9 @@ export function TransferScreen() {
           {qr.loaded !== payment.qrUrl ? (
             <View className="absolute inset-0 items-center justify-center gap-2 px-4">
               {qr.failed === payment.qrUrl ? (
-                <Text className="text-center text-[13px] leading-[20px] text-neutral-500">Không tải được mã QR. Bạn vẫn chuyển khoản tay theo thông tin bên dưới.</Text>
+                <Text className="text-center text-[13px] leading-[20px] text-neutral-500">
+                  Không tải được mã QR. Bạn vẫn chuyển khoản tay theo thông tin bên dưới.
+                </Text>
               ) : (
                 <ActivityIndicator color={appColors.primary} accessibilityLabel="Đang tải mã QR" />
               )}
@@ -134,27 +140,47 @@ export function TransferScreen() {
         <CopyRow label="Ngân hàng" value={payment.bank} />
         <CopyRow label="Số tài khoản" value={payment.accountNumber} />
         <CopyRow label="Chủ tài khoản" value={payment.accountName} />
-        <CopyRow label={received > 0 ? 'Số tiền còn thiếu' : 'Số tiền'} value={formatVnd(payment.amountVnd)} copyValue={String(payment.amountVnd)} />
+        <CopyRow
+          label={received > 0 ? 'Số tiền còn thiếu' : 'Số tiền'}
+          value={formatVnd(payment.amountVnd)}
+          copyValue={String(payment.amountVnd)}
+        />
         <CopyRow label="Nội dung chuyển khoản" value={payment.content} highlight />
       </View>
 
       <View className="flex-row items-start gap-2 rounded-[6px] bg-[#fff6e5] p-3">
         <Ionicons name="information-circle" size={18} color="#a15c00" />
         <Text className="flex-1 text-[12px] leading-[19px] text-[#a15c00]">
-          Đơn được xác nhận tự động trong vài giây sau khi tiền vào tài khoản. Chuyển thiếu thì chuyển bù phần còn lại với cùng nội dung; sai nội dung sẽ không được xác nhận tự động.
+          Đơn được xác nhận tự động trong vài giây sau khi tiền vào tài khoản. Chuyển thiếu thì chuyển bù phần còn lại với cùng nội dung;
+          sai nội dung sẽ không được xác nhận tự động.
         </Text>
       </View>
 
-      {actionError ? <Text role="alert" className="text-[13px] text-danger">{actionError}</Text> : null}
+      {actionError ? (
+        <Text role="alert" className="text-[13px] text-danger">
+          {actionError}
+        </Text>
+      ) : null}
       {expired ? (
-        <Button title={busy === 'renew' ? 'Đang gia hạn…' : 'Gia hạn mã thanh toán'} disabled={!!busy} onPress={act('renew', async () => update(await ordersApi.pay(order.id)))} />
+        <Button
+          title={busy === 'renew' ? 'Đang gia hạn…' : 'Gia hạn mã thanh toán'}
+          disabled={!!busy}
+          onPress={act('renew', async () => update(await ordersApi.pay(order.id)))}
+        />
       ) : null}
       <Button title="Xem đơn hàng" variant="outline" onPress={() => router.push({ pathname: '/orders/[id]', params: { id: order.id } })} />
       <Button
         title={busy === 'cancel' ? 'Đang huỷ…' : 'Huỷ đơn'}
         variant="text"
         disabled={!!busy}
-        onPress={() => confirmAction('Huỷ đơn hàng?', 'Nếu bạn đã chuyển tiền, đừng huỷ — đơn sẽ tự xác nhận.', 'Huỷ đơn', act('cancel', async () => update(await ordersApi.cancel(order.id))))}
+        onPress={() =>
+          confirmAction(
+            'Huỷ đơn hàng?',
+            'Nếu bạn đã chuyển tiền, đừng huỷ — đơn sẽ tự xác nhận.',
+            'Huỷ đơn',
+            act('cancel', async () => update(await ordersApi.cancel(order.id))),
+          )
+        }
       />
     </Screen>
   )

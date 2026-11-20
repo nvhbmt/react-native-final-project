@@ -15,8 +15,7 @@ export const adminApi = {
   moveFulfillment: (id: string, to: 'shipping' | 'delivered') =>
     api.post<AdminOrder>(`/admin/orders/${encodeURIComponent(id)}/fulfillment`, { to }),
   /** Gửi tin vào Hộp thư của khách đã bật nhận khuyến mãi; trả số người nhận. */
-  sendPromotion: (input: { title: string; body: string; productId?: string }) =>
-    api.post<{ sent: number }>('/admin/promotions', input),
+  sendPromotion: (input: { title: string; body: string; productId?: string }) => api.post<{ sent: number }>('/admin/promotions', input),
 }
 
 export const adminOrdersPath = (fulfillment: FulfillmentStatus | 'all') =>

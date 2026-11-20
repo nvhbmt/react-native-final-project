@@ -204,7 +204,13 @@ describe('đổi mật khẩu', () => {
 describe('quên / đặt lại mật khẩu', () => {
   function withMailbox() {
     const sent: { to: string; subject: string; text: string; html?: string }[] = []
-    const ctx = createTestApp({ mailer: { send: async (mail) => { sent.push(mail) } } })
+    const ctx = createTestApp({
+      mailer: {
+        send: async (mail) => {
+          sent.push(mail)
+        },
+      },
+    })
     const lastCode = () => sent.at(-1)!.text.match(/\b(\d{6})\b/)![1]!
     return { ...ctx, sent, lastCode }
   }
@@ -228,7 +234,9 @@ describe('quên / đặt lại mật khẩu', () => {
     expect(res.body.data.tokens.accessToken).toEqual(expect.any(String))
     expect((await call('POST', '/auth/refresh', { body: { refreshToken: old.refreshToken } })).status).toBe(401)
     expect((await call('POST', '/auth/login', { body: { email: alice.email, password: 'brand new pass' } })).status).toBe(200)
-    expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code, newPassword: 'another pass 1' } })).body.error.code).toBe('INVALID_RESET_CODE')
+    expect(
+      (await call('POST', '/auth/reset-password', { body: { email: alice.email, code, newPassword: 'another pass 1' } })).body.error.code,
+    ).toBe('INVALID_RESET_CODE')
   })
 
   it('email có tiêu đề MobiMart, bản HTML chứa mã và escape họ tên', async () => {
@@ -250,12 +258,17 @@ describe('quên / đặt lại mật khẩu', () => {
     await call('POST', '/auth/forgot-password', { body: { email: alice.email } })
     const second = lastCode()
     if (first !== second) {
-      expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code: first, newPassword: 'brand new pass' } })).status).toBe(400)
+      expect(
+        (await call('POST', '/auth/reset-password', { body: { email: alice.email, code: first, newPassword: 'brand new pass' } })).status,
+      ).toBe(400)
     }
     const wrong = second === '000000' ? '111111' : '000000'
     for (let i = 0; i < 5; i++) {
       await call('POST', '/auth/reset-password', { body: { email: alice.email, code: wrong, newPassword: 'brand new pass' } })
     }
-    expect((await call('POST', '/auth/reset-password', { body: { email: alice.email, code: second, newPassword: 'brand new pass' } })).body.error.code).toBe('INVALID_RESET_CODE')
+    expect(
+      (await call('POST', '/auth/reset-password', { body: { email: alice.email, code: second, newPassword: 'brand new pass' } })).body.error
+        .code,
+    ).toBe('INVALID_RESET_CODE')
   })
 })
