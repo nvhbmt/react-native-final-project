@@ -1,16 +1,20 @@
-import { Text, View } from '@tamagui/tailwind'
+import { Text } from '@tamagui/tailwind'
 import { router, type Href } from 'expo-router'
 
 type Props = { prompt: string; action: string; href: Href }
 
-/** "Chưa có tài khoản? Sign up" — thay màn hiện tại để stack không chồng Login/Register. */
+/**
+ * "Chưa có tài khoản? Đăng ký" — thay màn hiện tại để stack không chồng Login/Register.
+ * Một đoạn Text lồng nhau, rộng hết hàng và căn giữa: tách 2 Text trong flex-row thì Android
+ * có lúc đo hụt bề rộng → từ cuối rớt dòng và bị cắt mất.
+ */
 export function AuthSwitchLink({ prompt, action, href }: Props) {
   return (
-    <View className="flex-row items-center justify-center gap-1">
-      <Text className="text-[14px] leading-[22px] text-neutral-600">{prompt}</Text>
-      <View onPress={() => router.replace(href)} role="link" hitSlop={8} className="active:opacity-60">
-        <Text className="text-[14px] leading-[22px] font-bold text-primary">{action}</Text>
-      </View>
-    </View>
+    <Text className="text-center text-[14px] leading-[22px] text-neutral-600">
+      {prompt}{' '}
+      <Text role="link" onPress={() => router.replace(href)} className="font-bold text-primary">
+        {action}
+      </Text>
+    </Text>
   )
 }

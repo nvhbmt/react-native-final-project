@@ -27,23 +27,33 @@ export function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         <YStack px={24} mb={24}>
           <SearchField
-            value={query} onChangeText={setQuery} placeholder="Tìm kiếm sản phẩm"
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Tìm kiếm sản phẩm"
             onFilter={() => router.push('/filters')}
             filtered={filtered}
             onSubmit={() => router.push({ pathname: '/product-listing', params: { query } })}
           />
         </YStack>
-        {home.data ? <>
-          <CategoryStrip categories={home.data.categories} />
-          <YStack h={24} />
-          <Deals hero={home.data.deals[0] ?? home.data.recommendedProducts[0]} banners={home.data.banners} />
-          <YStack h={32} />
-          <RecommendedProducts
-            products={filtered ? recommendations.data?.items ?? [] : home.data.recommendedProducts}
-            loading={recommendations.loading}
-            onRetry={recommendations.error ? recommendations.retry : undefined}
+        {home.data ? (
+          <>
+            <CategoryStrip categories={home.data.categories} />
+            <YStack h={24} />
+            <Deals hero={home.data.deals[0] ?? home.data.recommendedProducts[0]} banners={home.data.banners} />
+            <YStack h={32} />
+            <RecommendedProducts
+              products={filtered ? (recommendations.data?.items ?? []) : home.data.recommendedProducts}
+              loading={recommendations.loading}
+              onRetry={recommendations.error ? recommendations.retry : undefined}
+            />
+          </>
+        ) : (
+          <CatalogStatus
+            loading={home.loading}
+            message={home.error ? 'Không tải được sản phẩm.' : undefined}
+            onRetry={home.error ? home.retry : undefined}
           />
-        </> : <CatalogStatus loading={home.loading} message={home.error ? 'Không tải được sản phẩm.' : undefined} onRetry={home.error ? home.retry : undefined} />}
+        )}
       </ScrollView>
     </MarketplaceFrame>
   )

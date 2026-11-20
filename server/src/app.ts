@@ -80,7 +80,12 @@ export function buildApp(deps: AppDeps) {
   const allowOrigin = (origin: string) =>
     deps.corsOrigins.includes(origin) || (deps.allowLocalhostOrigins && localhost.test(origin)) ? origin : null
   app.use('*', cors({ origin: allowOrigin, allowHeaders: ['Content-Type', 'Authorization'], maxAge: 600 }))
-  const jsonLimit = bodyLimit({ maxSize: 1024 * 1024, onError: () => { throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Dữ liệu gửi lên quá lớn') } })
+  const jsonLimit = bodyLimit({
+    maxSize: 1024 * 1024,
+    onError: () => {
+      throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'Dữ liệu gửi lên quá lớn')
+    },
+  })
   // Upload ảnh có giới hạn riêng (5MB) trong route của nó.
   app.use('/api/*', (c, next) => (c.req.path === '/api/v1/uploads' ? next() : jsonLimit(c, next)))
 
@@ -107,10 +112,26 @@ export function buildApp(deps: AppDeps) {
     api.route('/', feedbackRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', cartRoutes(deps.commerce.db, deps.accessSecret))
     api.route('/', favoriteRoutes(deps.commerce.db, deps.accessSecret))
-    api.route('/', orderRoutes(deps.commerce.db, deps.accessSecret, { allowDemo: deps.commerce.allowDemoCheckout, demoCards: deps.commerce.demoCards, sepay: deps.commerce.sepay }))
+    api.route(
+      '/',
+      orderRoutes(deps.commerce.db, deps.accessSecret, {
+        allowDemo: deps.commerce.allowDemoCheckout,
+        demoCards: deps.commerce.demoCards,
+        sepay: deps.commerce.sepay,
+      }),
+    )
     if (deps.commerce.sepay) api.route('/', paymentWebhookRoutes(deps.commerce.db, deps.commerce.sepay))
     api.route('/', adminRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.sepay))
-    api.route('/', aiRoutes({ db: deps.commerce.db, accessSecret: deps.accessSecret, provider: deps.ai, catalog: deps.catalog, messagesPerHour: deps.aiMessagesPerHour }))
+    api.route(
+      '/',
+      aiRoutes({
+        db: deps.commerce.db,
+        accessSecret: deps.accessSecret,
+        provider: deps.ai,
+        catalog: deps.catalog,
+        messagesPerHour: deps.aiMessagesPerHour,
+      }),
+    )
     api.route('/', reviewRoutes(deps.commerce.db, deps.accessSecret, deps.commerce.allowDemoCheckout))
   }
 

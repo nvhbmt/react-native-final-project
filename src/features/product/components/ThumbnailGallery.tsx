@@ -27,20 +27,22 @@ export function ThumbnailGallery({ images, selected, onSelect, width }: Props) {
         contentFit="contain"
         transition={200}
       />
-      {images.length > 1 && <View className="flex-row" style={{ gap: GAP }}>
-        {images.map((source, i) => (
-          <View
-            key={i}
-            onPress={() => onSelect(i)}
-            role="button"
-            aria-label={`Ảnh ${i + 1}`}
-            aria-selected={i === selected}
-            className={cn('overflow-hidden rounded-[4px] border-2', i === selected ? 'border-primary' : 'border-transparent')}
-          >
-            <Image source={source} style={{ width: thumbSize - 4, height: thumbSize - 4 }} contentFit="contain" />
-          </View>
-        ))}
-      </View>}
+      {images.length > 1 && (
+        <View className="flex-row" style={{ gap: GAP }}>
+          {images.map((source, i) => (
+            <View
+              key={i}
+              onPress={() => onSelect(i)}
+              role="button"
+              aria-label={`Ảnh ${i + 1}`}
+              aria-selected={i === selected}
+              className={cn('overflow-hidden rounded-[4px] border-2', i === selected ? 'border-primary' : 'border-transparent')}
+            >
+              <Image source={source} style={{ width: thumbSize - 4, height: thumbSize - 4 }} contentFit="contain" />
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   )
 }

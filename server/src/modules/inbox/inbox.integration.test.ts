@@ -5,8 +5,12 @@ import { notify } from './notify.ts'
 
 describe.skipIf(!commerceTestUrl)('hộp thư', () => {
   let t: Awaited<ReturnType<typeof startCommerceTest>>
-  beforeAll(async () => { t = await startCommerceTest() })
-  afterAll(async () => { await t?.stop() })
+  beforeAll(async () => {
+    t = await startCommerceTest()
+  })
+  afterAll(async () => {
+    await t?.stop()
+  })
 
   it('phân trang, đếm chưa đọc, đánh dấu đã đọc chỉ trong hộp thư của mình', async () => {
     const me = await t.register()

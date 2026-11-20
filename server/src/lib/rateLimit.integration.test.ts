@@ -8,8 +8,12 @@ import { createPostgresRateLimitStore } from './rateLimit.ts'
 
 describe.skipIf(!commerceTestUrl)('giới hạn request dùng chung qua PostgreSQL', () => {
   let t: Awaited<ReturnType<typeof startCommerceTest>>
-  beforeAll(async () => { t = await startCommerceTest() })
-  afterAll(async () => { await t?.stop() })
+  beforeAll(async () => {
+    t = await startCommerceTest()
+  })
+  afterAll(async () => {
+    await t?.stop()
+  })
 
   it('đếm tăng dần, không mất lượt khi gọi song song, hết cửa sổ thì đặt lại', async () => {
     const store = createPostgresRateLimitStore(t.db)

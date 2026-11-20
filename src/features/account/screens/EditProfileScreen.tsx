@@ -71,7 +71,9 @@ export function EditProfileScreen() {
         {user?.avatarUrl ? (
           <Text
             role="button"
-            onPress={async () => { if (!avatarBusy) setUser(await accountApi.setAvatar(null).catch(() => user)) }}
+            onPress={async () => {
+              if (!avatarBusy) setUser(await accountApi.setAvatar(null).catch(() => user))
+            }}
             className="text-[13px] leading-[20px] text-neutral-500"
           >
             Xoá ảnh đại diện
@@ -89,7 +91,13 @@ export function EditProfileScreen() {
       ) : null}
       <View className="gap-4">
         <AuthTextField label="Email" value={user?.email ?? ''} editable={false} />
-        <AuthTextField label="Họ tên" value={values.fullName} onChangeText={change('fullName')} error={form.fieldErrors.fullName} autoComplete="name" />
+        <AuthTextField
+          label="Họ tên"
+          value={values.fullName}
+          onChangeText={change('fullName')}
+          error={form.fieldErrors.fullName}
+          autoComplete="name"
+        />
         <AuthTextField
           label="Số điện thoại"
           value={values.phone}

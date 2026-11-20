@@ -1,14 +1,5 @@
-import {
-  Epilogue_500Medium,
-  Epilogue_600SemiBold,
-  Epilogue_700Bold,
-} from '@expo-google-fonts/epilogue'
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter'
+import { Epilogue_500Medium, Epilogue_600SemiBold, Epilogue_700Bold } from '@expo-google-fonts/epilogue'
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter'
 
 // Inter cho nội dung, Epilogue cho tiêu đề (theo design).
 // Key = tên font đăng ký với expo-font trên native, value = file font.

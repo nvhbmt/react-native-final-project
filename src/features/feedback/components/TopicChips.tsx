@@ -22,8 +22,7 @@ type Props = {
 }
 
 export function TopicChips({ value, onChange }: Props) {
-  const toggle = (topic: FeedbackTopic) =>
-    onChange(value.includes(topic) ? value.filter((t) => t !== topic) : [...value, topic])
+  const toggle = (topic: FeedbackTopic) => onChange(value.includes(topic) ? value.filter((t) => t !== topic) : [...value, topic])
 
   return (
     <View className="flex-row flex-wrap justify-center gap-x-1.5 gap-y-2 px-6">

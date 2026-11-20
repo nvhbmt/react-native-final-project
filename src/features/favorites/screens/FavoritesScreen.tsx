@@ -16,12 +16,20 @@ export function FavoritesScreen() {
   const auth = useAuthStatus()
   const { items, status, load } = useFavoritesStore()
   // Làm mới mỗi lần mở tab (có thể đã thêm/bỏ ở thiết bị khác).
-  useFocusEffect(useCallback(() => { void useFavoritesStore.getState().load() }, []))
+  useFocusEffect(
+    useCallback(() => {
+      void useFavoritesStore.getState().load()
+    }, []),
+  )
 
   return (
     <Screen title="Yêu thích" contentClassName="gap-3 pt-2 pb-6">
       {auth === 'guest' ? (
-        <EmptyState icon="heart-outline" title="Lưu sản phẩm bạn thích" description="Đăng nhập để lưu và xem lại sản phẩm yêu thích trên mọi thiết bị.">
+        <EmptyState
+          icon="heart-outline"
+          title="Lưu sản phẩm bạn thích"
+          description="Đăng nhập để lưu và xem lại sản phẩm yêu thích trên mọi thiết bị."
+        >
           <Button title="Đăng nhập" onPress={() => router.push('/login')} />
         </EmptyState>
       ) : auth === 'unknown' || (status === 'loading' && !items.length) ? (
@@ -38,7 +46,11 @@ export function FavoritesScreen() {
           </View>
         ))
       ) : (
-        <EmptyState icon="heart-outline" title="Chưa có sản phẩm yêu thích" description="Chạm biểu tượng trái tim ở trang sản phẩm để lưu lại.">
+        <EmptyState
+          icon="heart-outline"
+          title="Chưa có sản phẩm yêu thích"
+          description="Chạm biểu tượng trái tim ở trang sản phẩm để lưu lại."
+        >
           <Button title="Khám phá sản phẩm" onPress={() => router.navigate('/')} />
         </EmptyState>
       )}

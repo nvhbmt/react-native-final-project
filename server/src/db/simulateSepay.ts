@@ -42,16 +42,27 @@ const vnd = (value: number) => `${value.toLocaleString('vi-VN')}₫`
 try {
   if (!code) {
     const pending = await db.select().from(orders).where(eq(orders.status, 'pending_payment')).orderBy(desc(orders.createdAt)).limit(10)
-    if (!pending.length) console.log('Không có đơn nào đang chờ chuyển khoản. Đặt đơn bằng "Chuyển khoản ngân hàng (VietQR)" trong app trước.')
+    if (!pending.length)
+      console.log('Không có đơn nào đang chờ chuyển khoản. Đặt đơn bằng "Chuyển khoản ngân hàng (VietQR)" trong app trước.')
     for (const order of pending) {
-      console.log(`#${order.id.slice(0, 8).toUpperCase()}  mã CK ${order.paymentCode}  ${vnd(order.amountVnd ?? 0)}${order.receivedVnd ? ` (đã nhận ${vnd(order.receivedVnd)})` : ''}  ${order.createdAt.toLocaleString('vi-VN')}`)
+      console.log(
+        `#${order.id.slice(0, 8).toUpperCase()}  mã CK ${order.paymentCode}  ${vnd(order.amountVnd ?? 0)}${order.receivedVnd ? ` (đã nhận ${vnd(order.receivedVnd)})` : ''}  ${order.createdAt.toLocaleString('vi-VN')}`,
+      )
     }
     if (pending.length) console.log('\nChạy: npm run sepay:simulate -- <mã CK>')
   } else {
     const upper = code.toUpperCase()
-    const [order] = await db.select().from(orders)
-      .where(and(sql`${orders.paymentCode} = ${upper} or ${orders.id}::text like ${`${code.toLowerCase()}%`}`, sql`${orders.paymentCode} is not null`))
-      .orderBy(desc(orders.createdAt)).limit(1)
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(
+        and(
+          sql`${orders.paymentCode} = ${upper} or ${orders.id}::text like ${`${code.toLowerCase()}%`}`,
+          sql`${orders.paymentCode} is not null`,
+        ),
+      )
+      .orderBy(desc(orders.createdAt))
+      .limit(1)
     if (!order?.paymentCode) {
       console.error(`Không tìm thấy đơn chuyển khoản với mã "${code}".`)
       process.exitCode = 1
@@ -76,7 +87,7 @@ try {
           description: 'Giao dịch giả lập từ npm run sepay:simulate',
         }),
       })
-      const body = await response.json().catch(() => null) as { result?: string; error?: { message?: string } } | null
+      const body = (await response.json().catch(() => null)) as { result?: string; error?: { message?: string } } | null
       if (!response.ok) {
         console.error(`Webhook lỗi ${response.status}: ${body?.error?.message ?? 'không rõ'}`)
         process.exitCode = 1
@@ -88,7 +99,9 @@ try {
           unmatched: 'không khớp đơn nào',
           duplicate: 'giao dịch đã được xử lý',
         }
-        console.log(`Đơn #${order.id.slice(0, 8).toUpperCase()} · chuyển ${vnd(transferAmount)} · đã nhận trước đó ${vnd(order.receivedVnd)} / cần ${vnd(order.amountVnd ?? 0)}`)
+        console.log(
+          `Đơn #${order.id.slice(0, 8).toUpperCase()} · chuyển ${vnd(transferAmount)} · đã nhận trước đó ${vnd(order.receivedVnd)} / cần ${vnd(order.amountVnd ?? 0)}`,
+        )
         console.log(`Kết quả: ${body?.result} — ${meaning[body?.result ?? ''] ?? ''}`)
       }
     }

@@ -42,14 +42,25 @@ export function AssistantChatScreen() {
           >
             {chat.loading ? <CatalogStatus loading /> : null}
             {chat.hasMore ? (
-              <Text role="button" onPress={() => void chat.loadOlder()} className="self-center text-[13px] font-bold text-primary">Tải tin cũ hơn</Text>
+              <Text role="button" onPress={() => void chat.loadOlder()} className="self-center text-[13px] font-bold text-primary">
+                Tải tin cũ hơn
+              </Text>
             ) : null}
             {!chat.loading && !chat.messages.length ? (
               <View className="flex-1 items-center justify-center gap-3 py-10">
                 <Ionicons name="sparkles-outline" size={44} color={appColors.primary} />
-                <Text className="text-center text-[14px] leading-[22px] text-neutral-600">Hỏi trợ lý về sản phẩm, so sánh lựa chọn hoặc tình trạng đơn hàng.</Text>
+                <Text className="text-center text-[14px] leading-[22px] text-neutral-600">
+                  Hỏi trợ lý về sản phẩm, so sánh lựa chọn hoặc tình trạng đơn hàng.
+                </Text>
                 {SUGGESTIONS.map((s) => (
-                  <Text key={s} role="button" onPress={() => submit(s)} className="rounded-full border border-primary px-3 py-1 text-[13px] text-primary">{s}</Text>
+                  <Text
+                    key={s}
+                    role="button"
+                    onPress={() => submit(s)}
+                    className="rounded-full border border-primary px-3 py-1 text-[13px] text-primary"
+                  >
+                    {s}
+                  </Text>
                 ))}
               </View>
             ) : null}
@@ -61,8 +72,14 @@ export function AssistantChatScreen() {
                 onRate={(rating) => void chat.rate(message, rating)}
               />
             ))}
-            {chat.streaming && !chat.streaming.messageId ? <Text className="text-[13px] italic text-neutral-500">{chat.streaming.activity}</Text> : null}
-            {chat.error ? <Text role="alert" className="text-[13px] leading-[20px] text-danger">{chat.error}</Text> : null}
+            {chat.streaming && !chat.streaming.messageId ? (
+              <Text className="text-[13px] italic text-neutral-500">{chat.streaming.activity}</Text>
+            ) : null}
+            {chat.error ? (
+              <Text role="alert" className="text-[13px] leading-[20px] text-danger">
+                {chat.error}
+              </Text>
+            ) : null}
           </ScrollView>
 
           <View className="flex-row items-end gap-2 border-t border-neutral-200 px-4 py-2">
@@ -86,12 +103,25 @@ export function AssistantChatScreen() {
               maxLength={2000}
               accessibilityLabel="Tin nhắn cho trợ lý"
               style={{
-                flex: 1, maxHeight: 120, minHeight: 40, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 20,
-                backgroundColor: appColors['neutral-100'], fontFamily: bodyFontFamily, fontSize: 14, color: appColors['neutral-900'],
+                flex: 1,
+                maxHeight: 120,
+                minHeight: 40,
+                paddingHorizontal: 12,
+                paddingVertical: 9,
+                borderRadius: 20,
+                backgroundColor: appColors['neutral-100'],
+                fontFamily: bodyFontFamily,
+                fontSize: 14,
+                color: appColors['neutral-900'],
               }}
             />
             {chat.streaming ? (
-              <View onPress={chat.stop} role="button" aria-label="Dừng trả lời" className="size-[40px] items-center justify-center rounded-full bg-neutral-700 active:opacity-70">
+              <View
+                onPress={chat.stop}
+                role="button"
+                aria-label="Dừng trả lời"
+                className="size-[40px] items-center justify-center rounded-full bg-neutral-700 active:opacity-70"
+              >
                 <Ionicons name="stop" size={16} color="#ffffff" />
               </View>
             ) : (

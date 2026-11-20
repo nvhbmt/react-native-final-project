@@ -60,8 +60,12 @@ export function startInboxSync() {
   }
   onUser(useAuthStore.getState().user?.id ?? null)
   const unsubscribe = useAuthStore.subscribe((state) => onUser(state.user?.id ?? null))
-  const appState = AppState.addEventListener('change', (state) => { if (state === 'active' && current) refresh() })
-  const timer = setInterval(() => { if (current) refresh() }, POLL_MS)
+  const appState = AppState.addEventListener('change', (state) => {
+    if (state === 'active' && current) refresh()
+  })
+  const timer = setInterval(() => {
+    if (current) refresh()
+  }, POLL_MS)
   return () => {
     unsubscribe()
     appState.remove()

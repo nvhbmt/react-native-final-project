@@ -39,15 +39,25 @@ export function ReviewsScreen() {
       contentClassName="pt-2 pb-6"
       footer={
         <View className="border-t border-neutral-200 px-6 pt-3 pb-3">
-          {eligibility.auth === 'guest'
-            ? <Button title="Đăng nhập để viết đánh giá" onPress={() => router.push('/login')} />
-            : eligibility.data?.eligible
-              ? <Button title="Viết đánh giá" leftIcon="create-outline" onPress={() => router.push({ pathname: '/product/[id]/write-review', params: { id: product.id } })} />
-              : eligibility.error
-                ? <Button title="Kiểm tra lại quyền đánh giá" variant="text" onPress={eligibility.retry} />
-                : eligibility.data && <Text className="text-center text-[13px] text-neutral-600">
-                  {eligibility.data.reason === 'already_reviewed' ? 'Bạn đã đánh giá sản phẩm này.' : 'Hãy hoàn tất một đơn hàng có sản phẩm này để viết đánh giá.'}
-                </Text>}
+          {eligibility.auth === 'guest' ? (
+            <Button title="Đăng nhập để viết đánh giá" onPress={() => router.push('/login')} />
+          ) : eligibility.data?.eligible ? (
+            <Button
+              title="Viết đánh giá"
+              leftIcon="create-outline"
+              onPress={() => router.push({ pathname: '/product/[id]/write-review', params: { id: product.id } })}
+            />
+          ) : eligibility.error ? (
+            <Button title="Kiểm tra lại quyền đánh giá" variant="text" onPress={eligibility.retry} />
+          ) : (
+            eligibility.data && (
+              <Text className="text-center text-[13px] text-neutral-600">
+                {eligibility.data.reason === 'already_reviewed'
+                  ? 'Bạn đã đánh giá sản phẩm này.'
+                  : 'Hãy hoàn tất một đơn hàng có sản phẩm này để viết đánh giá.'}
+              </Text>
+            )
+          )}
         </View>
       }
     >
@@ -79,7 +89,11 @@ export function ReviewsScreen() {
 
       <View className="px-6">
         {page.loading || page.error ? (
-          <CatalogStatus loading={page.loading} message={page.error ? 'Không tải được đánh giá.' : undefined} onRetry={page.error ? page.retry : undefined} />
+          <CatalogStatus
+            loading={page.loading}
+            message={page.error ? 'Không tải được đánh giá.' : undefined}
+            onRetry={page.error ? page.retry : undefined}
+          />
         ) : reviews.length ? (
           reviews.map((r, i) => (
             <Fragment key={r.id}>
@@ -93,7 +107,13 @@ export function ReviewsScreen() {
           </Text>
         )}
         {page.hasMore && <Button title="Xem thêm đánh giá" variant="text" onPress={page.loadMore} />}
-        {(page.loadingMore || Boolean(page.moreError)) && <CatalogStatus loading={page.loadingMore} message={page.moreError ? 'Không tải thêm được đánh giá.' : undefined} onRetry={page.moreError ? page.retryMore : undefined} />}
+        {(page.loadingMore || Boolean(page.moreError)) && (
+          <CatalogStatus
+            loading={page.loadingMore}
+            message={page.moreError ? 'Không tải thêm được đánh giá.' : undefined}
+            onRetry={page.moreError ? page.retryMore : undefined}
+          />
+        )}
       </View>
     </Screen>
   )

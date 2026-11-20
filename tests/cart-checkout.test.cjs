@@ -4,7 +4,14 @@ const { beforeEach, test } = require('node:test')
 const { computeTotals, setCartRemote, useCartStore } = require('../src/features/cart/store/cartStore.ts')
 const { buildFeedbackPayload } = require('../src/features/feedback/lib/payload.ts')
 
-const hoodie = { productId: 'hoodie-shirt', name: 'Hoodie shirt', subtitle: 'Blue · L', image: 1, price: 2.99, options: { color: 'blue', size: 'L' } }
+const hoodie = {
+  productId: 'hoodie-shirt',
+  name: 'Hoodie shirt',
+  subtitle: 'Blue · L',
+  image: 1,
+  price: 2.99,
+  options: { color: 'blue', size: 'L' },
+}
 
 beforeEach(() => {
   useCartStore.getState().clear()
@@ -16,7 +23,13 @@ test('cart starts empty and combines matching variants while keeping sizes separ
   cart.addItem({ ...hoodie, quantity: 2 })
   cart.addItem(hoodie)
   cart.addItem({ ...hoodie, options: { color: 'blue', size: 'M' } })
-  assert.deepEqual(useCartStore.getState().items.map(({ quantity, options }) => [quantity, options.size]), [[3, 'L'], [1, 'M']])
+  assert.deepEqual(
+    useCartStore.getState().items.map(({ quantity, options }) => [quantity, options.size]),
+    [
+      [3, 'L'],
+      [1, 'M'],
+    ],
+  )
 })
 
 test('editing and removing a cart line updates the shared quantities', () => {
@@ -42,7 +55,13 @@ test('voucher discount, tax and the payment total use rounded monetary amounts',
   const cart = useCartStore.getState()
   assert.deepEqual(computeTotals(cart.items, cart.voucher.rate), { subtotal: 8.97, discount: 0.9, tax: 0.81, fees: 0, total: 8.88 })
   // Phí ship cộng sau thuế, không chịu thuế (khớp server).
-  assert.deepEqual(computeTotals(cart.items, cart.voucher.rate, 5.99), { subtotal: 8.97, discount: 0.9, tax: 0.81, fees: 5.99, total: 14.87 })
+  assert.deepEqual(computeTotals(cart.items, cart.voucher.rate, 5.99), {
+    subtotal: 8.97,
+    discount: 0.9,
+    tax: 0.81,
+    fees: 5.99,
+    total: 14.87,
+  })
   assert.equal(await useCartStore.getState().applyVoucher('unknown'), false)
   assert.equal(useCartStore.getState().voucher.code, 'SALE10')
 })
@@ -51,10 +70,16 @@ test('signed-in carts apply local changes immediately and then adopt the server 
   const sent = []
   const server = { items: [{ ...hoodie, key: 'hoodie-shirt:blue:L', price: 3.5, quantity: 5 }], voucher: { code: 'SALE10', rate: 0.1 } }
   setCartRemote({
-    add: async (line) => { sent.push(['add', line.quantity]); return server },
+    add: async (line) => {
+      sent.push(['add', line.quantity])
+      return server
+    },
     setQuantity: async () => server,
     remove: async () => server,
-    applyVoucher: async (code) => { if (code !== 'SALE10') throw new Error('bad'); return server },
+    applyVoucher: async (code) => {
+      if (code !== 'SALE10') throw new Error('bad')
+      return server
+    },
     clear: async () => ({ items: [], voucher: null }),
   })
   try {
@@ -85,7 +110,15 @@ test('feedback payload keeps product/order context and copies the form payload',
   const ids = ['upload-1']
   const payload = buildFeedbackPayload(form, ids, { productId: 'hoodie-shirt', orderId: 'order-1' })
   ids.push('upload-2')
-  assert.deepEqual(payload, { mood: 'happy', topics: ['Delivery'], comment: 'Good product', imageIds: ['upload-1'], rating: 4, productId: 'hoodie-shirt', orderId: 'order-1' })
+  assert.deepEqual(payload, {
+    mood: 'happy',
+    topics: ['Delivery'],
+    comment: 'Good product',
+    imageIds: ['upload-1'],
+    rating: 4,
+    productId: 'hoodie-shirt',
+    orderId: 'order-1',
+  })
   assert.equal('orderId' in buildFeedbackPayload(form, [], { orderId: '' }), false)
 })
 

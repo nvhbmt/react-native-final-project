@@ -16,29 +16,33 @@ export function favoriteRoutes(db: Db, accessSecret: string) {
   app.use('/favorites', requireAuth(accessSecret))
   app.use('/favorites/*', requireAuth(accessSecret))
 
-  return app
-    /** Danh sách đầy đủ (mới nhất trước) + mảng id để app tô tim nhanh. */
-    .get('/favorites', async (c) => {
-      const rows = await db.select({ product: catalogProducts, likedAt: favorites.createdAt }).from(favorites)
-        .innerJoin(catalogProducts, eq(favorites.productId, catalogProducts.id))
-        .where(eq(favorites.userId, c.var.auth.sub))
-        .orderBy(desc(favorites.createdAt))
-        .limit(500)
-      return ok(c, {
-        items: rows.map(({ product, likedAt }) => ({ ...productSummary(product), likedAt: likedAt.getTime() })),
-        ids: rows.map(({ product }) => product.id),
+  return (
+    app
+      /** Danh sách đầy đủ (mới nhất trước) + mảng id để app tô tim nhanh. */
+      .get('/favorites', async (c) => {
+        const rows = await db
+          .select({ product: catalogProducts, likedAt: favorites.createdAt })
+          .from(favorites)
+          .innerJoin(catalogProducts, eq(favorites.productId, catalogProducts.id))
+          .where(eq(favorites.userId, c.var.auth.sub))
+          .orderBy(desc(favorites.createdAt))
+          .limit(500)
+        return ok(c, {
+          items: rows.map(({ product, likedAt }) => ({ ...productSummary(product), likedAt: likedAt.getTime() })),
+          ids: rows.map(({ product }) => product.id),
+        })
       })
-    })
-    .put('/favorites/:productId', validate('param', params), async (c) => {
-      const { productId } = c.req.valid('param')
-      const [product] = await db.select({ id: catalogProducts.id }).from(catalogProducts).where(eq(catalogProducts.id, productId))
-      if (!product) throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Không tìm thấy sản phẩm')
-      await db.insert(favorites).values({ userId: c.var.auth.sub, productId }).onConflictDoNothing()
-      return ok(c, { productId, favorite: true })
-    })
-    .delete('/favorites/:productId', validate('param', params), async (c) => {
-      const { productId } = c.req.valid('param')
-      await db.delete(favorites).where(and(eq(favorites.userId, c.var.auth.sub), eq(favorites.productId, productId)))
-      return ok(c, { productId, favorite: false })
-    })
+      .put('/favorites/:productId', validate('param', params), async (c) => {
+        const { productId } = c.req.valid('param')
+        const [product] = await db.select({ id: catalogProducts.id }).from(catalogProducts).where(eq(catalogProducts.id, productId))
+        if (!product) throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Không tìm thấy sản phẩm')
+        await db.insert(favorites).values({ userId: c.var.auth.sub, productId }).onConflictDoNothing()
+        return ok(c, { productId, favorite: true })
+      })
+      .delete('/favorites/:productId', validate('param', params), async (c) => {
+        const { productId } = c.req.valid('param')
+        await db.delete(favorites).where(and(eq(favorites.userId, c.var.auth.sub), eq(favorites.productId, productId)))
+        return ok(c, { productId, favorite: false })
+      })
+  )
 }

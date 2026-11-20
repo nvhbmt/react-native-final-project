@@ -28,18 +28,28 @@ export function createCatalogRepository(db: Db) {
   return {
     async list(query: ListingQuery, after?: PagePosition, relatedTo?: { id: string; category: CategoryId }) {
       const score = orderScore(query)
-      const rows = await db.select({ product: products, score }).from(products).where(and(
-        ...query.q.split(/\s+/).filter(Boolean).map((term) => ilike(searchable, '%' + escapeLike(term) + '%')),
-        query.category ? eq(products.category, query.category) : undefined,
-        relatedTo ? and(eq(products.category, relatedTo.category), ne(products.id, relatedTo.id)) : undefined,
-        query.subcategory ? eq(products.subcategory, query.subcategory) : undefined,
-        query.minPrice === undefined ? undefined : gte(products.priceCents, query.minPrice),
-        query.maxPrice === undefined ? undefined : lte(products.priceCents, query.maxPrice),
-        query.minRating ? gte(products.ratingTenths, query.minRating) : undefined,
-        query.shipping.length ? arrayOverlaps(products.shippingOptions, query.shipping) : undefined,
-        query.benefits.length ? arrayContains(products.benefits, query.benefits) : undefined,
-        after ? or(lt(score, after.score), and(eq(score, after.score), gt(products.id, after.id))) : undefined,
-      )).orderBy(desc(score), asc(products.id)).limit(query.limit + 1)
+      const rows = await db
+        .select({ product: products, score })
+        .from(products)
+        .where(
+          and(
+            ...query.q
+              .split(/\s+/)
+              .filter(Boolean)
+              .map((term) => ilike(searchable, '%' + escapeLike(term) + '%')),
+            query.category ? eq(products.category, query.category) : undefined,
+            relatedTo ? and(eq(products.category, relatedTo.category), ne(products.id, relatedTo.id)) : undefined,
+            query.subcategory ? eq(products.subcategory, query.subcategory) : undefined,
+            query.minPrice === undefined ? undefined : gte(products.priceCents, query.minPrice),
+            query.maxPrice === undefined ? undefined : lte(products.priceCents, query.maxPrice),
+            query.minRating ? gte(products.ratingTenths, query.minRating) : undefined,
+            query.shipping.length ? arrayOverlaps(products.shippingOptions, query.shipping) : undefined,
+            query.benefits.length ? arrayContains(products.benefits, query.benefits) : undefined,
+            after ? or(lt(score, after.score), and(eq(score, after.score), gt(products.id, after.id))) : undefined,
+          ),
+        )
+        .orderBy(desc(score), asc(products.id))
+        .limit(query.limit + 1)
       return rows
     },
     async get(id: string) {
@@ -50,12 +60,19 @@ export function createCatalogRepository(db: Db) {
       return db.select().from(products).where(eq(products.featured, true)).orderBy(asc(products.id))
     },
     categoryPreviews() {
-      return db.selectDistinctOn([products.category, products.subcategory], {
-        category: products.category, subcategory: products.subcategory, image: sql<string>`${products.images}[1]`,
-      }).from(products).orderBy(products.category, products.subcategory, desc(products.featured), products.id)
+      return db
+        .selectDistinctOn([products.category, products.subcategory], {
+          category: products.category,
+          subcategory: products.subcategory,
+          image: sql<string>`${products.images}[1]`,
+        })
+        .from(products)
+        .orderBy(products.category, products.subcategory, desc(products.featured), products.id)
     },
     related(product: { id: string; category: CategoryId; subcategory: string }, limit: number) {
-      return db.select().from(products)
+      return db
+        .select()
+        .from(products)
         .where(and(eq(products.category, product.category), ne(products.id, product.id)))
         .orderBy(desc(eq(products.subcategory, product.subcategory)), sql`${products.ratingTenths} desc nulls last`, asc(products.id))
         .limit(limit)

@@ -17,11 +17,11 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: "22"
+        value: '22'
       # Bản demo: nút "(Demo) Chuyển sang" bước giao hàng và cho đánh giá đơn demo cũ. Đặt false khi lên production thật.
       # (Thẻ demo đã bỏ — chỉ thanh toán qua SePay.)
       - key: ALLOW_DEMO_CHECKOUT
-        value: "true"
+        value: 'true'
       - key: JWT_ACCESS_SECRET
         generateValue: true
       # Chuỗi kết nối Supabase (Session pooler, cổng 5432) — cùng giá trị trong server/.env.supabase.local
@@ -46,7 +46,7 @@ services:
         sync: false
       # SePay thật — để trống thì app KHÔNG có phương thức thanh toán nào (thẻ demo đã bỏ)
       - key: SEPAY_SIMULATED
-        value: "false"
+        value: 'false'
       # Phải trùng "Cấu trúc mã thanh toán" trên SePay
       - key: SEPAY_CODE_PREFIX
         value: MM
@@ -59,4 +59,4 @@ services:
       - key: SEPAY_ACCOUNT_NAME
         sync: false
       - key: USD_TO_VND_RATE
-        value: "25000"
+        value: '25000'

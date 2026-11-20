@@ -28,8 +28,12 @@ export function useAppFonts(): boolean {
     let mounted = true
     Promise.all(webFontFaces.map(({ family, weight }) => document.fonts.load(`${weight} 16px "${family}"`)))
       .catch(() => undefined)
-      .finally(() => { if (mounted) setReady(true) })
-    return () => { mounted = false }
+      .finally(() => {
+        if (mounted) setReady(true)
+      })
+    return () => {
+      mounted = false
+    }
   }, [])
   return ready
 }

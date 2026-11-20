@@ -7,22 +7,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/SamsungGalaxyS24UltraTitaniumBlack_Dual.png?v=1743090656&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/SamsungGalaxyS24UltraTitaniumBlack_Dual.png?v=1743090656&width=533"],
     "sourceUrl": "https://www.plug.tech/products/samsung-galaxy-s24-ultra-5g-512gb-titanium-black-unlocked",
     "priceCents": 64199,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": true,
     "compareAtPriceCents": 84999,
     "ratingTenths": 48,
@@ -36,21 +27,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/google-pixel-10-pro-fold-moonstone-01.png?v=1791130914&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/google-pixel-10-pro-fold-moonstone-01.png?v=1791130914&width=533"],
     "sourceUrl": "https://www.plug.tech/products/google-pixel-10-pro-fold-moonstone-256gb-unlocked",
     "priceCents": 99999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "featured": false
   },
   {
@@ -61,22 +44,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/GooglePixel9ProXLObsidian_Dual.png?v=1755013486&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/GooglePixel9ProXLObsidian_Dual.png?v=1755013486&width=533"],
     "sourceUrl": "https://www.plug.tech/products/google-pixel-9-pro-xl-obsidian-128gb-unlocked",
     "priceCents": 54999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 99999,
     "ratingTenths": 48,
@@ -90,22 +64,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/iPhone16PlusBlack_Dual.png?v=1738358216&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/iPhone16PlusBlack_Dual.png?v=1738358216&width=533"],
     "sourceUrl": "https://www.plug.tech/products/iphone-16-plus-black-128gb-unlocked",
     "priceCents": 58899,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 92999,
     "ratingTenths": 48,
@@ -119,22 +84,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/iPhone16eWhite_Main.png?v=1759164516&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/iPhone16eWhite_Main.png?v=1759164516&width=533"],
     "sourceUrl": "https://www.plug.tech/products/iphone-16e-white-128gb-unlocked",
     "priceCents": 40499,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 82999,
     "ratingTenths": 48,
@@ -148,22 +104,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/products/iPhone14Midnight_Dual_1.png?v=1759162088&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/products/iPhone14Midnight_Dual_1.png?v=1759162088&width=533"],
     "sourceUrl": "https://www.plug.tech/products/iphone-14-midnight-128gb-unlocked",
     "priceCents": 29699,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 79999,
     "ratingTenths": 48,
@@ -177,22 +124,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/iPhone16eBlack_Main.png?v=1759164196&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/iPhone16eBlack_Main.png?v=1759164196&width=533"],
     "sourceUrl": "https://www.plug.tech/products/iphone-16e-black-128gb-unlocked",
     "priceCents": 38499,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 82999,
     "ratingTenths": 48,
@@ -206,23 +144,13 @@
     "subcategory": "phone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned smartphone. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/iPhone15Blue_Dual.png?v=1714076839&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/iPhone15Blue_Dual.png?v=1714076839&width=533"],
     "sourceUrl": "https://www.plug.tech/products/iphone-15-blue-128gb-unlocked",
     "priceCents": 41399,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal",
-      "ship-to-store"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal", "ship-to-store"],
     "featured": false,
     "compareAtPriceCents": 82999,
     "ratingTenths": 48,
@@ -236,22 +164,13 @@
     "subcategory": "tablet",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned tablet. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/products/iPad8thGenWiFiSilver_Dual.png?v=1731525409&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/products/iPad8thGenWiFiSilver_Dual.png?v=1731525409&width=533"],
     "sourceUrl": "https://www.plug.tech/products/ipad-8th-gen-32-gb-silver-wifi",
     "priceCents": 13999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": true,
     "compareAtPriceCents": 39999,
     "ratingTenths": 49,
@@ -265,22 +184,13 @@
     "subcategory": "tablet",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned tablet. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/products/iPadAir5thGenWiFi_CellularSpaceGray_Dual_1.png?v=1669144968&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/products/iPadAir5thGenWiFi_CellularSpaceGray_Dual_1.png?v=1669144968&width=533"],
     "sourceUrl": "https://www.plug.tech/products/ipad-air-5th-gen-64gb-space-gray-wifi-cellular",
     "priceCents": 32999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 89999,
     "ratingTenths": 48,
@@ -301,15 +211,8 @@
     "priceCents": 17999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 54999,
     "ratingTenths": 49,
@@ -323,22 +226,13 @@
     "subcategory": "tablet",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned tablet. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/iPad10thGenSilverWifi_Dual_1.png?v=1744827356&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/iPad10thGenSilverWifi_Dual_1.png?v=1744827356&width=533"],
     "sourceUrl": "https://www.plug.tech/products/ipad-2022-10th-gen-10-9-64gb-silver-wifi-only",
     "priceCents": 28999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 59999,
     "ratingTenths": 49,
@@ -352,22 +246,13 @@
     "subcategory": "laptop",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned laptop. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/products/Untitled_500x500px_-2022-04-08T111105.734.png?v=1649443053&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/products/Untitled_500x500px_-2022-04-08T111105.734.png?v=1649443053&width=533"],
     "sourceUrl": "https://www.plug.tech/products/apple-macbook-air-13-inch-m1-256gb-8-core-cpu-7-core-gpu-13-late-2020-256gb",
     "priceCents": 44999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": true,
     "compareAtPriceCents": 99999,
     "ratingTenths": 48,
@@ -388,15 +273,8 @@
     "priceCents": 39999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 99999,
     "ratingTenths": 48,
@@ -410,22 +288,13 @@
     "subcategory": "laptop",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned laptop. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/MacbookAirM2Midnight_Front_1.png?v=1728073899&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/MacbookAirM2Midnight_Front_1.png?v=1728073899&width=533"],
     "sourceUrl": "https://www.plug.tech/products/apple-macbook-air-m2-13-inch-256gb-16gb-ram-8-core-cpu-8-core-gpu-mid-2022-midnight-1",
     "priceCents": 73999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 99999,
     "ratingTenths": 48,
@@ -446,15 +315,8 @@
     "priceCents": 49999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 99999,
     "ratingTenths": 48,
@@ -468,23 +330,13 @@
     "subcategory": "headphone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned audio device. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/AirPodsMaxUSB-CMidnight_Main.png?v=1756400252&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/AirPodsMaxUSB-CMidnight_Main.png?v=1756400252&width=533"],
     "sourceUrl": "https://www.plug.tech/products/airpods-max-midnight-usb-c",
     "priceCents": 39999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal",
-      "ship-to-store"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal", "ship-to-store"],
     "featured": true,
     "compareAtPriceCents": 54999,
     "ratingTenths": 48,
@@ -498,22 +350,13 @@
     "subcategory": "headphone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned audio device. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/AirPods4_Front.png?v=1738195507&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/AirPods4_Front.png?v=1738195507&width=533"],
     "sourceUrl": "https://www.plug.tech/products/airpods-4th-generation",
     "priceCents": 8999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 17999,
     "ratingTenths": 48,
@@ -527,22 +370,13 @@
     "subcategory": "headphone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned audio device. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/AirPodsPro3rdGen_Main.png?v=1772557479&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/AirPodsPro3rdGen_Main.png?v=1772557479&width=533"],
     "sourceUrl": "https://www.plug.tech/products/airpods-pro-3rd-generation",
     "priceCents": 17999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 24999,
     "ratingTenths": 48,
@@ -556,22 +390,13 @@
     "subcategory": "headphone",
     "subtitle": "Pre-owned · Plug",
     "description": "Pre-owned audio device. See the original listing for condition options and specifications.",
-    "images": [
-      "https://www.plug.tech/cdn/shop/files/Shopifyproductimage-MotoEdge_01Main.png?v=1791390566&width=533"
-    ],
+    "images": ["https://www.plug.tech/cdn/shop/files/Shopifyproductimage-MotoEdge_01Main.png?v=1791390566&width=533"],
     "sourceUrl": "https://www.plug.tech/products/jbl-tune-670nc-headphones-blue",
     "priceCents": 3999,
     "priceBasis": "from",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "best-deal"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "best-deal"],
     "featured": false,
     "compareAtPriceCents": 19999,
     "ratingTenths": 48,
@@ -585,21 +410,13 @@
     "subcategory": "apparel",
     "subtitle": "Pink Taffy",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/FA26_LOOK127_NEWZEALAND_MS_00159.png?v=1792789008&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/FA26_LOOK127_NEWZEALAND_MS_00159.png?v=1792789008&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/womens-restore-oversized-mock-neck-pink-taffy",
     "priceCents": 12800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -609,15 +426,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW2224PFY_FA26_WOMENS_LAYERS_SWATCH.png?v=1792104907"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL"]
     },
     "featured": false
   },
@@ -629,21 +438,13 @@
     "subcategory": "apparel",
     "subtitle": "Salt",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/FA26_LOOK133_NEWZEALAND_MS_00084.png?v=1792534273&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/FA26_LOOK133_NEWZEALAND_MS_00084.png?v=1792534273&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/pique-fleece-pant-30-salt",
     "priceCents": 13800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -653,15 +454,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V4140SAL_FA26_MENS_BOTTOMS_SWATCH.png?v=1792534265"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL"]
     },
     "featured": false
   },
@@ -673,21 +466,13 @@
     "subcategory": "apparel",
     "subtitle": "Cherry Noir",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW4301CNR_FA26_W_BOTTOMS_FULL_10.png?v=1792787261&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW4301CNR_FA26_W_BOTTOMS_FULL_10.png?v=1792787261&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/womens-vuori-allthefeels-slim-flare-short-cherry-noir",
     "priceCents": 11800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -697,15 +482,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW4301CNR_FA26_WOMENS_BOTTOMS_SWATCH.png?v=1792787016"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL"]
     },
     "featured": false
   },
@@ -724,14 +501,8 @@
     "priceCents": 13800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -741,16 +512,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V2115SAL_FA26_MENS_LAYERS_SWATCH.png?v=1792172489"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"]
     },
     "featured": true
   },
@@ -762,21 +524,13 @@
     "subcategory": "apparel",
     "subtitle": "Pink Taffy",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW2050PFY_FA26_W_LAYERS_FRONT_1.png?v=1792100864&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW2050PFY_FA26_W_LAYERS_FRONT_1.png?v=1792100864&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/womens-emilie-cashmere-crew-pink-taffy",
     "priceCents": 19800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -786,15 +540,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW2050PFY_FA26_WOMENS_LAYERS_SWATCH.png?v=1792100859"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL"]
     },
     "featured": false
   },
@@ -806,21 +552,13 @@
     "subcategory": "hoodie",
     "subtitle": "Hunter Green",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/FA26_LOOK174_NEWZEALAND_MS_00110.png?v=1792536692&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/FA26_LOOK174_NEWZEALAND_MS_00110.png?v=1792536692&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/berik-cashmere-hoodie-hunter-green",
     "priceCents": 22800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -830,16 +568,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V2026TRG_FA26_MENS_LAYERS_SWATCH.png?v=1791917490"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"]
     },
     "featured": false
   },
@@ -851,21 +580,13 @@
     "subcategory": "apparel",
     "subtitle": "Marshmallow Paloma Plaid",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW5150MPD_FA26_W_OUTERWEAR_CREATIVE_14.png?v=1792190913&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW5150MPD_FA26_W_OUTERWEAR_CREATIVE_14.png?v=1792190913&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/womens-alpine-printed-jacket-marshmallow-paloma-plaid",
     "priceCents": 20800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -875,15 +596,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW5150MPD_FA26_WOMENS_OUTERWEAR_SWATCH.png?v=1792190907"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL"]
     },
     "featured": false
   },
@@ -895,21 +608,13 @@
     "subcategory": "hoodie",
     "subtitle": "Raisin",
     "description": "Vuori apparel in the colorway shown. Listed sizes come from the source product options.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V2140RSN_FA26_M_LAYERS_CREATIVE_11.png?v=1792530740&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V2140RSN_FA26_M_LAYERS_CREATIVE_11.png?v=1792530740&width=800"],
     "sourceUrl": "https://vuoriclothing.com/products/seaside-pullover-hoodie-2-0-raisin",
     "priceCents": 14400,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -919,16 +624,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V4007RSN_FA26_MENS_BOTTOMS_SWATCH.png?v=1791928206"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"]
     },
     "featured": false
   },
@@ -947,14 +643,8 @@
     "priceCents": 11000,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "variants": {
       "colors": [
         {
@@ -964,15 +654,7 @@
           "swatchImage": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/VW2224PFY_FA26_WOMENS_LAYERS_SWATCH.png?v=1792104907"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL"]
     },
     "featured": false
   },
@@ -993,15 +675,8 @@
     "priceCents": 5800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "ship-to-store"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "ship-to-store"],
     "variants": {
       "colors": [
         {
@@ -1011,16 +686,7 @@
           "image": "https://cdn.shopify.com/s/files/1/0022/4008/6074/files/V126BLK_FA26_M_TOPS_FRONT_1.png?v=1790628028&width=800"
         }
       ],
-      "sizes": [
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "3XL"
-      ]
+      "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"]
     },
     "featured": false,
     "ratingTenths": 48,
@@ -1044,15 +710,8 @@
     "priceCents": 10500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection",
-      "ship-to-store"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection", "ship-to-store"],
     "available": true,
     "variants": {
       "colors": [
@@ -1062,22 +721,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A11559_25Q3_Cruiser_Dark_Navy_Blizzard_PDP_LEFT-2000x2000_9f5ba943-6b25-4f75-9c74-edd67a6a0aa7.png?v=1751900449&width=1024"
         }
       ],
-      "sizes": [
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11",
-        "11.5",
-        "12",
-        "12.5",
-        "13",
-        "13.5",
-        "14",
-        "15"
-      ]
+      "sizes": ["8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13", "13.5", "14", "15"]
     },
     "featured": true,
     "sizeChart": {
@@ -1152,14 +796,8 @@
     "priceCents": 7500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1169,21 +807,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12364_26Q1_Cruiser-Slip-On-Canvas-Warm-White-Natural-White_PDP_LEFT_9273769a-0a6f-47f4-a002-6d308f1f3e0e.png?v=1768946967&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1205,14 +829,8 @@
     "priceCents": 10000,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1222,21 +840,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12451_26Q1_Cruiser-Slip-On-Blizzard-Blizzard-Sole_PDP_LEFT_6b76e0cd-df5b-4ddc-bb7e-b354f44bbd8a.png?v=1768947332&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1258,14 +862,8 @@
     "priceCents": 10500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1275,21 +873,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12622_26Q1_Runner-NZ-Slip-On-Mushroom-Mushroom_PDP_LEFT_f22365dc-8298-40c8-a456-acf947b20a90.png?v=1768951496&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1311,14 +895,8 @@
     "priceCents": 10500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1328,21 +906,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12386_26Q1_Runner-NZ-Slip-On-Anthracite-Dark-Anthr-Sole_PDP_LEFT_7ec4ff21-9ae4-4f0f-9a3c-e813a8404674.png?v=1768951351&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1364,14 +928,8 @@
     "priceCents": 10500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1381,21 +939,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12488_26Q1_Runner-NZ-Slip-On-Dark-Navy-Dark-Navy_PDP_LEFT_76a29c75-099f-4514-86f6-f484a4d8d71f.png?v=1769559971&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1417,14 +961,8 @@
     "priceCents": 7500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1434,21 +972,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12852_26Q1_Cruiser-Canvas-Sea-Spray-Natural-White-Sole_PDP_LEFT_55c168b7-1ef8-43d8-8516-aa8a1a0c633f.png?v=1771027545&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1470,14 +994,8 @@
     "priceCents": 7500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1487,21 +1005,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12848_26Q1_Cruiser-Canvas-Port-Natural-White-Sole_PDP_LEFT_f544c3ab-bb93-4f19-9cb0-558975e64068.png?v=1774478056&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1523,14 +1027,8 @@
     "priceCents": 10000,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1540,21 +1038,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A11959_25Q3_Tree_Runner_NZ_Medium_Grey_Blizzard_Sole_PDP_LEFT-2000x2000_f6ff6164-62df-42dc-89a8-fabcb3b5d438.png?v=1751899014&width=1024"
         }
       ],
-      "sizes": [
-        "5",
-        "5.5",
-        "6",
-        "6.5",
-        "7",
-        "7.5",
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11"
-      ]
+      "sizes": ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"]
     },
     "featured": false
   },
@@ -1576,14 +1060,8 @@
     "priceCents": 10500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "variants": {
       "colors": [
@@ -1593,21 +1071,7 @@
           "image": "https://www.allbirds.com/cdn/shop/files/A12622_26Q1_Runner-NZ-Slip-On-Mushroom-Mushroom_PDP_LEFT.png?v=1768951251&width=1024"
         }
       ],
-      "sizes": [
-        "8",
-        "8.5",
-        "9",
-        "9.5",
-        "10",
-        "10.5",
-        "11",
-        "11.5",
-        "12",
-        "12.5",
-        "13",
-        "13.5",
-        "14"
-      ]
+      "sizes": ["8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13", "13.5", "14"]
     },
     "featured": false
   },
@@ -1619,21 +1083,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/19889_OpenA_R.png?v=1789658853&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/19889_OpenA_R.png?v=1789658853&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/glow-reviver-melting-lip-balm",
     "priceCents": 900,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": true,
     "ratingTenths": 47,
@@ -1647,21 +1103,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/21269_OpenA_R.png?v=1789591311&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/21269_OpenA_R.png?v=1789591311&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/squeeze-me-lip-balm",
     "priceCents": 500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 46,
@@ -1675,21 +1123,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/84856_OPENA_R.png?v=1776967205&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/84856_OPENA_R.png?v=1776967205&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/camo-color-corrector",
     "priceCents": 500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 45,
@@ -1703,21 +1143,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/84848_OpenA_R.png?v=1788302242&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/84848_OpenA_R.png?v=1788302242&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/glow-reviver-lip-oil-stick",
     "priceCents": 1000,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 47,
@@ -1731,21 +1163,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/82324_OpenA_V4_R.png?v=1776967382&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/82324_OpenA_V4_R.png?v=1776967382&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/sheer-for-it-blush-tint",
     "priceCents": 600,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": false,
     "featured": false,
     "ratingTenths": 45,
@@ -1759,21 +1183,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/84824_Open_A_R.png?v=1776967312&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/84824_Open_A_R.png?v=1776967312&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/hydrating-camo-concealer",
     "priceCents": 800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 45,
@@ -1794,14 +1210,8 @@
     "priceCents": 900,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 48,
@@ -1822,14 +1232,8 @@
     "priceCents": 800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 46,
@@ -1850,14 +1254,8 @@
     "priceCents": 200,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 47,
@@ -1871,21 +1269,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/82326_OpenA_R.png?v=1787603530&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/82326_OpenA_R.png?v=1787603530&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/sheer-for-it-bronzer-tint-4",
     "priceCents": 600,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": true,
     "ratingTenths": 42,
@@ -1906,14 +1296,8 @@
     "priceCents": 1000,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 43,
@@ -1927,21 +1311,13 @@
     "subcategory": "skincare",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/57109_OpenA_R.png?v=1783026727&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/57109_OpenA_R.png?v=1783026727&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/suntouchable-invisi-stick-spf-50-glitz",
     "priceCents": 1500,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 33,
@@ -1962,14 +1338,8 @@
     "priceCents": 700,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 46,
@@ -1990,14 +1360,8 @@
     "priceCents": 1100,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 48,
@@ -2018,14 +1382,8 @@
     "priceCents": 700,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 46,
@@ -2039,21 +1397,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/21151_OpenA_R.png?v=1776967203&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/21151_OpenA_R.png?v=1776967203&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/bite-size-eyeshadow",
     "priceCents": 400,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 47,
@@ -2067,21 +1417,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/22010_OpenA_R.png?v=1779830240&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/22010_OpenA_R.png?v=1779830240&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/smoky-kohl-eyeliner",
     "priceCents": 400,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 44,
@@ -2095,21 +1437,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/83279_OpenA_R.png?v=1776967356&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/83279_OpenA_R.png?v=1776967356&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/perfect-10-eyeshadow-palette",
     "priceCents": 1100,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 45,
@@ -2123,21 +1457,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/83674_OpenA_R.png?v=1780638553&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/83674_OpenA_R.png?v=1780638553&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/liquid-velvet-eyeshadow",
     "priceCents": 800,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 47,
@@ -2151,21 +1477,13 @@
     "subcategory": "makeup",
     "subtitle": "e.l.f. Cosmetics",
     "description": "Beauty product from the official e.l.f. catalog. The image shows the shade or format selected in the source listing.",
-    "images": [
-      "https://cdn.shopify.com/s/files/1/0661/2251/4520/files/81330_OpenA_V2_R.png?v=1776967349&width=800"
-    ],
+    "images": ["https://cdn.shopify.com/s/files/1/0661/2251/4520/files/81330_OpenA_V2_R.png?v=1776967349&width=800"],
     "sourceUrl": "https://www.elfcosmetics.com/products/no-budge-retractable-eyeliner",
     "priceCents": 600,
     "priceBasis": "listed",
     "priceUnit": "item",
-    "shippingOptions": [
-      "express",
-      "standard"
-    ],
-    "benefits": [
-      "free-return",
-      "buyer-protection"
-    ],
+    "shippingOptions": ["express", "standard"],
+    "benefits": ["free-return", "buyer-protection"],
     "available": true,
     "featured": false,
     "ratingTenths": 40,
@@ -2186,11 +1504,7 @@
     "priceCents": 186,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Pink_lady_and_cross_section.jpg",
@@ -2211,11 +1525,7 @@
     "priceCents": 192,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Pears.jpg",
@@ -2236,11 +1546,7 @@
     "priceCents": 246,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Autumn_Red_peaches.jpg",
@@ -2261,11 +1567,7 @@
     "priceCents": 366,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Cherry_season_%2848216568227%29.jpg",
@@ -2286,11 +1588,7 @@
     "priceCents": 380,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Apricot_and_cross_section.jpg",
@@ -2311,11 +1609,7 @@
     "priceCents": 266,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Plums_African_Rose_-_whole%2C_halved_and_slice.jpg",
@@ -2336,11 +1630,7 @@
     "priceCents": 61,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Bananas.jpg",
@@ -2361,11 +1651,7 @@
     "priceCents": 146,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Mangos_-_single_and_halved.jpg",
@@ -2386,11 +1672,7 @@
     "priceCents": 67,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Pineapple_and_cross_section.jpg",
@@ -2411,11 +1693,7 @@
     "priceCents": 131,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Papaya_-_longitudinal_section.jpg",
@@ -2436,11 +1714,7 @@
     "priceCents": 283,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Kiwifruit_cross_section.jpg",
@@ -2461,11 +1735,7 @@
     "priceCents": 144,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Oranges_-_whole-halved-segment.jpg",
@@ -2486,11 +1756,7 @@
     "priceCents": 159,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Clementines_whole%2C_peeled%2C_half_and_sectioned.jpg",
@@ -2511,11 +1777,7 @@
     "priceCents": 140,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Grapefruits_-_whole-halved-segments.jpg",
@@ -2536,11 +1798,7 @@
     "priceCents": 308,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Garden_strawberry_%28Fragaria_%C3%97_ananassa%29_single2.jpg",
@@ -2554,18 +1812,12 @@
     "subcategory": "berries",
     "subtitle": "Fresh fruit · USD/lb",
     "description": "Fresh blackberry. Price is a USDA 2023 U.S. retail average per pound.",
-    "images": [
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Blackberries_fruit.jpg/330px-Blackberries_fruit.jpg"
-    ],
+    "images": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Blackberries_fruit.jpg/330px-Blackberries_fruit.jpg"],
     "sourceUrl": "https://en.wikipedia.org/wiki/Blackberry",
     "priceCents": 683,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Blackberries_fruit.jpg",
@@ -2586,11 +1838,7 @@
     "priceCents": 513,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Blueberries.jpg",
@@ -2611,11 +1859,7 @@
     "priceCents": 797,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Raspberries_%28Rubus_idaeus%29.jpg",
@@ -2636,11 +1880,7 @@
     "priceCents": 79,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Cucumis_melo_var._reticulatus_%28photo_by_Scott_Bauer%29.jpg",
@@ -2661,11 +1901,7 @@
     "priceCents": 41,
     "priceBasis": "reference",
     "priceUnit": "lb",
-    "shippingOptions": [
-      "instant",
-      "express",
-      "standard"
-    ],
+    "shippingOptions": ["instant", "express", "standard"],
     "benefits": [],
     "priceSourceUrl": "https://www.ers.usda.gov/media/6210/all-fruits-average-prices-csv-format.csv?v=38026",
     "imageAttribution": "https://commons.wikimedia.org/wiki/File:Watermelon_cross_BNC.jpg",

@@ -20,13 +20,23 @@ const feedbackInput = z.object({
   /** Id ảnh đã upload với `purpose=feedback`. */
   imageIds: z.array(z.uuid()).max(5).default([]),
   rating: z.number().int().min(1).max(5),
-  productId: z.string().regex(/^[a-z0-9-]{1,160}$/).optional(),
+  productId: z
+    .string()
+    .regex(/^[a-z0-9-]{1,160}$/)
+    .optional(),
   orderId: z.uuid().optional(),
 })
 
 const serialize = (row: typeof feedback.$inferSelect) => ({
-  id: row.id, mood: row.mood, topics: row.topics, comment: row.comment, images: row.images, rating: row.rating,
-  productId: row.productId, orderId: row.orderId, createdAt: row.createdAt.getTime(),
+  id: row.id,
+  mood: row.mood,
+  topics: row.topics,
+  comment: row.comment,
+  images: row.images,
+  rating: row.rating,
+  productId: row.productId,
+  orderId: row.orderId,
+  createdAt: row.createdAt.getTime(),
 })
 
 export function feedbackRoutes(db: Db, accessSecret: string) {
@@ -44,14 +54,26 @@ export function feedbackRoutes(db: Db, accessSecret: string) {
         if (!product) throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Không tìm thấy sản phẩm')
       }
       if (input.orderId) {
-        const [order] = await db.select({ id: orders.id }).from(orders).where(and(eq(orders.id, input.orderId), eq(orders.userId, userId)))
+        const [order] = await db
+          .select({ id: orders.id })
+          .from(orders)
+          .where(and(eq(orders.id, input.orderId), eq(orders.userId, userId)))
         if (!order) throw new AppError(404, 'ORDER_NOT_FOUND', 'Không tìm thấy đơn hàng')
       }
       const created = await db.transaction(async (tx) => {
-        const [row] = await tx.insert(feedback).values({
-          userId, mood: input.mood ?? null, topics: [...new Set(input.topics)], comment: input.comment,
-          images: images.map(uploadUrl), rating: input.rating, productId: input.productId ?? null, orderId: input.orderId ?? null,
-        }).returning()
+        const [row] = await tx
+          .insert(feedback)
+          .values({
+            userId,
+            mood: input.mood ?? null,
+            topics: [...new Set(input.topics)],
+            comment: input.comment,
+            images: images.map(uploadUrl),
+            rating: input.rating,
+            productId: input.productId ?? null,
+            orderId: input.orderId ?? null,
+          })
+          .returning()
         await notify(tx, userId, {
           kind: 'feedback',
           title: 'Cảm ơn bạn đã góp ý',

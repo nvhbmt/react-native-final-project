@@ -42,9 +42,21 @@ export function AddressForm({ initial, onSubmit, onCancel }: Props) {
       {field('phone', 'Số điện thoại', { keyboardType: 'phone-pad', autoComplete: 'tel' })}
       {field('line1', 'Địa chỉ', { placeholder: 'Số nhà, đường, phường/xã, quận/huyện', autoComplete: 'street-address' })}
       {field('city', 'Tỉnh / thành phố')}
-      <SubmitButton title="Lưu địa chỉ" loading={form.submitting} onPress={() => form.submit(() => onSubmit({
-        ...values, recipientName: values.recipientName.trim(), phone: values.phone.trim(), line1: values.line1.trim(), city: values.city.trim(),
-      }))} />
+      <SubmitButton
+        title="Lưu địa chỉ"
+        loading={form.submitting}
+        onPress={() =>
+          form.submit(() =>
+            onSubmit({
+              ...values,
+              recipientName: values.recipientName.trim(),
+              phone: values.phone.trim(),
+              line1: values.line1.trim(),
+              city: values.city.trim(),
+            }),
+          )
+        }
+      />
       <Button title="Huỷ" variant="text" onPress={onCancel} />
     </View>
   )

@@ -33,9 +33,9 @@ export function useReviewEligibility(id?: string, orderId?: string) {
   const user = useCurrentUser()
   const version = useReviewVersion()
   const query = orderId ? `?orderId=${encodeURIComponent(orderId)}` : ''
-  const request = useCatalogRequest<ReviewEligibility>(
-    id && user ? `${reviewsPath(id)}/eligibility${query}` : undefined,
-    { auth: true, version: `${user?.id}:${version}` },
-  )
+  const request = useCatalogRequest<ReviewEligibility>(id && user ? `${reviewsPath(id)}/eligibility${query}` : undefined, {
+    auth: true,
+    version: `${user?.id}:${version}`,
+  })
   return { ...request, auth }
 }

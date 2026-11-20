@@ -29,10 +29,11 @@ const env = { ...process.env, DATABASE_URL: url.toString() }
 delete env.PGPASSWORD
 
 // Không để lỗi từ thư viện in vô tình làm lộ mật khẩu hoặc URL có mật khẩu.
-const redact = (value = '') => value
-  .replaceAll(password, '[REDACTED]')
-  .replaceAll(encodeURIComponent(password), '[REDACTED]')
-  .replaceAll(url.toString(), '[REDACTED_DATABASE_URL]')
+const redact = (value = '') =>
+  value
+    .replaceAll(password, '[REDACTED]')
+    .replaceAll(encodeURIComponent(password), '[REDACTED]')
+    .replaceAll(url.toString(), '[REDACTED_DATABASE_URL]')
 
 if (command === 'verify') {
   const { default: postgres } = await import('postgres')

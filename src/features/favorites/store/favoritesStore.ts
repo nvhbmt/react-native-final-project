@@ -39,7 +39,11 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
     const liked = before.ids.includes(product.id)
     set({
       ids: liked ? before.ids.filter((id) => id !== product.id) : [product.id, ...before.ids],
-      items: liked ? before.items.filter((item) => item.id !== product.id) : product.name ? [product as Product, ...before.items] : before.items,
+      items: liked
+        ? before.items.filter((item) => item.id !== product.id)
+        : product.name
+          ? [product as Product, ...before.items]
+          : before.items,
     })
     try {
       if (liked) await api.delete(`/favorites/${encodeURIComponent(product.id)}`)

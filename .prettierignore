@@ -1,0 +1,12 @@
+# Sinh tự động / lockfile
+node_modules
+package-lock.json
+server/package-lock.json
+server/drizzle
+dist
+web-build
+.expo
+expo-env.d.ts
+/ios
+/android
+*.md

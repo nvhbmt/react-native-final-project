@@ -10,43 +10,71 @@ const schema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   DATABASE_URL: z.string().url(),
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET phải dài tối thiểu 32 ký tự'),
-  ACCESS_TOKEN_TTL: z.coerce.number().int().positive().default(15 * 60),
-  REFRESH_TOKEN_TTL: z.coerce.number().int().positive().default(30 * 24 * 60 * 60),
+  ACCESS_TOKEN_TTL: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(15 * 60),
+  REFRESH_TOKEN_TTL: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(30 * 24 * 60 * 60),
   CORS_ORIGINS: z
     .string()
     .default('http://localhost:8081')
-    .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)),
+    .transform((value) =>
+      value
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean),
+    ),
   // Email (mã đặt lại mật khẩu). Chọn MỘT cách:
   // - SMTP_URL (vd. Mailpit `smtp://localhost:1025`, hoặc URL đầy đủ của nhà cung cấp);
   // - SMTP_USER + SMTP_PASS (Gmail App Password; mặc định smtp.gmail.com:465, dấu cách trong mật khẩu tự bỏ).
   // Không đặt gì thì chỉ in email ra console (dev).
   SMTP_URL: z.string().optional(),
   SMTP_USER: z.string().trim().optional(),
-  SMTP_PASS: z.string().transform((value) => value.replace(/\s+/g, '')).optional(),
+  SMTP_PASS: z
+    .string()
+    .transform((value) => value.replace(/\s+/g, ''))
+    .optional(),
   SMTP_HOST: z.string().default('smtp.gmail.com'),
   SMTP_PORT: z.coerce.number().int().positive().default(465),
   /** Mặc định `MobiMart <SMTP_USER>` khi dùng SMTP_USER (Gmail buộc người gửi trùng tài khoản đăng nhập). */
   MAIL_FROM: z.string().optional(),
   UPLOAD_DIR: z.string().default('uploads'),
   // Thẻ demo + nút "(Demo) Chuyển sang". Mặc định: bật khi NODE_ENV khác production. Bản demo online đặt true.
-  ALLOW_DEMO_CHECKOUT: z.enum(['true', 'false']).optional().transform((value) => (value === undefined ? undefined : value === 'true')),
+  ALLOW_DEMO_CHECKOUT: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => (value === undefined ? undefined : value === 'true')),
   // Lưu ảnh bền vững trên Supabase Storage (production). Thiếu thì lưu ổ đĩa UPLOAD_DIR (mất khi deploy lại).
   // Dòng trống `SUPABASE_URL=` (như .env.example) = chưa cấu hình, không phải URL sai.
   SUPABASE_URL: z.preprocess((value) => (value === '' ? undefined : value), z.string().url().optional()),
   // Secret key (`sb_secret_…`, Project Settings → API Keys). Tên cũ SUPABASE_SERVICE_ROLE_KEY (khoá JWT legacy) vẫn nhận.
   SUPABASE_SECRET_KEY: z.string().trim().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().trim().optional(),
-  SUPABASE_STORAGE_BUCKET: z.string().regex(/^[a-z0-9-]{3,63}$/, 'Tên bucket chỉ gồm chữ thường, số, gạch ngang').default('uploads'),
+  SUPABASE_STORAGE_BUCKET: z
+    .string()
+    .regex(/^[a-z0-9-]{3,63}$/, 'Tên bucket chỉ gồm chữ thường, số, gạch ngang')
+    .default('uploads'),
   // SePay — để trống SEPAY_WEBHOOK_API_KEY thì tắt thanh toán chuyển khoản.
   SEPAY_WEBHOOK_API_KEY: z.string().optional(),
   SEPAY_BANK: z.string().optional(),
   SEPAY_ACCOUNT_NUMBER: z.string().optional(),
   SEPAY_ACCOUNT_NAME: z.string().optional(),
-  SEPAY_CODE_PREFIX: z.string().regex(/^[A-Z]{2,5}$/, 'SEPAY_CODE_PREFIX chỉ gồm 2–5 chữ in hoa').default('DH'),
+  SEPAY_CODE_PREFIX: z
+    .string()
+    .regex(/^[A-Z]{2,5}$/, 'SEPAY_CODE_PREFIX chỉ gồm 2–5 chữ in hoa')
+    .default('DH'),
   SEPAY_PAYMENT_TTL_MINUTES: z.coerce.number().int().positive().default(30),
   USD_TO_VND_RATE: z.coerce.number().positive().default(25_000),
   // true = SePay giả lập ở máy dev: tài khoản ngân hàng giả, webhook gửi bằng `npm run sepay:simulate`.
-  SEPAY_SIMULATED: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
+  SEPAY_SIMULATED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
   AI_PROVIDER: z.enum(['anthropic', 'openai-compatible']).default('openai-compatible'),
   AI_BASE_URL: z.string().optional(),
   AI_API_KEY: z.string().optional(),

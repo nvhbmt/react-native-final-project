@@ -1,6 +1,14 @@
 import type { CategoryId, ProductFilters, SortOrder } from '../types'
 
-export function listingPath({ category, subcategory, query, sort, filters, relatedTo, limit }: {
+export function listingPath({
+  category,
+  subcategory,
+  query,
+  sort,
+  filters,
+  relatedTo,
+  limit,
+}: {
   category?: CategoryId
   subcategory?: string
   query?: string

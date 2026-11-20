@@ -16,23 +16,58 @@ export function RecommendedProducts({ products, loading, onRetry }: { products: 
     <YStack gap={20}>
       <XStack px={24} items="center" justify="space-between">
         <MarketHeading>Gợi ý cho bạn</MarketHeading>
-        <MarketText {...keyboardAction} role="button" aria-label="Xem tất cả sản phẩm gợi ý" onPress={() => router.push('/product-listing')} color={m.muted} hitSlop={8}>Xem tất cả</MarketText>
+        <MarketText
+          {...keyboardAction}
+          role="button"
+          aria-label="Xem tất cả sản phẩm gợi ý"
+          onPress={() => router.push('/product-listing')}
+          color={m.muted}
+          hitSlop={8}
+        >
+          Xem tất cả
+        </MarketText>
       </XStack>
-      {loading || onRetry ? <CatalogStatus loading={loading} message={onRetry ? 'Không tải được sản phẩm.' : undefined} onRetry={onRetry} /> : <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
-        {products.length === 0 && <MarketText color={m.secondary}>Không tìm thấy sản phẩm.</MarketText>}
-        {products.map((product) => (
-          <YStack {...keyboardAction} key={product.id} w={132} h={208} rounded={3} bg={m.surface} overflow="hidden" role="button" aria-label={`${product.name}, ${formatProductPrice(product)}`} onPress={() => router.push({ pathname: '/product/[id]', params: { id: product.id } })}>
-            <Image source={product.image} style={styles.image} contentFit="contain" />
-            <YStack px={12} pt={14} gap={12}>
-              <MarketHeading fontSize={12} lineHeight="18px" numberOfLines={1}>{product.name}</MarketHeading>
-              <XStack items="center" gap={5}>
-                {product.rating !== null && <><Ionicons name="star" color={m.star} size={15} /><MarketText fontSize={10} lineHeight="18px">{product.rating}</MarketText></>}
-                <MarketText ml="auto" fontSize={12} lineHeight="20px" color={m.primary} fontWeight="700" numberOfLines={1}>{formatProductPrice(product)}</MarketText>
-              </XStack>
+      {loading || onRetry ? (
+        <CatalogStatus loading={loading} message={onRetry ? 'Không tải được sản phẩm.' : undefined} onRetry={onRetry} />
+      ) : (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
+          {products.length === 0 && <MarketText color={m.secondary}>Không tìm thấy sản phẩm.</MarketText>}
+          {products.map((product) => (
+            <YStack
+              {...keyboardAction}
+              key={product.id}
+              w={132}
+              h={208}
+              rounded={3}
+              bg={m.surface}
+              overflow="hidden"
+              role="button"
+              aria-label={`${product.name}, ${formatProductPrice(product)}`}
+              onPress={() => router.push({ pathname: '/product/[id]', params: { id: product.id } })}
+            >
+              <Image source={product.image} style={styles.image} contentFit="contain" />
+              <YStack px={12} pt={14} gap={12}>
+                <MarketHeading fontSize={12} lineHeight="18px" numberOfLines={1}>
+                  {product.name}
+                </MarketHeading>
+                <XStack items="center" gap={5}>
+                  {product.rating !== null && (
+                    <>
+                      <Ionicons name="star" color={m.star} size={15} />
+                      <MarketText fontSize={10} lineHeight="18px">
+                        {product.rating}
+                      </MarketText>
+                    </>
+                  )}
+                  <MarketText ml="auto" fontSize={12} lineHeight="20px" color={m.primary} fontWeight="700" numberOfLines={1}>
+                    {formatProductPrice(product)}
+                  </MarketText>
+                </XStack>
+              </YStack>
             </YStack>
-          </YStack>
-        ))}
-      </ScrollView>}
+          ))}
+        </ScrollView>
+      )}
     </YStack>
   )
 }

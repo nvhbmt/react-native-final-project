@@ -42,8 +42,7 @@ export function productSummary(row: CatalogProductRow) {
 function decodeCursor(cursor: string, scope: string): PagePosition {
   try {
     const value = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8'))
-    if (value.scope === scope && Number.isSafeInteger(value.score)
-        && typeof value.id === 'string' && /^[a-z0-9-]{1,160}$/.test(value.id)) {
+    if (value.scope === scope && Number.isSafeInteger(value.score) && typeof value.id === 'string' && /^[a-z0-9-]{1,160}$/.test(value.id)) {
       return { score: value.score, id: value.id }
     }
   } catch {
@@ -83,12 +82,19 @@ export function createCatalogService(repository: CatalogRepository) {
         .sort((a, b) => b.discountPercent! - a.discountPercent!)
         .slice(0, 6)
       const banners = categoryList.flatMap((category) => {
-        const product = deals.find((item) => item.category === category.id)
-          ?? recommendedProducts.find((item) => item.category === category.id)
-        return product ? [{
-          category: category.id, productId: product.id, title: category.name, image: product.image,
-          discountPercent: product.discountPercent,
-        }] : []
+        const product =
+          deals.find((item) => item.category === category.id) ?? recommendedProducts.find((item) => item.category === category.id)
+        return product
+          ? [
+              {
+                category: category.id,
+                productId: product.id,
+                title: category.name,
+                image: product.image,
+                discountPercent: product.discountPercent,
+              },
+            ]
+          : []
       })
       return { categories: categoryList, banners, deals, recommendedProducts }
     },
@@ -100,9 +106,10 @@ export function createCatalogService(repository: CatalogRepository) {
       const rows = await repository.list(query, position, relatedTo)
       const page = rows.slice(0, limit)
       const last = page.at(-1)
-      const nextCursor = rows.length > limit && last
-        ? Buffer.from(JSON.stringify({ scope, score: last.score, id: last.product.id })).toString('base64url')
-        : null
+      const nextCursor =
+        rows.length > limit && last
+          ? Buffer.from(JSON.stringify({ scope, score: last.score, id: last.product.id })).toString('base64url')
+          : null
       return { items: page.map(({ product }) => productSummary(product)), nextCursor }
     },
     async detail(id: string) {

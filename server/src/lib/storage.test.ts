@@ -38,18 +38,40 @@ describe('Supabase Storage', () => {
 
   it('ensureBucket: có sẵn thì không tạo; chưa có thì tạo bucket public giới hạn 5MB', async () => {
     const exists = fakeFetch([new Response('{}', { status: 200 })])
-    expect(await createSupabaseStorage({ url: 'https://ref.supabase.co', serviceKey: SECRET, bucket: 'uploads', fetch: exists.fn }).ensureBucket()).toBe('exists')
+    expect(
+      await createSupabaseStorage({
+        url: 'https://ref.supabase.co',
+        serviceKey: SECRET,
+        bucket: 'uploads',
+        fetch: exists.fn,
+      }).ensureBucket(),
+    ).toBe('exists')
     expect(exists.calls).toHaveLength(1)
 
     const missing = fakeFetch([new Response('{}', { status: 404 }), new Response('{"name":"uploads"}', { status: 200 })])
-    expect(await createSupabaseStorage({ url: 'https://ref.supabase.co', serviceKey: SECRET, bucket: 'uploads', fetch: missing.fn }).ensureBucket()).toBe('created')
+    expect(
+      await createSupabaseStorage({
+        url: 'https://ref.supabase.co',
+        serviceKey: SECRET,
+        bucket: 'uploads',
+        fetch: missing.fn,
+      }).ensureBucket(),
+    ).toBe('created')
     expect(missing.calls[1]!.url).toBe('https://ref.supabase.co/storage/v1/bucket')
-    expect(JSON.parse(String(missing.calls[1]!.init!.body))).toMatchObject({ id: 'uploads', public: true, file_size_limit: 5 * 1024 * 1024 })
+    expect(JSON.parse(String(missing.calls[1]!.init!.body))).toMatchObject({
+      id: 'uploads',
+      public: true,
+      file_size_limit: 5 * 1024 * 1024,
+    })
   })
 
   it('khoá service_role cũ (JWT) gửi cả apikey lẫn Authorization: Bearer', async () => {
     const { fn, calls } = fakeFetch([new Response('{}', { status: 200 })])
-    await createSupabaseStorage({ url: 'https://ref.supabase.co', serviceKey: 'eyJlegacy.jwt.value', bucket: 'uploads', fetch: fn }).put('a.png', new Uint8Array([1]), 'image/png')
+    await createSupabaseStorage({ url: 'https://ref.supabase.co', serviceKey: 'eyJlegacy.jwt.value', bucket: 'uploads', fetch: fn }).put(
+      'a.png',
+      new Uint8Array([1]),
+      'image/png',
+    )
     expect(calls[0]!.init!.headers).toMatchObject({ apikey: 'eyJlegacy.jwt.value', Authorization: 'Bearer eyJlegacy.jwt.value' })
   })
 })

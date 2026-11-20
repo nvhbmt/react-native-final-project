@@ -35,20 +35,30 @@ try {
   const missing: string[] = []
   for (const row of pending) {
     const bytes = await readFile(join(env.UPLOAD_DIR, row.fileName)).catch(() => null)
-    if (!bytes) { missing.push(row.fileName); continue }
-    if (!apply) { moved++; continue }
+    if (!bytes) {
+      missing.push(row.fileName)
+      continue
+    }
+    if (!apply) {
+      moved++
+      continue
+    }
     const oldUrl = `/uploads/${row.fileName}`
     const newUrl = storage.publicUrl(row.fileName)
     await storage.put(row.fileName, new Uint8Array(bytes), row.mimeType)
     await db.transaction(async (tx) => {
       await tx.update(uploads).set({ url: newUrl }).where(eq(uploads.id, row.id))
       await tx.update(users).set({ avatarUrl: newUrl }).where(eq(users.avatarUrl, oldUrl))
-      await tx.update(feedback).set({ images: sql`array_replace(${feedback.images}, ${oldUrl}, ${newUrl})` })
+      await tx
+        .update(feedback)
+        .set({ images: sql`array_replace(${feedback.images}, ${oldUrl}, ${newUrl})` })
         .where(sql`${oldUrl} = any(${feedback.images})`)
     })
     moved++
   }
-  console.log(`${apply ? 'Đã chuyển' : 'Sẽ chuyển'}: ${moved}. Không tìm thấy file trên ổ đĩa: ${missing.length}${missing.length ? ` (${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '…' : ''})` : ''}`)
+  console.log(
+    `${apply ? 'Đã chuyển' : 'Sẽ chuyển'}: ${moved}. Không tìm thấy file trên ổ đĩa: ${missing.length}${missing.length ? ` (${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '…' : ''})` : ''}`,
+  )
 } finally {
   await close()
 }

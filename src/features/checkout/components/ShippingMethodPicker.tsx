@@ -26,7 +26,10 @@ export function ShippingMethodPicker({ options, selectedId, freeShipping, onSele
             role="radio"
             aria-checked={selected}
             aria-label={`${option.label}, ${option.eta}, ${price}`}
-            className={cn('flex-row items-center gap-3 rounded-[4px] border px-4 py-3 active:opacity-80', selected ? 'border-primary' : 'border-neutral-300')}
+            className={cn(
+              'flex-row items-center gap-3 rounded-[4px] border px-4 py-3 active:opacity-80',
+              selected ? 'border-primary' : 'border-neutral-300',
+            )}
           >
             <View className="flex-1 gap-[2px]">
               <Text className="text-[14px] leading-[22px] font-bold text-neutral-900">{option.label}</Text>
@@ -36,9 +39,16 @@ export function ShippingMethodPicker({ options, selectedId, freeShipping, onSele
               {freeShipping ? (
                 <Text className="text-[12px] leading-[18px] text-neutral-400 line-through">{formatPrice(option.fee)}</Text>
               ) : null}
-              <Text className={cn('text-[14px] leading-[22px] font-semibold', freeShipping ? 'text-success-700' : 'text-neutral-900')}>{price}</Text>
+              <Text className={cn('text-[14px] leading-[22px] font-semibold', freeShipping ? 'text-success-700' : 'text-neutral-900')}>
+                {price}
+              </Text>
             </View>
-            <View className={cn('size-[16px] items-center justify-center rounded-full border', selected ? 'border-primary' : 'border-neutral-600')}>
+            <View
+              className={cn(
+                'size-[16px] items-center justify-center rounded-full border',
+                selected ? 'border-primary' : 'border-neutral-600',
+              )}
+            >
               {selected ? <View className="size-[8px] rounded-full bg-primary" /> : null}
             </View>
           </View>

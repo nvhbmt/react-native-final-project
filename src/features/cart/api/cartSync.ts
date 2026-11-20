@@ -42,12 +42,13 @@ export function startCartSync() {
     }
     const { items, voucher } = useCartStore.getState()
     try {
-      const snapshot = items.length || voucher
-        ? await api.post<CartSnapshot>('/cart/merge', {
-            items: items.map(({ productId, quantity, options }) => ({ productId, quantity, options })),
-            voucher: voucher?.code,
-          })
-        : await api.get<CartSnapshot>('/cart')
+      const snapshot =
+        items.length || voucher
+          ? await api.post<CartSnapshot>('/cart/merge', {
+              items: items.map(({ productId, quantity, options }) => ({ productId, quantity, options })),
+              voucher: voucher?.code,
+            })
+          : await api.get<CartSnapshot>('/cart')
       if (currentUser !== userId) return
       setCartRemote(remote, reload)
       useCartStore.getState().replace(snapshot)

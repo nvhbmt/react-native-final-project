@@ -25,8 +25,14 @@ const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('Thiếu DATABASE_URL')
 
 const REVIEWERS = [
-  'Nguyễn Minh Anh', 'Trần Quốc Bảo', 'Lê Thu Hà', 'Phạm Gia Huy',
-  'Võ Ngọc Trâm', 'Đặng Hoàng Long', 'Bùi Khánh Linh', 'Huỳnh Tấn Phát',
+  'Nguyễn Minh Anh',
+  'Trần Quốc Bảo',
+  'Lê Thu Hà',
+  'Phạm Gia Huy',
+  'Võ Ngọc Trâm',
+  'Đặng Hoàng Long',
+  'Bùi Khánh Linh',
+  'Huỳnh Tấn Phát',
 ]
 
 /** [chỉ số người đánh giá, số sao, nội dung, số ngày trước] */
@@ -85,7 +91,10 @@ try {
   const idByEmail = new Map(existing.map((u) => [u.email, u.id]))
   for (const [i, fullName] of REVIEWERS.entries()) {
     if (idByEmail.has(emails[i]!)) continue
-    const [created] = await db.insert(users).values({ email: emails[i]!, fullName, passwordHash: await hashPassword(randomUUID()) }).returning({ id: users.id })
+    const [created] = await db
+      .insert(users)
+      .values({ email: emails[i]!, fullName, passwordHash: await hashPassword(randomUUID()) })
+      .returning({ id: users.id })
     idByEmail.set(emails[i]!, created!.id)
   }
 
@@ -97,12 +106,13 @@ try {
 
   for (const [productId, seeds] of Object.entries(REVIEWS)) {
     const product = byId.get(productId)
-    if (!product) { console.warn(`Bỏ qua: không có sản phẩm ${productId} trong catalog`); continue }
+    if (!product) {
+      console.warn(`Bỏ qua: không có sản phẩm ${productId} trong catalog`)
+      continue
+    }
     // Sản phẩm có biến thể: chọn màu đầu tiên và size M (nếu có).
     const sizes = product.variants?.sizes ?? []
-    const options = product.variants
-      ? { color: product.variants.colors[0]?.id, size: sizes.includes('M') ? 'M' : sizes[0] }
-      : undefined
+    const options = product.variants ? { color: product.variants.colors[0]?.id, size: sizes.includes('M') ? 'M' : sizes[0] } : undefined
 
     for (const [reviewer, rating, content, daysAgo] of seeds) {
       const userId = idByEmail.get(emails[reviewer]!)!
@@ -114,15 +124,34 @@ try {
       // Đơn demo đã giao chứa sản phẩm — điều kiện để được đánh giá.
       const items = await priceLines(db, [{ productId, quantity: 1, options }])
       const shippingCents = SHIPPING_METHODS.standard.feeCents
-      await db.insert(orders).values({
-        userId, requestId, requestHash: requestId, paymentMethod: 'pm_visa', status: 'completed', paymentMode: 'demo',
-        items, ...computeTotalsCents(items, null, shippingCents), shippingMethod: 'standard',
-        fulfillment: 'delivered', shippedAt: new Date(placedAt.getTime() + day), deliveredAt, createdAt: placedAt,
-      }).onConflictDoNothing({ target: [orders.userId, orders.requestId] })
-      const [order] = await db.select({ id: orders.id }).from(orders).where(and(eq(orders.userId, userId), eq(orders.requestId, requestId)))
+      await db
+        .insert(orders)
+        .values({
+          userId,
+          requestId,
+          requestHash: requestId,
+          paymentMethod: 'pm_visa',
+          status: 'completed',
+          paymentMode: 'demo',
+          items,
+          ...computeTotalsCents(items, null, shippingCents),
+          shippingMethod: 'standard',
+          fulfillment: 'delivered',
+          shippedAt: new Date(placedAt.getTime() + day),
+          deliveredAt,
+          createdAt: placedAt,
+        })
+        .onConflictDoNothing({ target: [orders.userId, orders.requestId] })
+      const [order] = await db
+        .select({ id: orders.id })
+        .from(orders)
+        .where(and(eq(orders.userId, userId), eq(orders.requestId, requestId)))
 
-      const inserted = await db.insert(productReviews).values({ userId, orderId: order!.id, productId, rating, content, createdAt: reviewedAt })
-        .onConflictDoNothing().returning({ id: productReviews.id })
+      const inserted = await db
+        .insert(productReviews)
+        .values({ userId, orderId: order!.id, productId, rating, content, createdAt: reviewedAt })
+        .onConflictDoNothing()
+        .returning({ id: productReviews.id })
       if (inserted.length) added++
       else skipped++
     }

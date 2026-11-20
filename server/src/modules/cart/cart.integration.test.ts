@@ -4,8 +4,12 @@ import { commerceTestUrl, startCommerceTest } from '@/test/integration.ts'
 
 describe.skipIf(!commerceTestUrl)('giỏ hàng theo tài khoản', () => {
   let t: Awaited<ReturnType<typeof startCommerceTest>>
-  beforeAll(async () => { t = await startCommerceTest() })
-  afterAll(async () => { await t?.stop() })
+  beforeAll(async () => {
+    t = await startCommerceTest()
+  })
+  afterAll(async () => {
+    await t?.stop()
+  })
 
   it('yêu cầu đăng nhập', async () => {
     expect((await t.call('GET', '/cart')).status).toBe(401)
@@ -33,7 +37,9 @@ describe.skipIf(!commerceTestUrl)('giỏ hàng theo tài khoản', () => {
   it('từ chối biến thể sai và giỏ của người khác tách biệt', async () => {
     const a = await t.register()
     const b = await t.register()
-    expect((await t.call('POST', '/cart/items', { token: a.token, body: { productId: 'vuori-strato-tech-tee-black' } })).body.error.code).toBe('INVALID_VARIANT')
+    expect(
+      (await t.call('POST', '/cart/items', { token: a.token, body: { productId: 'vuori-strato-tech-tee-black' } })).body.error.code,
+    ).toBe('INVALID_VARIANT')
     await t.call('POST', '/cart/items', { token: a.token, body: { productId: 'pear' } })
     expect((await t.call('GET', '/cart', { token: b.token })).body.data.items).toEqual([])
   })
@@ -42,7 +48,13 @@ describe.skipIf(!commerceTestUrl)('giỏ hàng theo tài khoản', () => {
     const { token, addressId } = await t.register()
     const merged = await t.call('POST', '/cart/merge', {
       token,
-      body: { items: [{ productId: 'orange', quantity: 2 }, { productId: 'does-not-exist', quantity: 1 }], voucher: 'SALE10' },
+      body: {
+        items: [
+          { productId: 'orange', quantity: 2 },
+          { productId: 'does-not-exist', quantity: 1 },
+        ],
+        voucher: 'SALE10',
+      },
     })
     expect(merged.body.data.items.map((i: { key: string }) => i.key)).toEqual(['orange'])
     expect(merged.body.data.voucher.code).toBe('SALE10')

@@ -16,10 +16,11 @@ export function CartItemRow({ item }: { item: CartItem }) {
   const [editing, setEditing] = useState(false)
   const setQuantity = useCartStore((s) => s.setQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
-  const openProduct = () => router.push({
-    pathname: '/product/[id]',
-    params: { id: item.productId, color: item.options?.color ?? '', size: item.options?.size ?? '' },
-  })
+  const openProduct = () =>
+    router.push({
+      pathname: '/product/[id]',
+      params: { id: item.productId, color: item.options?.color ?? '', size: item.options?.size ?? '' },
+    })
 
   return (
     <View className="h-[99px] flex-row items-center gap-4">

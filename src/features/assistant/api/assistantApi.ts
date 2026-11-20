@@ -5,7 +5,14 @@ import { api, ApiError, getApiBaseUrl } from '@/lib/api'
 
 import { parseSseChunk } from '../lib/sse'
 
-export type Conversation = { id: string; title: string; productId: string | null; orderId: string | null; createdAt: number; updatedAt: number }
+export type Conversation = {
+  id: string
+  title: string
+  productId: string | null
+  orderId: string | null
+  createdAt: number
+  updatedAt: number
+}
 export type ChatMessage = {
   id: string
   role: 'user' | 'assistant'
@@ -56,8 +63,12 @@ export async function streamMessage(conversationId: string, content: string, han
     response = await open(conversationId, content, fresh, signal)
   }
   if (!response.ok || !response.body) {
-    const payload = await response.json().catch(() => null) as { error?: { code?: string; message?: string } } | null
-    throw new ApiError(response.status, payload?.error?.code ?? 'UNKNOWN_ERROR', payload?.error?.message ?? `Máy chủ trả lỗi ${response.status}`)
+    const payload = (await response.json().catch(() => null)) as { error?: { code?: string; message?: string } } | null
+    throw new ApiError(
+      response.status,
+      payload?.error?.code ?? 'UNKNOWN_ERROR',
+      payload?.error?.message ?? `Máy chủ trả lỗi ${response.status}`,
+    )
   }
 
   const reader = response.body.getReader()
@@ -75,8 +86,13 @@ export async function streamMessage(conversationId: string, content: string, han
       if (event === 'start') handlers.onStart(payload.userMessage, payload.assistantMessageId)
       else if (event === 'delta') handlers.onDelta(payload.text)
       else if (event === 'tool') handlers.onTool(payload.name)
-      else if (event === 'done') { finished = true; handlers.onDone(payload.message) }
-      else if (event === 'error') { finished = true; handlers.onError(payload.message, payload.assistantMessage) }
+      else if (event === 'done') {
+        finished = true
+        handlers.onDone(payload.message)
+      } else if (event === 'error') {
+        finished = true
+        handlers.onError(payload.message, payload.assistantMessage)
+      }
     }
   }
   if (!finished) throw new ApiError(0, 'AI_STREAM_INTERRUPTED', 'Kết nối với trợ lý bị gián đoạn, vui lòng thử lại')

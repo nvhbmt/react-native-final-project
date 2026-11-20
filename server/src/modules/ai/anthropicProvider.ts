@@ -57,7 +57,11 @@ async function* sseEvents(body: ReadableStream<Uint8Array>): AsyncIterable<Recor
     while ((boundary = buffer.indexOf('\n\n')) >= 0) {
       const frame = buffer.slice(0, boundary)
       buffer = buffer.slice(boundary + 2)
-      const data = frame.split('\n').filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trimStart()).join('\n')
+      const data = frame
+        .split('\n')
+        .filter((line) => line.startsWith('data:'))
+        .map((line) => line.slice(5).trimStart())
+        .join('\n')
       if (data) {
         const parsed: unknown = JSON.parse(data)
         if (parsed && typeof parsed === 'object') yield parsed as Record<string, unknown>
@@ -88,11 +92,15 @@ export function createAnthropicProvider(
           system: input.system,
           messages: input.messages,
           stream: true,
-          ...(tools.length ? { tools: tools.map((tool: ToolSpec) => ({
-            name: tool.function.name,
-            description: tool.function.description,
-            input_schema: tool.function.parameters,
-          })) } : {}),
+          ...(tools.length
+            ? {
+                tools: tools.map((tool: ToolSpec) => ({
+                  name: tool.function.name,
+                  description: tool.function.description,
+                  input_schema: tool.function.parameters,
+                })),
+              }
+            : {}),
         }),
       })
       if (!response.ok || !response.body) throw new Error(`Anthropic API trả HTTP ${response.status}`)
@@ -131,11 +139,13 @@ export function createAnthropicProvider(
       if (!completed) throw new Error('Anthropic stream kết thúc trước message_stop')
       if (stopReason === 'max_tokens') throw new Error('Anthropic đã đạt giới hạn output token')
       if (calls.size) {
-        const ready: ToolCall[] = [...calls.entries()].sort(([a], [b]) => a - b).map(([, call]) => ({
-          id: call.id,
-          type: 'function',
-          function: { name: call.name, arguments: JSON.stringify(call.input ? toolInput(call.input) : call.initialInput) },
-        }))
+        const ready: ToolCall[] = [...calls.entries()]
+          .sort(([a], [b]) => a - b)
+          .map(([, call]) => ({
+            id: call.id,
+            type: 'function',
+            function: { name: call.name, arguments: JSON.stringify(call.input ? toolInput(call.input) : call.initialInput) },
+          }))
         if (ready.some((call) => !call.id || !call.function.name)) throw new Error('Anthropic trả tool call không đầy đủ')
         yield { type: 'tool_calls', calls: ready }
       }

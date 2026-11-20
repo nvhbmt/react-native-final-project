@@ -46,7 +46,15 @@ export function AuthTextField({ label, error, password, ref, ...input }: Props) 
             setFocused(false)
             input.onBlur?.(e)
           }}
-          style={{ flex: 1, minWidth: 0, height: 44, padding: 0, fontFamily: bodyFontFamily, fontSize: 14, color: appColors['neutral-900'] }}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            height: 44,
+            padding: 0,
+            fontFamily: bodyFontFamily,
+            fontSize: 14,
+            color: appColors['neutral-900'],
+          }}
         />
         {password ? (
           <View

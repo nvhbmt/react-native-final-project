@@ -7,13 +7,19 @@ import { commerceTestUrl, startCommerceTest } from '@/test/integration.ts'
 
 describe.skipIf(!commerceTestUrl)('quản trị giao hàng', () => {
   let t: Awaited<ReturnType<typeof startCommerceTest>>
-  beforeAll(async () => { t = await startCommerceTest() })
-  afterAll(async () => { await t?.stop() })
+  beforeAll(async () => {
+    t = await startCommerceTest()
+  })
+  afterAll(async () => {
+    await t?.stop()
+  })
 
   const setRole = (id: string, role: 'admin' | 'customer') => t.db.update(users).set({ role }).where(eq(users.id, id))
-  const place = (user: { token: string; addressId: string }, productId = 'pear') => t.call('POST', '/orders', {
-    token: user.token, body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId: user.addressId, items: [{ productId, quantity: 1 }] },
-  })
+  const place = (user: { token: string; addressId: string }, productId = 'pear') =>
+    t.call('POST', '/orders', {
+      token: user.token,
+      body: { requestId: crypto.randomUUID(), paymentMethod: 'pm_visa', addressId: user.addressId, items: [{ productId, quantity: 1 }] },
+    })
 
   it('chỉ admin xem được đơn của mọi khách; thu quyền có hiệu lực ngay', async () => {
     const customer = await t.register('Khách A')
@@ -26,7 +32,11 @@ describe.skipIf(!commerceTestUrl)('quản trị giao hàng', () => {
     await setRole(admin.id, 'admin')
     const list = (await t.call('GET', '/admin/orders?fulfillment=processing&limit=50', { token: admin.token })).body.data
     const found = list.items.find((o: { id: string }) => o.id === order.id)
-    expect(found).toMatchObject({ customer: { id: customer.id, fullName: 'Khách A', email: customer.email }, fulfillment: 'processing', nextFulfillment: 'shipping' })
+    expect(found).toMatchObject({
+      customer: { id: customer.id, fullName: 'Khách A', email: customer.email },
+      fulfillment: 'processing',
+      nextFulfillment: 'shipping',
+    })
     expect(found.shippingAddress).toMatchObject({ recipientName: 'Khách A' })
     expect(list.items.every((o: { fulfillment: string }) => o.fulfillment === 'processing')).toBe(true)
     expect((await t.call('GET', `/admin/orders/${crypto.randomUUID()}`, { token: admin.token })).status).toBe(404)
@@ -47,7 +57,12 @@ describe.skipIf(!commerceTestUrl)('quản trị giao hàng', () => {
     expect((await move('processing')).status).toBe(400)
 
     const shipping = (await move('shipping')).body.data
-    expect(shipping).toMatchObject({ fulfillment: 'shipping', nextFulfillment: 'delivered', fulfillmentUpdatedBy: admin.id, cancellable: false })
+    expect(shipping).toMatchObject({
+      fulfillment: 'shipping',
+      nextFulfillment: 'delivered',
+      fulfillmentUpdatedBy: admin.id,
+      cancellable: false,
+    })
     expect((await move('shipping')).body.error.code).toBe('ORDER_CHANGED')
 
     const delivered = (await move('delivered')).body.data
@@ -74,7 +89,10 @@ describe.skipIf(!commerceTestUrl)('quản trị giao hàng', () => {
     const production = createTestApp({ commerce: { db: t.db, allowDemoCheckout: false } })
     // Nút demo của khách bị chặn ở production, nhưng admin vẫn chuyển bước được.
     expect((await production.call('POST', `/orders/${order.id}/advance`, { token: customer.token })).body.error.code).toBe('DEMO_ONLY')
-    expect((await production.call('POST', `/admin/orders/${order.id}/fulfillment`, { token: admin.token, body: { to: 'shipping' } })).body.data.fulfillment).toBe('shipping')
+    expect(
+      (await production.call('POST', `/admin/orders/${order.id}/fulfillment`, { token: admin.token, body: { to: 'shipping' } })).body.data
+        .fulfillment,
+    ).toBe('shipping')
   })
 
   it('gửi khuyến mãi chỉ tới khách đã bật nhận; khách thường không gửi được', async () => {
@@ -88,7 +106,9 @@ describe.skipIf(!commerceTestUrl)('quản trị giao hàng', () => {
 
     const body = { title: 'Giảm 20% cuối tuần', body: 'Áp dụng cho trái cây tươi.', productId: 'pear' }
     expect((await t.call('POST', '/admin/promotions', { token: fan.token, body })).body.error.code).toBe('FORBIDDEN')
-    expect((await t.call('POST', '/admin/promotions', { token: admin.token, body: { ...body, productId: 'khong-co' } })).body.error.code).toBe('PRODUCT_NOT_FOUND')
+    expect(
+      (await t.call('POST', '/admin/promotions', { token: admin.token, body: { ...body, productId: 'khong-co' } })).body.error.code,
+    ).toBe('PRODUCT_NOT_FOUND')
     const sent = await t.call('POST', '/admin/promotions', { token: admin.token, body })
     expect(sent.status).toBe(201)
     expect(sent.body.data.sent).toBe(before)

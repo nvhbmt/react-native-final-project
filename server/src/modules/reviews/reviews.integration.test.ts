@@ -49,7 +49,8 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
     userIds.push(result.body.data.user.id)
     const token = result.body.data.tokens.accessToken as string
     const address = await call('POST', '/users/me/addresses', {
-      token, body: { recipientName: fullName, phone: '0901234567', line1: '1 Lê Lợi', city: 'TP. Hồ Chí Minh', isDefault: true },
+      token,
+      body: { recipientName: fullName, phone: '0901234567', line1: '1 Lê Lợi', city: 'TP. Hồ Chí Minh', isDefault: true },
     })
     expect(address.status).toBe(201)
     addressOf.set(token, address.body.data[0].id)
@@ -57,17 +58,17 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
   }
 
   const checkout = (productId: string, token: string) => ({
-    requestId: randomUUID(), paymentMethod: 'pm_visa', addressId: addressOf.get(token), items: [{ productId, quantity: 2 }],
+    requestId: randomUUID(),
+    paymentMethod: 'pm_visa',
+    addressId: addressOf.get(token),
+    items: [{ productId, quantity: 2 }],
   })
 
   it('computes prices on the server and replays checkout without duplicating private orders', async () => {
     const buyer = await register('Buyer')
     const other = await register('Other customer')
     const body = { ...checkout('banana', buyer), voucher: 'SALE10', total: 0 }
-    const responses = await Promise.all([
-      call('POST', '/orders', { body, token: buyer }),
-      call('POST', '/orders', { body, token: buyer }),
-    ])
+    const responses = await Promise.all([call('POST', '/orders', { body, token: buyer }), call('POST', '/orders', { body, token: buyer })])
     expect(responses.map(({ status }) => status).sort()).toEqual([200, 201])
     const order = responses[0]!.body.data
     expect(responses[1]!.body.data.id).toBe(order.id)
@@ -75,7 +76,9 @@ describe.skipIf(!url)('orders and reviews with PostgreSQL', () => {
     expect((await call('GET', `/orders/${order.id}`, { token: buyer })).body.data.id).toBe(order.id)
     expect((await call('GET', `/orders/${order.id}`, { token: other })).status).toBe(404)
     expect((await call('POST', '/orders', { body: { ...body, paymentMethod: 'pm_master' }, token: buyer })).status).toBe(409)
-    expect((await call('POST', '/orders', { body: checkout('vuori-strato-tech-tee-black', buyer), token: buyer })).body.error.code).toBe('INVALID_VARIANT')
+    expect((await call('POST', '/orders', { body: checkout('vuori-strato-tech-tee-black', buyer), token: buyer })).body.error.code).toBe(
+      'INVALID_VARIANT',
+    )
   })
 
   it('blocks guests, wrong orders and duplicates, and publishes an eligible review', async () => {

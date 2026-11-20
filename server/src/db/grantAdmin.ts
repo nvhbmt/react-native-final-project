@@ -17,7 +17,10 @@ const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('Thiếu DATABASE_URL')
 
 const args = process.argv.slice(2)
-const email = args.find((arg) => !arg.startsWith('--'))?.trim().toLowerCase()
+const email = args
+  .find((arg) => !arg.startsWith('--'))
+  ?.trim()
+  .toLowerCase()
 const revoke = args.includes('--revoke')
 if (!email) {
   console.error('Cách dùng: npm run admin:grant -- <email> [--revoke]')
@@ -26,8 +29,11 @@ if (!email) {
 
 const { db, close } = createDb(databaseUrl)
 try {
-  const [user] = await db.update(users).set({ role: revoke ? 'customer' : 'admin', updatedAt: new Date() })
-    .where(eq(users.email, email)).returning({ fullName: users.fullName, role: users.role })
+  const [user] = await db
+    .update(users)
+    .set({ role: revoke ? 'customer' : 'admin', updatedAt: new Date() })
+    .where(eq(users.email, email))
+    .returning({ fullName: users.fullName, role: users.role })
   if (!user) {
     console.error(`Không tìm thấy tài khoản ${email}. Tài khoản cần đăng ký trong app trước.`)
     process.exitCode = 1

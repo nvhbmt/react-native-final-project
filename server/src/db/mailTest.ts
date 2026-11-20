@@ -16,9 +16,10 @@ if (!smtp) {
   process.exit(1)
 }
 
-const target = typeof smtp.transport === 'string'
-  ? new URL(smtp.transport).host
-  : `${smtp.transport.host}:${smtp.transport.port} (đăng nhập ${smtp.transport.auth.user})`
+const target =
+  typeof smtp.transport === 'string'
+    ? new URL(smtp.transport).host
+    : `${smtp.transport.host}:${smtp.transport.port} (đăng nhập ${smtp.transport.auth.user})`
 console.log(`SMTP: ${target}\nNgười gửi: ${smtp.from}`)
 
 const mailer = createSmtpMailer(smtp.transport, smtp.from)

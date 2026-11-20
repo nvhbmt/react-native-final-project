@@ -30,7 +30,12 @@ export function LoginScreen() {
     })
 
   return (
-    <AuthScreenFrame brand header="Đăng nhập" title="Chào mừng trở lại" subtitle="Đăng nhập để đồng bộ giỏ hàng, đơn hàng và trò chuyện với trợ lý.">
+    <AuthScreenFrame
+      brand
+      header="Đăng nhập"
+      title="Chào mừng trở lại"
+      subtitle="Đăng nhập để đồng bộ giỏ hàng, đơn hàng và trò chuyện với trợ lý."
+    >
       <FormBanner message={form.formError} />
       <View className="gap-4">
         <AuthTextField
